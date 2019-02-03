@@ -7,231 +7,146 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private float fallMultiplier = 2.5f;
 	[SerializeField] private float lowJumpMultiplier = 2f;
 	[SerializeField] private float playerHorizontalSpeed;
-
 	[SerializeField] private float gravity = 1;
-	[SerializeField] private float jumpSpeed;
-
+	[SerializeField] private float jumpSpeed = 3.0f;
+	[SerializeField] private float rotationSpeed = 5.0f;
 	[SerializeField] private Transform groundCheck;
-	[SerializeField] private LayerMask whatIsGround;
-
+	[SerializeField] private float groundRadius;
+	[SerializeField] private LayerMask layerGround;
 	[SerializeField] private GameObject mainCamera;
-	private const float NORMAL_GRAVITY = 9.81f;
-	private float groundRadius = 0.2f;
-	private float _inputHorizontal;
-	private Rigidbody2D _myRigidBody;
-	private bool _isAlive = true;
 
-	enum GravityDirection
+	enum CardinalDirection
 	{
-		NORTH,
-		SOUTH,
-		EAST,
-		WEST
+		South,
+		East,
+		North,
+		West
 	}
 
-	GravityDirection gravityDirection;
+	private CardinalDirection _gravityDirection;
 
-	bool turnLeft;
-	bool turnRight;
-	bool jump;
-	bool canTurn;
-	bool grounded;
-
+	private const float NORMAL_GRAVITY = 9.81f;
+	private Rigidbody2D _myRigidbody;
+	private bool _isGrounded;
+	private bool _isAlive = true;
+	private bool _canTurn = true;
+	private float _horizontalInput;
+	private bool _isPressingJump;
+	private bool _isPressingLeft;
+	private bool _isPressingRight;
 
 	private void Start()
 	{
-		_myRigidBody = GetComponent<Rigidbody2D>();
-		gravityDirection = GravityDirection.SOUTH;
-		canTurn = true;
 		gravity *= NORMAL_GRAVITY;
+		_myRigidbody = GetComponent<Rigidbody2D>();
+
+		//setup correctly the direction the player is positioned at setup
+		float initRot = transform.eulerAngles.z;
+		Debug.Log(initRot);
+		if (Mathf.Abs(initRot) < 45)
+		{
+			_gravityDirection = CardinalDirection.South;
+		}
+		else
+		{
+			if (Mathf.Abs(initRot % 180) > 135)
+			{
+				_gravityDirection = CardinalDirection.North;
+			}
+			else
+			{
+				if (initRot > 180)
+				{
+					_gravityDirection = CardinalDirection.West;
+				}
+				else
+				{
+					_gravityDirection = CardinalDirection.East;
+				}
+			}
+		}
 	}
 
 	private void Update()
 	{
-		grounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, whatIsGround);
-		_inputHorizontal = Input.GetAxis("Horizontal");
-		if (canTurn)
+		_isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, layerGround);
+		if (Input.GetButtonDown("Jump") && _isGrounded)
 		{
-			if (Input.GetButtonDown("TurnLeft"))
-				turnLeft = true;
-			if (Input.GetButtonDown("TurnRight"))
-				turnRight = true;
-			if (Input.GetButtonDown("Jump") && grounded)
-				jump = true;
+			_isPressingJump = true;
+		}
+		else if (Input.GetButtonUp("Jump"))
+		{
+			_isPressingJump = false;
 		}
 
-		Debug.Log(jump);
+		if (_canTurn)
+		{
+			if (Input.GetButtonDown("TurnLeft"))
+			{
+				TurnTo(_gravityDirection + (_gravityDirection == CardinalDirection.West ? -3 : 1));
+			}
+
+			else if (Input.GetButtonDown("TurnRight"))
+			{
+				TurnTo(_gravityDirection - (_gravityDirection == CardinalDirection.South ? -3 : 1));
+			}
+		}
 	}
 
 	private void FixedUpdate()
 	{
-		if (turnLeft)
+		if (_canTurn)
 		{
-			gravityDirection = TurnLeft(gravityDirection);
-			StartCoroutine("TurnLeftCoroutine");
-			turnLeft = false;
-		}
+			_myRigidbody.AddForce(-transform.up.normalized * gravity);
+			_myRigidbody.velocity = transform.right.normalized * playerHorizontalSpeed * _horizontalInput +
+			                        Vector3.Project(_myRigidbody.velocity, transform.up);
+			if (_isPressingJump)
+			{
+				_myRigidbody.velocity = transform.up.normalized * jumpSpeed +
+				                        Vector3.Project(_myRigidbody.velocity, transform.right);
+				_isPressingJump = false;
+			}
 
-		if (turnRight)
-		{
-			gravityDirection = TurnRight(gravityDirection);
-			StartCoroutine("TurnRightCoroutine");
-			turnRight = false;
-		}
-
-		switch (gravityDirection)
-		{
-			case GravityDirection.SOUTH:
-				gameObject.transform.eulerAngles = new Vector3(0, 0, 0);
-				_myRigidBody.AddForce(new Vector2(0, -gravity));
-				_myRigidBody.velocity = new Vector2(_inputHorizontal * playerHorizontalSpeed, _myRigidBody.velocity.y);
-				if (jump && grounded)
-				{
-					_myRigidBody.velocity = new Vector2(_myRigidBody.velocity.x, jumpSpeed);
-					jump = false;
-				}
-
-
-				if (_myRigidBody.velocity.y < 0)
-				{
-					_myRigidBody.velocity += Vector2.up * -gravity * (fallMultiplier + 1) * Time.deltaTime;
-				}
-				else if (_myRigidBody.velocity.y > 0 && !Input.GetButton("Jump"))
-				{
-					_myRigidBody.velocity += Vector2.up * -gravity * (lowJumpMultiplier + 1) * Time.deltaTime;
-				}
-
-				break;
-			case GravityDirection.NORTH:
-				gameObject.transform.eulerAngles = new Vector3(0, 0, 180);
-				_myRigidBody.AddForce(new Vector2(0, gravity));
-				_myRigidBody.velocity = new Vector2(-_inputHorizontal * playerHorizontalSpeed, _myRigidBody.velocity.y);
-				if (jump && grounded)
-				{
-					_myRigidBody.velocity = new Vector2(_myRigidBody.velocity.x, -jumpSpeed);
-					jump = false;
-				}
-
-
-				if (_myRigidBody.velocity.y > 0)
-				{
-					_myRigidBody.velocity += Vector2.down * -gravity * (fallMultiplier + 1) * Time.deltaTime;
-				}
-				else if (_myRigidBody.velocity.y < 0 && !Input.GetButton("Jump"))
-				{
-					_myRigidBody.velocity += Vector2.down * -gravity * (lowJumpMultiplier + 1) * Time.deltaTime;
-				}
-
-				break;
-			case GravityDirection.WEST:
-				gameObject.transform.eulerAngles = new Vector3(0, 0, 270);
-				_myRigidBody.AddForce(new Vector2(-gravity, 0));
-				_myRigidBody.velocity = new Vector2(_myRigidBody.velocity.x, -_inputHorizontal * playerHorizontalSpeed);
-				if (jump && grounded)
-				{
-					_myRigidBody.velocity = new Vector2(jumpSpeed, _myRigidBody.velocity.y);
-					jump = false;
-				}
-
-				if (_myRigidBody.velocity.x < 0)
-				{
-					_myRigidBody.velocity += Vector2.right * -gravity * (fallMultiplier + 1) * Time.deltaTime;
-				}
-				else if (_myRigidBody.velocity.x > 0 && !Input.GetButton("Jump"))
-				{
-					_myRigidBody.velocity += Vector2.right * -gravity * (lowJumpMultiplier + 1) * Time.deltaTime;
-				}
-
-				break;
-			case GravityDirection.EAST:
-				gameObject.transform.eulerAngles = new Vector3(0, 0, 90);
-				_myRigidBody.AddForce(new Vector2(gravity, 0));
-				_myRigidBody.velocity = new Vector2(_myRigidBody.velocity.x, _inputHorizontal * playerHorizontalSpeed);
-				if (jump && grounded)
-				{
-					_myRigidBody.velocity = new Vector2(-jumpSpeed, _myRigidBody.velocity.y);
-					jump = false;
-				}
-
-				if (_myRigidBody.velocity.x > 0)
-				{
-					_myRigidBody.velocity += Vector2.left * -gravity * (fallMultiplier + 1) * Time.deltaTime;
-				}
-				else if (_myRigidBody.velocity.x < 0 && !Input.GetButton("Jump"))
-				{
-					_myRigidBody.velocity += Vector2.left * -gravity * (lowJumpMultiplier + 1) * Time.deltaTime;
-				}
-
-				break;
+			if (Vector3.Project(_myRigidbody.velocity, transform.up).magnitude < 0)
+			{
+				_myRigidbody.velocity += (Vector2) transform.up.normalized * Physics2D.gravity.y * (fallMultiplier - 1);
+			}
+			else if (_myRigidbody.velocity.y > 0 && !Input.GetButton("Jump"))
+			{
+				_myRigidbody.velocity += (Vector2) transform.up.normalized * Physics2D.gravity.y * (lowJumpMultiplier - 1);
+			}
 		}
 	}
 
-	GravityDirection TurnLeft(GravityDirection gravityDirection)
+	private void TurnTo(CardinalDirection direction)
 	{
-		switch (gravityDirection)
-		{
-			case GravityDirection.SOUTH:
-				gravityDirection = GravityDirection.EAST;
-				break;
-			case GravityDirection.NORTH:
-				gravityDirection = GravityDirection.WEST;
-				break;
-			case GravityDirection.WEST:
-				gravityDirection = GravityDirection.SOUTH;
-				break;
-			case GravityDirection.EAST:
-				gravityDirection = GravityDirection.NORTH;
-				break;
-		}
-
-		return gravityDirection;
+		_canTurn = false;
+		_myRigidbody.velocity = Vector2.zero;
+		StartCoroutine(TurnCameraAndPlayer(rotationSpeed));
 	}
 
-	GravityDirection TurnRight(GravityDirection gravityDirection)
+	private IEnumerator TurnCameraAndPlayer(float speedTurn)
 	{
-		switch (gravityDirection)
+		float time = (90.0f / speedTurn);
+		float timer = 0.0f;
+		float initRotCam = mainCamera.transform.eulerAngles.z;
+		float initRotPlayer = transform.eulerAngles.z;
+		while (timer < time)
 		{
-			case GravityDirection.SOUTH:
-				gravityDirection = GravityDirection.WEST;
-				break;
-			case GravityDirection.NORTH:
-				gravityDirection = GravityDirection.EAST;
-				break;
-			case GravityDirection.WEST:
-				gravityDirection = GravityDirection.NORTH;
-				break;
-			case GravityDirection.EAST:
-				gravityDirection = GravityDirection.SOUTH;
-				break;
+			Vector3 cameraRotation = mainCamera.transform.eulerAngles;
+			mainCamera.transform.eulerAngles = (Vector3.right * cameraRotation.x + Vector3.up * cameraRotation.y +
+			                                    Vector3.forward * (Mathf.Lerp(initRotCam,
+				                                    (float) _gravityDirection * 90, timer / time)));
+			Vector3 playerRotation = transform.eulerAngles;
+			transform.eulerAngles = (Vector3.right * playerRotation.x + Vector3.up * playerRotation.y +
+			                         Vector3.forward * (Mathf.Lerp(initRotPlayer,
+				                         (float) _gravityDirection * 90, timer / time)));
+			timer += Time.deltaTime;
+			yield return null;
 		}
 
-		return gravityDirection;
+		_canTurn = true;
 	}
-
-	IEnumerator TurnLeftCoroutine()
-	{
-		canTurn = false;
-		for (int i = 0; i < 90; i += 2)
-		{
-			mainCamera.transform.eulerAngles = new Vector3(0, 0, mainCamera.transform.eulerAngles.z + 2);
-			yield return new WaitForSeconds(0.01f);
-		}
-
-		canTurn = true;
-	}
-
-	IEnumerator TurnRightCoroutine()
-	{
-		canTurn = false;
-		for (int i = 0; i < 90; i += 2)
-		{
-			mainCamera.transform.eulerAngles = new Vector3(0, 0, mainCamera.transform.eulerAngles.z - 2);
-			yield return new WaitForSeconds(0.01f);
-		}
-
-		canTurn = true;
-	}
-
 
 	public void Die()
 	{
