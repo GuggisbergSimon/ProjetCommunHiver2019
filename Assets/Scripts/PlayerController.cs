@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    private bool _isAlive = true;
     // Start is called before the first frame update
     void Start()
     {
@@ -14,5 +15,13 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public void Die()
+    {
+        if (_isAlive)
+        {
+            _isAlive = false;
+        }
     }
 }
