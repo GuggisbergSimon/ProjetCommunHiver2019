@@ -5,15 +5,15 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
 	[SerializeField] private float fallMultiplier = 2.5f;
-	[SerializeField] private float lowJumpMultiplier = 2f;
-	[SerializeField] private float playerHorizontalSpeed;
-	[SerializeField] private float gravity = 1;
+	[SerializeField] private float lowJumpMultiplier = 2.0f;
+	[SerializeField] private float playerHorizontalSpeed = 5.0f;
+	[SerializeField] private float gravityMultiplier = 1.0f;
 	[SerializeField] private float jumpSpeed = 3.0f;
 	[SerializeField] private float rotationSpeed = 5.0f;
-	[SerializeField] private Transform groundCheck;
-	[SerializeField] private float groundRadius;
-	[SerializeField] private LayerMask layerGround;
-	[SerializeField] private GameObject mainCamera;
+	[SerializeField] private Transform groundCheck = null;
+	[SerializeField] private float groundRadius = 0.2f;
+	[SerializeField] private LayerMask layerGround = 0;
+	[SerializeField] private GameObject mainCamera = null;
 
 	enum CardinalDirection
 	{
@@ -24,8 +24,6 @@ public class PlayerController : MonoBehaviour
 	}
 
 	private CardinalDirection _gravityDirection;
-
-	private const float NORMAL_GRAVITY = 9.81f;
 	private Rigidbody2D _myRigidbody;
 	private bool _isGrounded;
 	private bool _isAlive = true;
@@ -37,12 +35,10 @@ public class PlayerController : MonoBehaviour
 
 	private void Start()
 	{
-		gravity *= NORMAL_GRAVITY;
 		_myRigidbody = GetComponent<Rigidbody2D>();
 
 		//setup correctly the direction the player is positioned at setup
 		float initRot = transform.eulerAngles.z;
-		Debug.Log(initRot);
 		if (Mathf.Abs(initRot) < 45)
 		{
 			_gravityDirection = CardinalDirection.South;
@@ -69,6 +65,7 @@ public class PlayerController : MonoBehaviour
 
 	private void Update()
 	{
+		_horizontalInput = Input.GetAxis("Horizontal");
 		_isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, layerGround);
 		if (Input.GetButtonDown("Jump") && _isGrounded)
 		{
@@ -83,12 +80,12 @@ public class PlayerController : MonoBehaviour
 		{
 			if (Input.GetButtonDown("TurnLeft"))
 			{
-				TurnTo(_gravityDirection + (_gravityDirection == CardinalDirection.West ? -3 : 1));
+				TurnTo(_gravityDirection - (_gravityDirection == CardinalDirection.South ? -3 : 1));
 			}
 
 			else if (Input.GetButtonDown("TurnRight"))
 			{
-				TurnTo(_gravityDirection - (_gravityDirection == CardinalDirection.South ? -3 : 1));
+				TurnTo(_gravityDirection + (_gravityDirection == CardinalDirection.North ? -3 : 1));
 			}
 		}
 	}
@@ -97,7 +94,7 @@ public class PlayerController : MonoBehaviour
 	{
 		if (_canTurn)
 		{
-			_myRigidbody.AddForce(-transform.up.normalized * gravity);
+			_myRigidbody.AddForce(transform.up.normalized * gravityMultiplier * Physics2D.gravity.y);
 			_myRigidbody.velocity = transform.right.normalized * playerHorizontalSpeed * _horizontalInput +
 			                        Vector3.Project(_myRigidbody.velocity, transform.up);
 			if (_isPressingJump)
@@ -107,13 +104,16 @@ public class PlayerController : MonoBehaviour
 				_isPressingJump = false;
 			}
 
-			if (Vector3.Project(_myRigidbody.velocity, transform.up).magnitude < 0)
+			if (Vector3.Dot(Vector3.Project(_myRigidbody.velocity, transform.up).normalized,
+				    transform.up.normalized) < 0)
 			{
 				_myRigidbody.velocity += (Vector2) transform.up.normalized * Physics2D.gravity.y * (fallMultiplier - 1);
 			}
-			else if (_myRigidbody.velocity.y > 0 && !Input.GetButton("Jump"))
+			else if (Vector3.Dot(Vector3.Project(_myRigidbody.velocity, transform.up).normalized,
+				         transform.up.normalized) > 0 && !Input.GetButton("Jump"))
 			{
-				_myRigidbody.velocity += (Vector2) transform.up.normalized * Physics2D.gravity.y * (lowJumpMultiplier - 1);
+				_myRigidbody.velocity +=
+					(Vector2) transform.up.normalized * Physics2D.gravity.y * (lowJumpMultiplier - 1);
 			}
 		}
 	}
@@ -122,6 +122,7 @@ public class PlayerController : MonoBehaviour
 	{
 		_canTurn = false;
 		_myRigidbody.velocity = Vector2.zero;
+		_gravityDirection = direction;
 		StartCoroutine(TurnCameraAndPlayer(rotationSpeed));
 	}
 
@@ -134,13 +135,12 @@ public class PlayerController : MonoBehaviour
 		while (timer < time)
 		{
 			Vector3 cameraRotation = mainCamera.transform.eulerAngles;
+			float angle = (float) _gravityDirection * 90;
 			mainCamera.transform.eulerAngles = (Vector3.right * cameraRotation.x + Vector3.up * cameraRotation.y +
-			                                    Vector3.forward * (Mathf.Lerp(initRotCam,
-				                                    (float) _gravityDirection * 90, timer / time)));
+			                                    Vector3.forward * (Mathf.LerpAngle(initRotCam, angle, timer / time)));
 			Vector3 playerRotation = transform.eulerAngles;
 			transform.eulerAngles = (Vector3.right * playerRotation.x + Vector3.up * playerRotation.y +
-			                         Vector3.forward * (Mathf.Lerp(initRotPlayer,
-				                         (float) _gravityDirection * 90, timer / time)));
+			                         Vector3.forward * (Mathf.LerpAngle(initRotPlayer, angle, timer / time)));
 			timer += Time.deltaTime;
 			yield return null;
 		}
