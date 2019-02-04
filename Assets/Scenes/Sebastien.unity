@@ -501,6 +501,11 @@ PrefabInstance:
       propertyPath: m_Constraints
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 7278362155401064619, guid: 66ec3452024136b4bac7199316a10c66,
+        type: 3}
+      propertyPath: m_CollisionDetection
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7278362154666824566, guid: 66ec3452024136b4bac7199316a10c66,
         type: 3}
       propertyPath: m_SortingLayerID
