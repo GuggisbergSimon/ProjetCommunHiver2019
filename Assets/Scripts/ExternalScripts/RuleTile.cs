@@ -14,19 +14,19 @@ namespace UnityEngine
 		[Serializable]
 		public class TilingRule
 		{
-			public Neighbor[] m_Neighbors;
-			public Sprite[] m_Sprites;
+			public Neighbor[] m_Neighbors; //Connaitre les voisins
+			public Sprite[] m_Sprites; //Savoir quelle sprite
 			public float m_AnimationSpeed;
-			public float m_PerlinScale;
-			public Transform m_RuleTransform;
-			public OutputSprite m_Output;
+			public float m_PerlinScale; //Je ne vois pas encore
+			public Transform m_RuleTransform; //Modifier Facilement la tile
+			public OutputSprite m_Output; //Animée, random ou normale
 			public Tile.ColliderType m_ColliderType;
 			public Transform m_RandomTransform;
 			
 			public TilingRule()
 			{
 				m_Output = OutputSprite.Single;
-				m_Neighbors = new Neighbor[8];
+				m_Neighbors = new Neighbor[8]; // car 8 voisins comptés
 				m_Sprites = new Sprite[1];
 				m_AnimationSpeed = 1f;
 				m_PerlinScale = 0.5f;
@@ -41,7 +41,7 @@ namespace UnityEngine
 			public enum OutputSprite { Single, Random, Animation }
 		}
 
-		[HideInInspector] public List<TilingRule> m_TilingRules;
+		[HideInInspector] public List<TilingRule> m_TilingRules; //Doit être créée pour chaque Tile dispo
 
 		public override void GetTileData(Vector3Int position, ITilemap tileMap, ref TileData tileData)
 		{
