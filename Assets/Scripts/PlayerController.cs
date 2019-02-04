@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private float groundRadius = 0.2f;
 	[SerializeField] private LayerMask layerGround = 0;
 	[SerializeField] private GameObject mainCamera = null;
+	[SerializeField] private float inputBufferTime = 0.1f;
 
 	enum CardinalDirection
 	{
@@ -24,6 +25,7 @@ public class PlayerController : MonoBehaviour
 	}
 
 	private CardinalDirection _gravityDirection;
+	private Coroutine rotatingCoroutine;
 	private Rigidbody2D _myRigidbody;
 	private bool _isGrounded;
 	private bool _isAlive = true;
@@ -76,19 +78,31 @@ public class PlayerController : MonoBehaviour
 			_isPressingJump = false;
 		}
 
+		if ((Input.GetButtonDown("TurnLeft") && Input.GetButtonDown("TurnRight")) ||
+		    (_isPressingLeft && Input.GetButtonDown("TurnRight")) ||
+		    (_isPressingRight && Input.GetButtonDown("TurnLeft")))
+		{
+			_isPressingLeft = true;
+			_isPressingRight = true;
+			TurnTo(_gravityDirection + ((int) _gravityDirection < 2 ? 2 : -2));
+		}
+
 		if (_canTurn)
 		{
 			if (Input.GetButtonDown("TurnLeft"))
 			{
+				_isPressingLeft = true;
 				TurnTo(_gravityDirection - (_gravityDirection == CardinalDirection.South ? -3 : 1));
 			}
 
 			else if (Input.GetButtonDown("TurnRight"))
 			{
+				_isPressingRight = true;
 				TurnTo(_gravityDirection + (_gravityDirection == CardinalDirection.North ? -3 : 1));
 			}
 		}
 	}
+
 
 	private void FixedUpdate()
 	{
@@ -118,12 +132,25 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
+	private IEnumerator ResetPressingTurn(float timeToWait)
+	{
+		yield return new WaitForSeconds(timeToWait);
+		_isPressingRight = false;
+		_isPressingLeft = false;
+	}
+
 	private void TurnTo(CardinalDirection direction)
 	{
 		_canTurn = false;
 		_myRigidbody.velocity = Vector2.zero;
 		_gravityDirection = direction;
-		StartCoroutine(TurnCameraAndPlayer(rotationSpeed));
+		StartCoroutine(ResetPressingTurn(inputBufferTime));
+		if (rotatingCoroutine != null)
+		{
+			StopCoroutine(rotatingCoroutine);
+		}
+
+		rotatingCoroutine = StartCoroutine(TurnCameraAndPlayer(rotationSpeed));
 	}
 
 	private IEnumerator TurnCameraAndPlayer(float speedTurn)
