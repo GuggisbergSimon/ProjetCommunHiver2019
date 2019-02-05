@@ -171,7 +171,7 @@ public class PlayerController : MonoBehaviour
 			float angle = (float) _actualGravityDirection * 90;
 			mainCamera.transform.eulerAngles = (Vector3.right * cameraRotation.x + Vector3.up * cameraRotation.y +
 			                                    Vector3.forward * (Mathf.LerpAngle(initRotCam, angle, timer / time)));
-            Vector3 playerRotation = transform.eulerAngles;
+			Vector3 playerRotation = transform.eulerAngles;
 			transform.eulerAngles = (Vector3.right * playerRotation.x + Vector3.up * playerRotation.y +
 			                         Vector3.forward * (Mathf.LerpAngle(initRotPlayer, angle, timer / time)));
 			timer += Time.deltaTime;
