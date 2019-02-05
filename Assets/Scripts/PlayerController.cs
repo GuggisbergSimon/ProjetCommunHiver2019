@@ -11,10 +11,9 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private float gravityMultiplier = 1.0f;
 	[SerializeField] private float jumpSpeed = 3.0f;
 	[SerializeField] private float rotationSpeed = 5.0f;
-	[SerializeField] private Transform groundCheck = null;
-	[SerializeField] private float groundRadius = 0.1f;
+	[SerializeField] private float distMaxGroundCheck = 0.1f;
+	[SerializeField] private Vector2 sizeMaxCheckGround = new Vector2(0.5f, 0.1f);
 	[SerializeField] private LayerMask layerGround = 0;
-	[SerializeField] private GameObject mainCamera = null;
 	[SerializeField] private float inputBufferTime = 0.1f;
 	[SerializeField] private int maxNumberGravityUse = 1;
 
@@ -39,10 +38,12 @@ public class PlayerController : MonoBehaviour
 	private bool _isPressingLeft;
 	private bool _isPressingRight;
 	private int _numberGravityUseRemaining;
+	private Collider2D _myCollider;
 
 	private void Awake()
 	{
 		_myRigidbody = GetComponent<Rigidbody2D>();
+		_myCollider = GetComponent<Collider2D>();
 		_numberGravityUseRemaining = maxNumberGravityUse;
 
 		//setup correctly the direction the player is positioned at setup
@@ -78,7 +79,9 @@ public class PlayerController : MonoBehaviour
 		_horizontalInput = Input.GetAxis("Horizontal");
 
 		bool isGroundedPastValue = _isGrounded;
-		_isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, layerGround);
+
+		_isGrounded = Physics2D.BoxCast(transform.position, sizeMaxCheckGround, 0, -transform.up, distMaxGroundCheck,
+			layerGround);
 		if (_isGrounded && !isGroundedPastValue)
 		{
 			_numberGravityUseRemaining = maxNumberGravityUse;
@@ -170,6 +173,7 @@ public class PlayerController : MonoBehaviour
 		_canTurn = false;
 		_myRigidbody.velocity = Vector2.zero;
 		_actualGravityDirection = direction;
+		_myCollider.enabled = false;
 		GameManager.Instance.CameraManager.ChangeVCamByDirection(_actualGravityDirection);
 		if (_rotatingCoroutine != null)
 		{
@@ -183,15 +187,10 @@ public class PlayerController : MonoBehaviour
 	{
 		float time = (90.0f / speedTurn);
 		float timer = 0.0f;
-		float initRotCam = mainCamera.transform.eulerAngles.z;
 		float initRotPlayer = transform.eulerAngles.z;
-
 		while (timer < time)
 		{
-			Vector3 cameraRotation = mainCamera.transform.eulerAngles;
 			float angle = (float) _actualGravityDirection * 90;
-			//mainCamera.transform.eulerAngles = (Vector3.right * cameraRotation.x + Vector3.up * cameraRotation.y +
-			//                                    Vector3.forward * (Mathf.LerpAngle(initRotCam, angle, timer / time)));
 			Vector3 playerRotation = transform.eulerAngles;
 			transform.eulerAngles = (Vector3.right * playerRotation.x + Vector3.up * playerRotation.y +
 			                         Vector3.forward * (Mathf.LerpAngle(initRotPlayer, angle, timer / time)));
@@ -201,6 +200,7 @@ public class PlayerController : MonoBehaviour
 
 		_previousGravityDirection = _actualGravityDirection;
 		_canTurn = true;
+		_myCollider.enabled = true;
 	}
 
 	public void Die()

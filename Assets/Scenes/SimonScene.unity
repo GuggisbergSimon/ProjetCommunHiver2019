@@ -302,10 +302,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 221499810, guid: 66ec3452024136b4bac7199316a10c66, type: 3}
-      propertyPath: mainCamera
-      value: 
-      objectReference: {fileID: 1181079051}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 66ec3452024136b4bac7199316a10c66, type: 3}
 --- !u!1 &929603575
@@ -708,12 +704,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edfa5d45b1ebb5a428e864f90c345e9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &1181079051 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8189616496569966795, guid: 90ecd07f6b343d24c938c96234a274bc,
-    type: 3}
-  m_PrefabInstance: {fileID: 8189616497612469952}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1202395463
 GameObject:
   m_ObjectHideFlags: 0
@@ -18990,5 +18980,17 @@ PrefabInstance:
       propertyPath: m_BoundingShape2D
       value: 
       objectReference: {fileID: 1412621439}
+    - target: {fileID: 1122251153, guid: 90ecd07f6b343d24c938c96234a274bc, type: 3}
+      propertyPath: m_CameraCutEvent.m_PersistentCalls.m_Calls.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1122251153, guid: 90ecd07f6b343d24c938c96234a274bc, type: 3}
+      propertyPath: m_CameraCutEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1122251153, guid: 90ecd07f6b343d24c938c96234a274bc, type: 3}
+      propertyPath: m_CameraCutEvent.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 90ecd07f6b343d24c938c96234a274bc, type: 3}
