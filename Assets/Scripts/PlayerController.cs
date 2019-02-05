@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Cinemachine;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -11,7 +12,7 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private float gravityMultiplier = 1.0f;
 	[SerializeField] private float jumpSpeed = 3.0f;
 	[SerializeField] private float rotationSpeed = 5.0f;
-    [SerializeField] private float fallingSpeedLimit;
+	[SerializeField] private float fallingSpeedLimit = 30.0f;
 	[SerializeField] private Transform groundCheck = null;
 	[SerializeField] private float groundRadius = 0.1f;
 	[SerializeField] private LayerMask layerGround = 0;
@@ -206,6 +207,8 @@ public class PlayerController : MonoBehaviour
 		if (_isAlive)
 		{
 			_isAlive = false;
+			//respawning
+			GameManager.Instance.LoadLevel(SceneManager.GetActiveScene().name,true,true);
 		}
 	}
 

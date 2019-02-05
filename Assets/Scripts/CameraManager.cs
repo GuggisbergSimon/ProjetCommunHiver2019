@@ -19,7 +19,6 @@ public class CameraManager : MonoBehaviour
 		{
 			_vCams.Add((PlayerController.CardinalDirection) i,cam);
 			cam.transform.eulerAngles = Vector3.forward * 90 * i;
-			Debug.Log(i + cam.name);
 			++i;
 		}
 
