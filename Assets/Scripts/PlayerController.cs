@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using Cinemachine;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -11,12 +11,11 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private float gravityMultiplier = 1.0f;
 	[SerializeField] private float jumpSpeed = 3.0f;
 	[SerializeField] private float rotationSpeed = 5.0f;
-    [SerializeField] private float fallingSpeedLimit;
-	[SerializeField] private Transform groundCheck = null;
-	[SerializeField] private float groundRadius = 0.1f;
+	[SerializeField] private float distMaxGroundCheck = 0.1f;
+	[SerializeField] private Vector2 sizeMaxCheckGround = new Vector2(0.5f, 0.1f);
 	[SerializeField] private LayerMask layerGround = 0;
-	[SerializeField] private GameObject mainCamera = null;
 	[SerializeField] private float inputBufferTime = 0.1f;
+	[SerializeField] private int maxNumberGravityUse = 1;
 
 	public enum CardinalDirection
 	{
@@ -38,13 +37,14 @@ public class PlayerController : MonoBehaviour
 	private bool _isPressingJump;
 	private bool _isPressingLeft;
 	private bool _isPressingRight;
-    private bool _canChangeGravity;
-    private bool _checkIfChangeGravity = true;
-    private bool _maxSpeed = false;
+	private int _numberGravityUseRemaining;
+	private Collider2D _myCollider;
 
 	private void Awake()
 	{
 		_myRigidbody = GetComponent<Rigidbody2D>();
+		_myCollider = GetComponent<Collider2D>();
+		_numberGravityUseRemaining = maxNumberGravityUse;
 
 		//setup correctly the direction the player is positioned at setup
 		float initRot = transform.eulerAngles.z;
@@ -77,7 +77,16 @@ public class PlayerController : MonoBehaviour
 	private void Update()
 	{
 		_horizontalInput = Input.GetAxis("Horizontal");
-		_isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, layerGround);
+
+		bool isGroundedPastValue = _isGrounded;
+
+		_isGrounded = Physics2D.BoxCast(transform.position, sizeMaxCheckGround, 0, -transform.up, distMaxGroundCheck,
+			layerGround);
+		if (_isGrounded && !isGroundedPastValue)
+		{
+			_numberGravityUseRemaining = maxNumberGravityUse;
+		}
+
 		if (Input.GetButtonDown("Jump") && _isGrounded)
 		{
 			_isPressingJump = true;
@@ -87,40 +96,39 @@ public class PlayerController : MonoBehaviour
 			_isPressingJump = false;
 		}
 
-		if ((Input.GetButtonDown("TurnLeft") && Input.GetButtonDown("TurnRight")) ||
+		if ((Input.GetButtonDown("TurnLeft") && Input.GetButtonDown("TurnRight") && _numberGravityUseRemaining > 0) ||
 		    (_isPressingLeft && Input.GetButtonDown("TurnRight")) ||
 		    (_isPressingRight && Input.GetButtonDown("TurnLeft")))
 		{
+			if (!_isPressingLeft && !_isPressingRight)
+			{
+				_numberGravityUseRemaining--;
+			}
+
 			_isPressingLeft = true;
 			_isPressingRight = true;
 			TurnTo(_previousGravityDirection + ((int) _previousGravityDirection < 2 ? 2 : -2));
+			StartCoroutine(ResetPressingTurn(0));
 		}
-        if (_canChangeGravity)
-        {
-            if (_canTurn)
-            {
-                if (Input.GetButtonDown("TurnLeft"))
-                {
-                    _isPressingLeft = true;
-                    TurnTo(_actualGravityDirection - (_actualGravityDirection == CardinalDirection.South ? -3 : 1));
-                }
 
-                else if (Input.GetButtonDown("TurnRight"))
-                {
-                    _isPressingRight = true;
-                    TurnTo(_actualGravityDirection + (_actualGravityDirection == CardinalDirection.West ? -3 : 1));
-                }
-            }
-        }
+		if (_canTurn && _numberGravityUseRemaining > 0)
+		{
+			if (Input.GetButtonDown("TurnLeft"))
+			{
+				_numberGravityUseRemaining--;
+				_isPressingLeft = true;
+				TurnTo(_actualGravityDirection - (_actualGravityDirection == CardinalDirection.South ? -3 : 1));
+				StartCoroutine(ResetPressingTurn(inputBufferTime));
+			}
 
-        if (_checkIfChangeGravity)
-        {
-            if (_isGrounded)
-            {
-                _canChangeGravity = true;
-                _checkIfChangeGravity = false;
-            }
-        }
+			else if (Input.GetButtonDown("TurnRight"))
+			{
+				_numberGravityUseRemaining--;
+				_isPressingRight = true;
+				TurnTo(_actualGravityDirection + (_actualGravityDirection == CardinalDirection.West ? -3 : 1));
+				StartCoroutine(ResetPressingTurn(inputBufferTime));
+			}
+		}
 	}
 
 
@@ -165,8 +173,8 @@ public class PlayerController : MonoBehaviour
 		_canTurn = false;
 		_myRigidbody.velocity = Vector2.zero;
 		_actualGravityDirection = direction;
+		_myCollider.enabled = false;
 		GameManager.Instance.CameraManager.ChangeVCamByDirection(_actualGravityDirection);
-		StartCoroutine(ResetPressingTurn(inputBufferTime));
 		if (_rotatingCoroutine != null)
 		{
 			StopCoroutine(_rotatingCoroutine);
@@ -179,26 +187,20 @@ public class PlayerController : MonoBehaviour
 	{
 		float time = (90.0f / speedTurn);
 		float timer = 0.0f;
-		float initRotCam = mainCamera.transform.eulerAngles.z;
 		float initRotPlayer = transform.eulerAngles.z;
-        _canChangeGravity = false;
-
 		while (timer < time)
 		{
-			Vector3 cameraRotation = mainCamera.transform.eulerAngles;
 			float angle = (float) _actualGravityDirection * 90;
-			
-			//mainCamera.transform.eulerAngles = (Vector3.right * cameraRotation.x + Vector3.up * cameraRotation.y +
-			//                                    Vector3.forward * (Mathf.LerpAngle(initRotCam, angle, timer / time)));
 			Vector3 playerRotation = transform.eulerAngles;
 			transform.eulerAngles = (Vector3.right * playerRotation.x + Vector3.up * playerRotation.y +
 			                         Vector3.forward * (Mathf.LerpAngle(initRotPlayer, angle, timer / time)));
 			timer += Time.deltaTime;
 			yield return null;
 		}
-        _checkIfChangeGravity = true;
+
 		_previousGravityDirection = _actualGravityDirection;
 		_canTurn = true;
+		_myCollider.enabled = true;
 	}
 
 	public void Die()
@@ -206,57 +208,7 @@ public class PlayerController : MonoBehaviour
 		if (_isAlive)
 		{
 			_isAlive = false;
+			GameManager.Instance.LoadLevel(SceneManager.GetActiveScene().name, true, true);
 		}
 	}
-
-    private void FreezeFallingSpeed(Rigidbody2D rigidbody2D, CardinalDirection cardinalDirection)
-    {
-        switch (cardinalDirection)
-        {
-            case CardinalDirection.North:
-                FreezeFallingSpeed(rigidbody2D.velocity.y);
-                if (_maxSpeed)
-                {
-                    rigidbody2D.velocity = new Vector2(rigidbody2D.velocity.x, fallingSpeedLimit);
-                }
-                break;
-            case CardinalDirection.South:
-                FreezeFallingSpeed(-rigidbody2D.velocity.y);
-                if (_maxSpeed)
-                {
-                    rigidbody2D.velocity = new Vector2(rigidbody2D.velocity.x, -fallingSpeedLimit);
-                }
-                break;
-            case CardinalDirection.East:
-                FreezeFallingSpeed(rigidbody2D.velocity.x);
-                if (_maxSpeed)
-                {
-                    rigidbody2D.velocity = new Vector2(fallingSpeedLimit, rigidbody2D.velocity.y);
-                }
-                break;
-            case CardinalDirection.West:
-                FreezeFallingSpeed(-rigidbody2D.velocity.x);
-                if (_maxSpeed)
-                {
-                    rigidbody2D.velocity = new Vector2(-fallingSpeedLimit, rigidbody2D.velocity.y);
-                }
-                break;
-        }
-
-    }
-
-    private void FreezeFallingSpeed(float value)
-    {
-        if (value > fallingSpeedLimit)
-        {
-            _maxSpeed = true;
-        }
-        else
-        {
-            _maxSpeed = false;
-        }
-    }
-
-
-
 }
