@@ -160,8 +160,8 @@ MonoBehaviour:
   fallMultiplier: 5
   lowJumpMultiplier: 2.5
   playerHorizontalSpeed: 5
-  gravityMultiplier: 1
-  jumpSpeed: 5
+  gravityMultiplier: 3
+  jumpSpeed: 14
   rotationSpeed: 75
   groundCheck: {fileID: 7278362154615815021}
   groundRadius: 0.2

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Cinemachine;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -163,13 +164,14 @@ public class PlayerController : MonoBehaviour
 		float timer = 0.0f;
 		float initRotCam = mainCamera.transform.eulerAngles.z;
 		float initRotPlayer = transform.eulerAngles.z;
+
 		while (timer < time)
 		{
 			Vector3 cameraRotation = mainCamera.transform.eulerAngles;
 			float angle = (float) _actualGravityDirection * 90;
 			mainCamera.transform.eulerAngles = (Vector3.right * cameraRotation.x + Vector3.up * cameraRotation.y +
 			                                    Vector3.forward * (Mathf.LerpAngle(initRotCam, angle, timer / time)));
-			Vector3 playerRotation = transform.eulerAngles;
+            Vector3 playerRotation = transform.eulerAngles;
 			transform.eulerAngles = (Vector3.right * playerRotation.x + Vector3.up * playerRotation.y +
 			                         Vector3.forward * (Mathf.LerpAngle(initRotPlayer, angle, timer / time)));
 			timer += Time.deltaTime;
