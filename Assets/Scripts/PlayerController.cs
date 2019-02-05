@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private float jumpSpeed = 3.0f;
 	[SerializeField] private float rotationSpeed = 5.0f;
 	[SerializeField] private Transform groundCheck = null;
-	[SerializeField] private float groundRadius = 0.2f;
+	[SerializeField] private float groundRadius = 0.1f;
 	[SerializeField] private LayerMask layerGround = 0;
 	[SerializeField] private GameObject mainCamera = null;
 	[SerializeField] private float inputBufferTime = 0.1f;
@@ -25,9 +25,8 @@ public class PlayerController : MonoBehaviour
 		West
 	}
 
-	private CardinalDirection _previousGravityDirection;
-	private CardinalDirection _actualGravityDirection;
-	private Coroutine _rotatingCoroutine;
+	private CardinalDirection _gravityDirection;
+	private Coroutine rotatingCoroutine;
 	private Rigidbody2D _myRigidbody;
 	private bool _isGrounded;
 	private bool _isAlive = true;
@@ -45,28 +44,26 @@ public class PlayerController : MonoBehaviour
 		float initRot = transform.eulerAngles.z;
 		if (Mathf.Abs(initRot) < 45)
 		{
-			_actualGravityDirection = CardinalDirection.South;
+			_gravityDirection = CardinalDirection.South;
 		}
 		else
 		{
 			if (Mathf.Abs(initRot % 180) > 135)
 			{
-				_actualGravityDirection = CardinalDirection.North;
+				_gravityDirection = CardinalDirection.North;
 			}
 			else
 			{
 				if (initRot > 180)
 				{
-					_actualGravityDirection = CardinalDirection.West;
+					_gravityDirection = CardinalDirection.West;
 				}
 				else
 				{
-					_actualGravityDirection = CardinalDirection.East;
+					_gravityDirection = CardinalDirection.East;
 				}
 			}
 		}
-
-		_previousGravityDirection = _actualGravityDirection;
 	}
 
 	private void Update()
@@ -88,7 +85,7 @@ public class PlayerController : MonoBehaviour
 		{
 			_isPressingLeft = true;
 			_isPressingRight = true;
-			TurnTo(_previousGravityDirection + ((int) _previousGravityDirection < 2 ? 2 : -2));
+			TurnTo(_gravityDirection + ((int) _gravityDirection < 2 ? 2 : -2));
 		}
 
 		if (_canTurn)
@@ -96,13 +93,13 @@ public class PlayerController : MonoBehaviour
 			if (Input.GetButtonDown("TurnLeft"))
 			{
 				_isPressingLeft = true;
-				TurnTo(_actualGravityDirection - (_actualGravityDirection == CardinalDirection.South ? -3 : 1));
+				TurnTo(_gravityDirection - (_gravityDirection == CardinalDirection.South ? -3 : 1));
 			}
 
 			else if (Input.GetButtonDown("TurnRight"))
 			{
 				_isPressingRight = true;
-				TurnTo(_actualGravityDirection + (_actualGravityDirection == CardinalDirection.North ? -3 : 1));
+				TurnTo(_gravityDirection + (_gravityDirection == CardinalDirection.North ? -3 : 1));
 			}
 		}
 	}
@@ -125,14 +122,13 @@ public class PlayerController : MonoBehaviour
 			if (Vector3.Dot(Vector3.Project(_myRigidbody.velocity, transform.up).normalized,
 				    transform.up.normalized) < 0)
 			{
-				_myRigidbody.velocity += (Vector2) transform.up.normalized * Physics2D.gravity.y *
-				                         (fallMultiplier - 1) * Time.deltaTime;
+				_myRigidbody.velocity += (Vector2) transform.up.normalized * Physics2D.gravity.y * (fallMultiplier - 1);
 			}
 			else if (Vector3.Dot(Vector3.Project(_myRigidbody.velocity, transform.up).normalized,
 				         transform.up.normalized) > 0 && !Input.GetButton("Jump"))
 			{
 				_myRigidbody.velocity +=
-					(Vector2) transform.up.normalized * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
+					(Vector2) transform.up.normalized * Physics2D.gravity.y * (lowJumpMultiplier - 1);
 			}
 		}
 	}
@@ -148,14 +144,14 @@ public class PlayerController : MonoBehaviour
 	{
 		_canTurn = false;
 		_myRigidbody.velocity = Vector2.zero;
-		_actualGravityDirection = direction;
+		_gravityDirection = direction;
 		StartCoroutine(ResetPressingTurn(inputBufferTime));
-		if (_rotatingCoroutine != null)
+		if (rotatingCoroutine != null)
 		{
-			StopCoroutine(_rotatingCoroutine);
+			StopCoroutine(rotatingCoroutine);
 		}
 
-		_rotatingCoroutine = StartCoroutine(TurnCameraAndPlayer(rotationSpeed));
+		rotatingCoroutine = StartCoroutine(TurnCameraAndPlayer(rotationSpeed));
 	}
 
 	private IEnumerator TurnCameraAndPlayer(float speedTurn)
@@ -168,7 +164,7 @@ public class PlayerController : MonoBehaviour
 		while (timer < time)
 		{
 			Vector3 cameraRotation = mainCamera.transform.eulerAngles;
-			float angle = (float) _actualGravityDirection * 90;
+			float angle = (float) _gravityDirection * 90;
 			mainCamera.transform.eulerAngles = (Vector3.right * cameraRotation.x + Vector3.up * cameraRotation.y +
 			                                    Vector3.forward * (Mathf.LerpAngle(initRotCam, angle, timer / time)));
             Vector3 playerRotation = transform.eulerAngles;
@@ -177,9 +173,8 @@ public class PlayerController : MonoBehaviour
 			timer += Time.deltaTime;
 			yield return null;
 		}
-
-		_previousGravityDirection = _actualGravityDirection;
-		_canTurn = true;
+        
+        _canTurn = true;
 	}
 
 	public void Die()
