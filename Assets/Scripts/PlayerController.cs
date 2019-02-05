@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private GameObject mainCamera = null;
 	[SerializeField] private float inputBufferTime = 0.1f;
 
-	enum CardinalDirection
+	public enum CardinalDirection
 	{
 		South,
 		East,

@@ -5,23 +5,26 @@ using Cinemachine;
 
 public class CameraManager : MonoBehaviour
 {
-    private CinemachineVirtualCamera vcam;
-    private CinemachineBasicMultiChannelPerlin noise;
+	private Dictionary<CinemachineVirtualCamera, PlayerController.CardinalDirection> vcams;
+	//private CinemachineVirtualCamera[] _vcams;
+	private CinemachineVirtualCamera _vcam;
+	private CinemachineBasicMultiChannelPerlin _noise;
 
-    void Start()
-    {
-        vcam = GameObject.Find("CM vcam1").GetComponent<CinemachineVirtualCamera>();
-        noise = vcam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
-    }
+	void Start()
+	{
+		GameObject.FindObjectOfType<CinemachineVirtualCamera>();
+		_vcam = GameObject.Find("CM vcam1").GetComponent<CinemachineVirtualCamera>();
+		_noise = _vcam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
+	}
 
-    public void ChangePriorityOfVCam1By(int value)
-    {
-        vcam.Priority += value;
-    }
+	public void ChangePriorityofVCam(PlayerController.CardinalDirection direction)
+	{
+		
+	}
 
-    public void Noise(float amplitudeGain, float frequencyGain)
-    {
-        noise.m_AmplitudeGain = amplitudeGain;
-        noise.m_FrequencyGain = frequencyGain;
-    }
+	public void Noise(float amplitudeGain, float frequencyGain)
+	{
+		_noise.m_AmplitudeGain = amplitudeGain;
+		_noise.m_FrequencyGain = frequencyGain;
+	}
 }
