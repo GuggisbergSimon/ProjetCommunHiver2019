@@ -58,6 +58,11 @@ public class GameManager : MonoBehaviour
 		SceneManager.LoadScene(nameLevel);
 	}
 
+	public void LoadScene(string nameLevel, float fadeinTime, float fadeoutTime,bool fadeinToBlack, bool fadeoutToBlack)
+	{
+		
+	}
+
 	public void QuitGame()
 	{
 #if UNITY_EDITOR

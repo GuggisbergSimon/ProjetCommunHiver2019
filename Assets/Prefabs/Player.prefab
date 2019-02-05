@@ -157,8 +157,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1fb66d3b4e44f64faceb18e7cc6927f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fallMultiplier: 1.07
-  lowJumpMultiplier: 1.5
+  fallMultiplier: 5
+  lowJumpMultiplier: 2.5
   playerHorizontalSpeed: 5
   gravityMultiplier: 3
   jumpSpeed: 14
