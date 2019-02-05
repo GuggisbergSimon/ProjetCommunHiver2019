@@ -7,6 +7,9 @@ public class GameManager : MonoBehaviour
 	public static GameManager Instance { get; private set; }
 	private PlayerController player;
 	public PlayerController Player => player;
+	private CameraManager cameraManager;
+
+	public CameraManager CameraManager => cameraManager;
 	
 	private void OnEnable()
 	{
@@ -36,6 +39,7 @@ public class GameManager : MonoBehaviour
 	{
 		player = FindObjectOfType<PlayerController>();
 		//player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+		cameraManager = FindObjectOfType<CameraManager>();
 	}
 
 	private void Awake()
