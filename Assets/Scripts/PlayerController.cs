@@ -11,8 +11,9 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private float gravityMultiplier = 1.0f;
 	[SerializeField] private float jumpSpeed = 3.0f;
 	[SerializeField] private float rotationSpeed = 5.0f;
+    [SerializeField] private float fallingSpeedLimit;
 	[SerializeField] private Transform groundCheck = null;
-	[SerializeField] private float groundRadius = 0.2f;
+	[SerializeField] private float groundRadius = 0.1f;
 	[SerializeField] private LayerMask layerGround = 0;
 	[SerializeField] private GameObject mainCamera = null;
 	[SerializeField] private float inputBufferTime = 0.1f;
@@ -36,6 +37,9 @@ public class PlayerController : MonoBehaviour
 	private bool _isPressingJump;
 	private bool _isPressingLeft;
 	private bool _isPressingRight;
+    private bool _canChangeGravity;
+    private bool _checkIfChangeGravity = true;
+    private bool _maxSpeed = false;
 
 	private void Start()
 	{
@@ -90,21 +94,32 @@ public class PlayerController : MonoBehaviour
 			_isPressingRight = true;
 			TurnTo(_previousGravityDirection + ((int) _previousGravityDirection < 2 ? 2 : -2));
 		}
+        if (_canChangeGravity)
+        {
+            if (_canTurn)
+            {
+                if (Input.GetButtonDown("TurnLeft"))
+                {
+                    _isPressingLeft = true;
+                    TurnTo(_actualGravityDirection - (_actualGravityDirection == CardinalDirection.South ? -3 : 1));
+                }
 
-		if (_canTurn)
-		{
-			if (Input.GetButtonDown("TurnLeft"))
-			{
-				_isPressingLeft = true;
-				TurnTo(_actualGravityDirection - (_actualGravityDirection == CardinalDirection.South ? -3 : 1));
-			}
+                else if (Input.GetButtonDown("TurnRight"))
+                {
+                    _isPressingRight = true;
+                    TurnTo(_actualGravityDirection + (_actualGravityDirection == CardinalDirection.North ? -3 : 1));
+                }
+            }
+        }
 
-			else if (Input.GetButtonDown("TurnRight"))
-			{
-				_isPressingRight = true;
-				TurnTo(_actualGravityDirection + (_actualGravityDirection == CardinalDirection.North ? -3 : 1));
-			}
-		}
+        if (_checkIfChangeGravity)
+        {
+            if (_isGrounded)
+            {
+                _canChangeGravity = true;
+                _checkIfChangeGravity = false;
+            }
+        }
 	}
 
 
@@ -164,6 +179,7 @@ public class PlayerController : MonoBehaviour
 		float timer = 0.0f;
 		float initRotCam = mainCamera.transform.eulerAngles.z;
 		float initRotPlayer = transform.eulerAngles.z;
+        _canChangeGravity = false;
 
 		while (timer < time)
 		{
@@ -177,7 +193,7 @@ public class PlayerController : MonoBehaviour
 			timer += Time.deltaTime;
 			yield return null;
 		}
-
+        _checkIfChangeGravity = true;
 		_previousGravityDirection = _actualGravityDirection;
 		_canTurn = true;
 	}
@@ -189,4 +205,55 @@ public class PlayerController : MonoBehaviour
 			_isAlive = false;
 		}
 	}
+
+    private void FreezeFallingSpeed(Rigidbody2D rigidbody2D, CardinalDirection cardinalDirection)
+    {
+        switch (cardinalDirection)
+        {
+            case CardinalDirection.North:
+                FreezeFallingSpeed(rigidbody2D.velocity.y);
+                if (_maxSpeed)
+                {
+                    rigidbody2D.velocity = new Vector2(rigidbody2D.velocity.x, fallingSpeedLimit);
+                }
+                break;
+            case CardinalDirection.South:
+                FreezeFallingSpeed(-rigidbody2D.velocity.y);
+                if (_maxSpeed)
+                {
+                    rigidbody2D.velocity = new Vector2(rigidbody2D.velocity.x, -fallingSpeedLimit);
+                }
+                break;
+            case CardinalDirection.East:
+                FreezeFallingSpeed(rigidbody2D.velocity.x);
+                if (_maxSpeed)
+                {
+                    rigidbody2D.velocity = new Vector2(fallingSpeedLimit, rigidbody2D.velocity.y);
+                }
+                break;
+            case CardinalDirection.West:
+                FreezeFallingSpeed(-rigidbody2D.velocity.x);
+                if (_maxSpeed)
+                {
+                    rigidbody2D.velocity = new Vector2(-fallingSpeedLimit, rigidbody2D.velocity.y);
+                }
+                break;
+        }
+
+    }
+
+    private void FreezeFallingSpeed(float value)
+    {
+        if (value > fallingSpeedLimit)
+        {
+            _maxSpeed = true;
+        }
+        else
+        {
+            _maxSpeed = false;
+        }
+    }
+
+
+
 }
