@@ -28,6 +28,7 @@ public class PlayerController : MonoBehaviour
 
 	private CardinalDirection _previousGravityDirection;
 	private CardinalDirection _actualGravityDirection;
+	public CardinalDirection ActualGravityDirection => _actualGravityDirection;
 	private Coroutine _rotatingCoroutine;
 	private Rigidbody2D _myRigidbody;
 	private bool _isGrounded;
@@ -41,7 +42,7 @@ public class PlayerController : MonoBehaviour
     private bool _checkIfChangeGravity = true;
     private bool _maxSpeed = false;
 
-	private void Start()
+	private void Awake()
 	{
 		_myRigidbody = GetComponent<Rigidbody2D>();
 
@@ -107,7 +108,7 @@ public class PlayerController : MonoBehaviour
                 else if (Input.GetButtonDown("TurnRight"))
                 {
                     _isPressingRight = true;
-                    TurnTo(_actualGravityDirection + (_actualGravityDirection == CardinalDirection.North ? -3 : 1));
+                    TurnTo(_actualGravityDirection + (_actualGravityDirection == CardinalDirection.West ? -3 : 1));
                 }
             }
         }
@@ -164,6 +165,7 @@ public class PlayerController : MonoBehaviour
 		_canTurn = false;
 		_myRigidbody.velocity = Vector2.zero;
 		_actualGravityDirection = direction;
+		GameManager.Instance.CameraManager.ChangeVCamByDirection(_actualGravityDirection);
 		StartCoroutine(ResetPressingTurn(inputBufferTime));
 		if (_rotatingCoroutine != null)
 		{
@@ -185,8 +187,9 @@ public class PlayerController : MonoBehaviour
 		{
 			Vector3 cameraRotation = mainCamera.transform.eulerAngles;
 			float angle = (float) _actualGravityDirection * 90;
-			mainCamera.transform.eulerAngles = (Vector3.right * cameraRotation.x + Vector3.up * cameraRotation.y +
-			                                    Vector3.forward * (Mathf.LerpAngle(initRotCam, angle, timer / time)));
+			
+			//mainCamera.transform.eulerAngles = (Vector3.right * cameraRotation.x + Vector3.up * cameraRotation.y +
+			//                                    Vector3.forward * (Mathf.LerpAngle(initRotCam, angle, timer / time)));
 			Vector3 playerRotation = transform.eulerAngles;
 			transform.eulerAngles = (Vector3.right * playerRotation.x + Vector3.up * playerRotation.y +
 			                         Vector3.forward * (Mathf.LerpAngle(initRotPlayer, angle, timer / time)));
