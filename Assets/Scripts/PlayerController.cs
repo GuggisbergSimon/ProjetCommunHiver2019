@@ -124,13 +124,14 @@ public class PlayerController : MonoBehaviour
 			if (Vector3.Dot(Vector3.Project(_myRigidbody.velocity, transform.up).normalized,
 				    transform.up.normalized) < 0)
 			{
-				_myRigidbody.velocity += (Vector2) transform.up.normalized * Physics2D.gravity.y * (fallMultiplier - 1);
+				_myRigidbody.velocity += (Vector2) transform.up.normalized * Physics2D.gravity.y *
+				                         (fallMultiplier - 1) * Time.deltaTime;
 			}
 			else if (Vector3.Dot(Vector3.Project(_myRigidbody.velocity, transform.up).normalized,
 				         transform.up.normalized) > 0 && !Input.GetButton("Jump"))
 			{
 				_myRigidbody.velocity +=
-					(Vector2) transform.up.normalized * Physics2D.gravity.y * (lowJumpMultiplier - 1);
+					(Vector2) transform.up.normalized * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
 			}
 		}
 	}

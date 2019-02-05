@@ -306,14 +306,6 @@ PrefabInstance:
       propertyPath: mainCamera
       value: 
       objectReference: {fileID: 1181079051}
-    - target: {fileID: 221499810, guid: 66ec3452024136b4bac7199316a10c66, type: 3}
-      propertyPath: fallMultiplier
-      value: 1.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 221499810, guid: 66ec3452024136b4bac7199316a10c66, type: 3}
-      propertyPath: lowJumpMultiplier
-      value: 1.5
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 66ec3452024136b4bac7199316a10c66, type: 3}
 --- !u!1 &929603575
