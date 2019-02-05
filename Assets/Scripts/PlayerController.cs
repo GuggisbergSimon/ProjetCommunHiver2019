@@ -10,15 +10,13 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private float playerHorizontalSpeed = 5.0f;
 	[SerializeField] private float gravityMultiplier = 1.0f;
 	[SerializeField] private float jumpSpeed = 3.0f;
-
 	[SerializeField] private float rotationSpeed = 5.0f;
-
-	//[SerializeField] private float fallingSpeedLimit = 30.0f;
 	[SerializeField] private Transform groundCheck = null;
 	[SerializeField] private float groundRadius = 0.1f;
 	[SerializeField] private LayerMask layerGround = 0;
 	[SerializeField] private GameObject mainCamera = null;
 	[SerializeField] private float inputBufferTime = 0.1f;
+	[SerializeField] private int maxNumberGravityUse = 1;
 
 	public enum CardinalDirection
 	{
@@ -40,10 +38,12 @@ public class PlayerController : MonoBehaviour
 	private bool _isPressingJump;
 	private bool _isPressingLeft;
 	private bool _isPressingRight;
+	private int _numberGravityUseRemaining;
 
 	private void Awake()
 	{
 		_myRigidbody = GetComponent<Rigidbody2D>();
+		_numberGravityUseRemaining = maxNumberGravityUse;
 
 		//setup correctly the direction the player is positioned at setup
 		float initRot = transform.eulerAngles.z;
@@ -76,7 +76,14 @@ public class PlayerController : MonoBehaviour
 	private void Update()
 	{
 		_horizontalInput = Input.GetAxis("Horizontal");
+
+		bool isGroundedPastValue = _isGrounded;
 		_isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, layerGround);
+		if (_isGrounded && !isGroundedPastValue)
+		{
+			_numberGravityUseRemaining = maxNumberGravityUse;
+		}
+
 		if (Input.GetButtonDown("Jump") && _isGrounded)
 		{
 			_isPressingJump = true;
@@ -86,20 +93,26 @@ public class PlayerController : MonoBehaviour
 			_isPressingJump = false;
 		}
 
-		if ((Input.GetButtonDown("TurnLeft") && Input.GetButtonDown("TurnRight")) ||
+		if ((Input.GetButtonDown("TurnLeft") && Input.GetButtonDown("TurnRight") && _numberGravityUseRemaining > 0) ||
 		    (_isPressingLeft && Input.GetButtonDown("TurnRight")) ||
 		    (_isPressingRight && Input.GetButtonDown("TurnLeft")))
 		{
+			if (!_isPressingLeft && !_isPressingRight)
+			{
+				_numberGravityUseRemaining--;
+			}
+
 			_isPressingLeft = true;
 			_isPressingRight = true;
 			TurnTo(_previousGravityDirection + ((int) _previousGravityDirection < 2 ? 2 : -2));
 			StartCoroutine(ResetPressingTurn(0));
 		}
 
-		if (_canTurn)
+		if (_canTurn && _numberGravityUseRemaining > 0)
 		{
 			if (Input.GetButtonDown("TurnLeft"))
 			{
+				_numberGravityUseRemaining--;
 				_isPressingLeft = true;
 				TurnTo(_actualGravityDirection - (_actualGravityDirection == CardinalDirection.South ? -3 : 1));
 				StartCoroutine(ResetPressingTurn(inputBufferTime));
@@ -107,6 +120,7 @@ public class PlayerController : MonoBehaviour
 
 			else if (Input.GetButtonDown("TurnRight"))
 			{
+				_numberGravityUseRemaining--;
 				_isPressingRight = true;
 				TurnTo(_actualGravityDirection + (_actualGravityDirection == CardinalDirection.West ? -3 : 1));
 				StartCoroutine(ResetPressingTurn(inputBufferTime));

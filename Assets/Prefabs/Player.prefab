@@ -163,7 +163,6 @@ MonoBehaviour:
   gravityMultiplier: 3
   jumpSpeed: 14
   rotationSpeed: 75
-  fallingSpeedLimit: 30
   groundCheck: {fileID: 7278362154615815021}
   groundRadius: 0.2
   layerGround:
@@ -171,6 +170,7 @@ MonoBehaviour:
     m_Bits: 256
   mainCamera: {fileID: 0}
   inputBufferTime: 0.1
+  maxNumberGravityUse: 1
 --- !u!50 &7278362155401064619
 Rigidbody2D:
   serializedVersion: 4
