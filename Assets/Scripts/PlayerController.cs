@@ -26,7 +26,7 @@ public class PlayerController : MonoBehaviour
 
 	private CardinalDirection _previousGravityDirection;
 	private CardinalDirection _actualGravityDirection;
-	private Coroutine rotatingCoroutine;
+	private Coroutine _rotatingCoroutine;
 	private Rigidbody2D _myRigidbody;
 	private bool _isGrounded;
 	private bool _isAlive = true;
@@ -149,12 +149,12 @@ public class PlayerController : MonoBehaviour
 		_myRigidbody.velocity = Vector2.zero;
 		_actualGravityDirection = direction;
 		StartCoroutine(ResetPressingTurn(inputBufferTime));
-		if (rotatingCoroutine != null)
+		if (_rotatingCoroutine != null)
 		{
-			StopCoroutine(rotatingCoroutine);
+			StopCoroutine(_rotatingCoroutine);
 		}
 
-		rotatingCoroutine = StartCoroutine(TurnCameraAndPlayer(rotationSpeed));
+		_rotatingCoroutine = StartCoroutine(TurnCameraAndPlayer(rotationSpeed));
 	}
 
 	private IEnumerator TurnCameraAndPlayer(float speedTurn)
