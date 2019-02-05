@@ -157,11 +157,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1fb66d3b4e44f64faceb18e7cc6927f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fallMultiplier: 2.5
-  lowJumpMultiplier: 2
+  fallMultiplier: 1.07
+  lowJumpMultiplier: 1.5
   playerHorizontalSpeed: 5
-  gravityMultiplier: 1
-  jumpSpeed: 5
+  gravityMultiplier: 3
+  jumpSpeed: 14
   rotationSpeed: 75
   groundCheck: {fileID: 7278362154615815021}
   groundRadius: 0.2
@@ -169,6 +169,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   mainCamera: {fileID: 0}
+  inputBufferTime: 0.1
 --- !u!50 &7278362155401064619
 Rigidbody2D:
   serializedVersion: 4
