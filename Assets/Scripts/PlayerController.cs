@@ -16,10 +16,7 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private float timeBeforeGravityAgain = 0.2f;
 	[SerializeField] private float distMaxGroundCheck = 0.1f;
 	[SerializeField] private Vector2 sizeMaxCheckGround = new Vector2(0.5f, 0.1f);
-
 	[SerializeField] private LayerMask layerGround = 0;
-
-	//[SerializeField] private float inputBufferTime = 0.1f;
 	[SerializeField] private int maxNumberGravityUse = 1;
 
 	public enum CardinalDirection
@@ -30,7 +27,6 @@ public class PlayerController : MonoBehaviour
 		West
 	}
 
-	//private CardinalDirection _previousGravityDirection;
 	private CardinalDirection _actualGravityDirection;
 	public CardinalDirection ActualGravityDirection => _actualGravityDirection;
 	private Coroutine _rotatingCoroutine;
@@ -40,11 +36,7 @@ public class PlayerController : MonoBehaviour
 	private bool _canTurn = true;
 	private bool _canMove = true;
 	private float _horizontalInput;
-
 	private bool _isPressingJump;
-
-	//private bool _isPressingLeft;
-	//private bool _isPressingRight;
 	private int _numberGravityUseRemaining;
 	private Collider2D _myCollider;
 
@@ -78,8 +70,6 @@ public class PlayerController : MonoBehaviour
 				}
 			}
 		}
-
-		//_previousGravityDirection = _actualGravityDirection;
 	}
 
 	private void Update()
@@ -97,25 +87,6 @@ public class PlayerController : MonoBehaviour
 			_isPressingJump = false;
 		}
 
-		/*if ((Input.GetButtonDown("TurnLeft") && Input.GetButtonDown("TurnRight") && _numberGravityUseRemaining > 0 &&
-			 _previousGravityDirection == _actualGravityDirection) ||
-			(_isPressingLeft && Input.GetButtonDown("TurnRight")) ||
-			(_isPressingRight && Input.GetButtonDown("TurnLeft")))
-
-		if ((_isPressingLeft && Input.GetButtonDown("TurnLeft")) ||
-			(_isPressingRight && Input.GetButtonDown("TurnRight")))
-		{
-			/*if (!_isPressingLeft && !_isPressingRight)
-			{
-				_numberGravityUseRemaining--;
-			}
-
-			//_isPressingLeft = true;
-			//_isPressingRight = true;
-			TurnTo(_previousGravityDirection + ((int) _previousGravityDirection < 2 ? 2 : -2));
-			//StartCoroutine(ResetPressingTurn(0));
-		}*/
-
 		if (_canTurn)
 		{
 			if (Input.GetButtonDown("TurnLeft") || Input.GetButtonDown("TurnRight"))
@@ -129,12 +100,6 @@ public class PlayerController : MonoBehaviour
 					TurnTo(_actualGravityDirection + (_actualGravityDirection == CardinalDirection.West ? -3 : 1));
 				}
 			}
-
-			/*else if (Input.GetButtonDown("TurnRight"))
-			{
-				_numberGravityUseRemaining--;
-				//StartCoroutine(ResetPressingTurn(inputBufferTime));
-			}*/
 		}
 	}
 
@@ -183,13 +148,6 @@ public class PlayerController : MonoBehaviour
 			-transform.up, distMaxGroundCheck, layerGround);
 	}
 
-	/*private IEnumerator ResetPressingTurn(float timeToWait)
-	{
-		yield return new WaitForSeconds(timeToWait);
-		_isPressingRight = false;
-		_isPressingLeft = false;
-	}*/
-
 	private void TurnTo(CardinalDirection direction)
 	{
 		if (_canMove)
@@ -225,7 +183,6 @@ public class PlayerController : MonoBehaviour
 		yield return new WaitForSeconds(timeBeforeGravityAgain);
 		_canMove = true;
 		_canTurn = _numberGravityUseRemaining > 0;
-		//_previousGravityDirection = _actualGravityDirection;
 		_myCollider.enabled = true;
 	}
 
