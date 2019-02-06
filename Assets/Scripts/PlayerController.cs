@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-//todo player 180° by double tap in same frame then again is causing problem (maybe?)
 //todo rework boxcast to be more precise
 
 public class PlayerController : MonoBehaviour
@@ -14,10 +13,13 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private float gravityMultiplier = 1.0f;
 	[SerializeField] private float jumpSpeed = 3.0f;
 	[SerializeField] private float rotationTime = 1.75f;
+	[SerializeField] private float timeBeforeGravityAgain = 0.2f;
 	[SerializeField] private float distMaxGroundCheck = 0.1f;
 	[SerializeField] private Vector2 sizeMaxCheckGround = new Vector2(0.5f, 0.1f);
+
 	[SerializeField] private LayerMask layerGround = 0;
-	[SerializeField] private float inputBufferTime = 0.1f;
+
+	//[SerializeField] private float inputBufferTime = 0.1f;
 	[SerializeField] private int maxNumberGravityUse = 1;
 
 	public enum CardinalDirection
@@ -28,24 +30,27 @@ public class PlayerController : MonoBehaviour
 		West
 	}
 
-	private CardinalDirection _previousGravityDirection;
+	//private CardinalDirection _previousGravityDirection;
 	private CardinalDirection _actualGravityDirection;
 	public CardinalDirection ActualGravityDirection => _actualGravityDirection;
 	private Coroutine _rotatingCoroutine;
-	private Rigidbody2D _myRigidbody;
+	private Rigidbody2D _myRigidBody;
 	private bool _isGrounded;
 	private bool _isAlive = true;
 	private bool _canTurn = true;
+	private bool _canMove = true;
 	private float _horizontalInput;
+
 	private bool _isPressingJump;
-	private bool _isPressingLeft;
-	private bool _isPressingRight;
+
+	//private bool _isPressingLeft;
+	//private bool _isPressingRight;
 	private int _numberGravityUseRemaining;
 	private Collider2D _myCollider;
 
 	private void Awake()
 	{
-		_myRigidbody = GetComponent<Rigidbody2D>();
+		_myRigidBody = GetComponent<Rigidbody2D>();
 		_myCollider = GetComponent<Collider2D>();
 		_numberGravityUseRemaining = maxNumberGravityUse;
 
@@ -74,7 +79,7 @@ public class PlayerController : MonoBehaviour
 			}
 		}
 
-		_previousGravityDirection = _actualGravityDirection;
+		//_previousGravityDirection = _actualGravityDirection;
 	}
 
 	private void Update()
@@ -82,14 +87,6 @@ public class PlayerController : MonoBehaviour
 		_horizontalInput = Input.GetAxis("Horizontal");
 
 		CheckGrounded();
-		/*bool isGroundedPastValue = _isGrounded;
-
-		_isGrounded = Physics2D.BoxCast(transform.position, sizeMaxCheckGround, 0, -transform.up, distMaxGroundCheck,
-			layerGround);
-		if (_isGrounded && !isGroundedPastValue)
-		{
-			_numberGravityUseRemaining = maxNumberGravityUse;
-		}*/
 
 		if (Input.GetButtonDown("Jump") && _isGrounded)
 		{
@@ -100,67 +97,72 @@ public class PlayerController : MonoBehaviour
 			_isPressingJump = false;
 		}
 
-		if ((Input.GetButtonDown("TurnLeft") && Input.GetButtonDown("TurnRight") && _numberGravityUseRemaining > 0 &&
+		/*if ((Input.GetButtonDown("TurnLeft") && Input.GetButtonDown("TurnRight") && _numberGravityUseRemaining > 0 &&
 			 _previousGravityDirection == _actualGravityDirection) ||
 			(_isPressingLeft && Input.GetButtonDown("TurnRight")) ||
 			(_isPressingRight && Input.GetButtonDown("TurnLeft")))
+
+		if ((_isPressingLeft && Input.GetButtonDown("TurnLeft")) ||
+			(_isPressingRight && Input.GetButtonDown("TurnRight")))
 		{
-			if (!_isPressingLeft && !_isPressingRight)
+			/*if (!_isPressingLeft && !_isPressingRight)
 			{
 				_numberGravityUseRemaining--;
 			}
 
-			_isPressingLeft = true;
-			_isPressingRight = true;
+			//_isPressingLeft = true;
+			//_isPressingRight = true;
 			TurnTo(_previousGravityDirection + ((int) _previousGravityDirection < 2 ? 2 : -2));
-			StartCoroutine(ResetPressingTurn(0));
-		}
+			//StartCoroutine(ResetPressingTurn(0));
+		}*/
 
-		if (_canTurn && _numberGravityUseRemaining > 0)
+		if (_canTurn)
 		{
-			if (Input.GetButtonDown("TurnLeft"))
+			if (Input.GetButtonDown("TurnLeft") || Input.GetButtonDown("TurnRight"))
 			{
-				_numberGravityUseRemaining--;
-				_isPressingLeft = true;
-				TurnTo(_actualGravityDirection - (_actualGravityDirection == CardinalDirection.South ? -3 : 1));
-				StartCoroutine(ResetPressingTurn(inputBufferTime));
+				if (Input.GetButtonDown("TurnLeft"))
+				{
+					TurnTo(_actualGravityDirection - (_actualGravityDirection == CardinalDirection.South ? -3 : 1));
+				}
+				else
+				{
+					TurnTo(_actualGravityDirection + (_actualGravityDirection == CardinalDirection.West ? -3 : 1));
+				}
 			}
 
-			else if (Input.GetButtonDown("TurnRight"))
+			/*else if (Input.GetButtonDown("TurnRight"))
 			{
 				_numberGravityUseRemaining--;
-				_isPressingRight = true;
-				TurnTo(_actualGravityDirection + (_actualGravityDirection == CardinalDirection.West ? -3 : 1));
-				StartCoroutine(ResetPressingTurn(inputBufferTime));
-			}
+				//StartCoroutine(ResetPressingTurn(inputBufferTime));
+			}*/
 		}
 	}
 
 
 	private void FixedUpdate()
 	{
-		if (_canTurn)
+		if (_canMove)
 		{
-			_myRigidbody.AddForce(transform.up.normalized * gravityMultiplier * Physics2D.gravity.y);
-			_myRigidbody.velocity = transform.right.normalized * playerHorizontalSpeed * _horizontalInput +
-									Vector3.Project(_myRigidbody.velocity, transform.up);
+			_myRigidBody.AddForce(transform.up.normalized * gravityMultiplier * Physics2D.gravity.y);
+			_myRigidBody.velocity = transform.right.normalized * playerHorizontalSpeed * _horizontalInput +
+									Vector3.Project(_myRigidBody.velocity, transform.up);
 			if (_isPressingJump)
 			{
-				_myRigidbody.velocity = transform.up.normalized * jumpSpeed +
-										Vector3.Project(_myRigidbody.velocity, transform.right);
+				_myRigidBody.velocity = transform.up.normalized * jumpSpeed +
+										Vector3.Project(_myRigidBody.velocity, transform.right);
 				_isPressingJump = false;
 			}
 
-			if (Vector3.Dot(Vector3.Project(_myRigidbody.velocity, transform.up).normalized,
+			if (Vector3.Dot(Vector3.Project(_myRigidBody.velocity, transform.up).normalized,
 					transform.up.normalized) < 0)
 			{
-				_myRigidbody.velocity += (Vector2) transform.up.normalized * Physics2D.gravity.y *
+				_myRigidBody.velocity += (Vector2) transform.up.normalized * Physics2D.gravity.y *
 										 (fallMultiplier - 1) * Time.deltaTime;
 			}
-			else if (Vector3.Dot(Vector3.Project(_myRigidbody.velocity, transform.up).normalized,
+			else if (Vector3.Dot(Vector3.Project(_myRigidBody.velocity, transform.up).normalized,
 						 transform.up.normalized) > 0 && !Input.GetButton("Jump"))
 			{
-				_myRigidbody.velocity +=
+				_myRigidBody.velocity +=
 					(Vector2) transform.up.normalized * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
 			}
 		}
@@ -171,29 +173,34 @@ public class PlayerController : MonoBehaviour
 		if (_isGrounded)
 		{
 			_numberGravityUseRemaining = maxNumberGravityUse;
+			_canTurn = _numberGravityUseRemaining > 0;
 		}
 	}
 
 	private void CheckGrounded()
 	{
-		Debug.Log(transform.up.ToString());
 		_isGrounded = Physics2D.BoxCast(transform.position, sizeMaxCheckGround, 0,
 			-transform.up, distMaxGroundCheck, layerGround);
 	}
 
-	private IEnumerator ResetPressingTurn(float timeToWait)
+	/*private IEnumerator ResetPressingTurn(float timeToWait)
 	{
 		yield return new WaitForSeconds(timeToWait);
 		_isPressingRight = false;
 		_isPressingLeft = false;
-	}
+	}*/
 
 	private void TurnTo(CardinalDirection direction)
 	{
-		_canTurn = false;
-		_myRigidbody.velocity = Vector2.zero;
+		if (_canMove)
+		{
+			_canMove = false;
+			_numberGravityUseRemaining--;
+			_myRigidBody.velocity = Vector2.zero;
+			_myCollider.enabled = false;
+		}
+
 		_actualGravityDirection = direction;
-		_myCollider.enabled = false;
 		GameManager.Instance.CameraManager.ChangeVCamByDirection(_actualGravityDirection);
 		if (_rotatingCoroutine != null)
 		{
@@ -211,15 +218,14 @@ public class PlayerController : MonoBehaviour
 		{
 			timer += Time.deltaTime;
 			float angle = (float) _actualGravityDirection * 90.0f;
-			//Vector3 playerRotation = transform.eulerAngles;
-			_myRigidbody.rotation = (Mathf.LerpAngle(initRotPlayer, angle, timer / time));
-			//transform.eulerAngles = (Vector3.right * playerRotation.x + Vector3.up * playerRotation.y +
-			//						 Vector3.forward * (Mathf.LerpAngle(initRotPlayer, angle, timer / time)));
+			_myRigidBody.rotation = (Mathf.LerpAngle(initRotPlayer, angle, timer / time));
 			yield return null;
 		}
 
-		_previousGravityDirection = _actualGravityDirection;
-		_canTurn = true;
+		yield return new WaitForSeconds(timeBeforeGravityAgain);
+		_canMove = true;
+		_canTurn = _numberGravityUseRemaining > 0;
+		//_previousGravityDirection = _actualGravityDirection;
 		_myCollider.enabled = true;
 	}
 

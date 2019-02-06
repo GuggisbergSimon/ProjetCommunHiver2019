@@ -14,6 +14,12 @@ public class GameManager : MonoBehaviour
 	public UIManager UIManager => _uiManager;
 	private bool _fadeOutToBlack = false;
 
+	public bool FadeOutToBlack
+	{
+		get => _fadeOutToBlack;
+		set => _fadeOutToBlack = value;
+	}
+	
 	private void OnEnable()
 	{
 		SceneManager.sceneLoaded += OnLevelFinishedLoadingScene;
@@ -77,7 +83,7 @@ public class GameManager : MonoBehaviour
 		if (fadeInToBlack)
 		{
 			_uiManager.FadeToBlack(true);
-			_fadeOutToBlack = fadeOutToBlack;
+			this._fadeOutToBlack = fadeOutToBlack;
 			StartCoroutine(LoadingLevel(nameLevel));
 		}
 	}
