@@ -131,8 +131,8 @@ MonoBehaviour:
   playerHorizontalSpeed: 5
   gravityMultiplier: 3
   jumpSpeed: 14
-  rotationSpeed: 75
-  distMaxGroundCheck: 1.1
+  rotationTime: 1.3
+  distMaxGroundCheck: 1.15
   sizeMaxCheckGround: {x: 0.5, y: 0.1}
   layerGround:
     serializedVersion: 2
