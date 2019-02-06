@@ -100,7 +100,8 @@ public class PlayerController : MonoBehaviour
 			_isPressingJump = false;
 		}
 
-		if ((Input.GetButtonDown("TurnLeft") && Input.GetButtonDown("TurnRight") && _numberGravityUseRemaining > 0) ||
+		if ((Input.GetButtonDown("TurnLeft") && Input.GetButtonDown("TurnRight") && _numberGravityUseRemaining > 0 &&
+			 _previousGravityDirection == _actualGravityDirection) ||
 			(_isPressingLeft && Input.GetButtonDown("TurnRight")) ||
 			(_isPressingRight && Input.GetButtonDown("TurnLeft")))
 		{
