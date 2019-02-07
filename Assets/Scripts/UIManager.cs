@@ -8,7 +8,7 @@ public class UIManager : MonoBehaviour
 {
 	[SerializeField] private float fadingToBlackTime = 0.5f;
 	[SerializeField] private Image blackPanel = null;
-	private bool _isFadingToBlack = false;
+	private bool _isFadingToBlack;
 	public bool IsFadingToBlack => _isFadingToBlack;
 
 	public void FadeToBlack(bool value)

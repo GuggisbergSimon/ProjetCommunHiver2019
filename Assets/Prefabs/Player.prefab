@@ -131,13 +131,13 @@ MonoBehaviour:
   playerHorizontalSpeed: 5
   gravityMultiplier: 3
   jumpSpeed: 14
-  rotationSpeed: 75
-  distMaxGroundCheck: 1.1
+  rotationTime: 1
+  timeBeforeGravityAgain: 0.17
+  distMaxGroundCheck: 1.15
   sizeMaxCheckGround: {x: 0.5, y: 0.1}
   layerGround:
     serializedVersion: 2
     m_Bits: 256
-  inputBufferTime: 0.1
   maxNumberGravityUse: 1
 --- !u!50 &7278362155401064619
 Rigidbody2D:
