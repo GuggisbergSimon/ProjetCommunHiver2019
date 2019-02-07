@@ -15,7 +15,7 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private float rotationTime = 1.75f;
 	[SerializeField] private float timeBeforeGravityAgain = 0.2f;
 	[SerializeField] private float distMaxGroundCheck = 0.1f;
-	[SerializeField] private Vector2 sizeMaxCheckGround = new Vector2(0.5f, 0.1f);
+	[SerializeField] private float radiusGroundCheck = 0.5f;
 	[SerializeField] private LayerMask layerGround = 0;
 	[SerializeField] private int maxNumberGravityUse = 1;
 
@@ -27,6 +27,7 @@ public class PlayerController : MonoBehaviour
 		West
 	}
 
+	private CardinalDirection _previousGravityDirection;
 	private CardinalDirection _actualGravityDirection;
 	public CardinalDirection ActualGravityDirection => _actualGravityDirection;
 	private Coroutine _rotatingCoroutine;
@@ -37,6 +38,8 @@ public class PlayerController : MonoBehaviour
 	private bool _canMove = true;
 	private float _horizontalInput;
 	private bool _isPressingJump;
+	private bool _isPressingRight;
+	private bool _isPressingLeft;
 	private int _numberGravityUseRemaining;
 	private Collider2D _myCollider;
 
@@ -70,6 +73,8 @@ public class PlayerController : MonoBehaviour
 				}
 			}
 		}
+
+		_previousGravityDirection = _actualGravityDirection;
 	}
 
 	private void Update()
@@ -89,16 +94,17 @@ public class PlayerController : MonoBehaviour
 
 		if (_canTurn)
 		{
-			if (Input.GetButtonDown("TurnLeft") || Input.GetButtonDown("TurnRight"))
+			if (Input.GetButtonDown("TurnLeft") && !_isPressingRight)
 			{
-				if (Input.GetButtonDown("TurnLeft"))
-				{
-					TurnTo(_actualGravityDirection - (_actualGravityDirection == CardinalDirection.South ? -3 : 1));
-				}
-				else
-				{
-					TurnTo(_actualGravityDirection + (_actualGravityDirection == CardinalDirection.West ? -3 : 1));
-				}
+				_isPressingLeft = true;
+				TurnTo(_actualGravityDirection -
+					   (_actualGravityDirection == CardinalDirection.South ? -3 : 1));
+			}
+			else if (Input.GetButtonDown("TurnRight") && !_isPressingLeft)
+			{
+				_isPressingRight = true;
+				TurnTo(_actualGravityDirection +
+					   (_actualGravityDirection == CardinalDirection.West ? -3 : 1));
 			}
 		}
 	}
@@ -135,6 +141,7 @@ public class PlayerController : MonoBehaviour
 
 	private void OnCollisionEnter2D(Collision2D other)
 	{
+		CheckGrounded();
 		if (_isGrounded)
 		{
 			_numberGravityUseRemaining = maxNumberGravityUse;
@@ -144,28 +151,32 @@ public class PlayerController : MonoBehaviour
 
 	private void CheckGrounded()
 	{
-		_isGrounded = Physics2D.BoxCast(transform.position, sizeMaxCheckGround, 0,
-			-transform.up, distMaxGroundCheck, layerGround);
+		_isGrounded = Physics2D.CircleCast(transform.position, radiusGroundCheck, -transform.up, distMaxGroundCheck,
+			layerGround);
 	}
 
 	private void TurnTo(CardinalDirection direction)
 	{
-		if (_canMove)
+		//check that the player can not go further than 180°
+		if (_actualGravityDirection + ((int) _actualGravityDirection > 1 ? -2 : 2) != _previousGravityDirection)
 		{
-			_canMove = false;
-			_numberGravityUseRemaining--;
-			_myRigidBody.velocity = Vector2.zero;
-			_myCollider.enabled = false;
-		}
+			if (_canMove)
+			{
+				_canMove = false;
+				_numberGravityUseRemaining--;
+				_myRigidBody.velocity = Vector2.zero;
+				_myCollider.enabled = false;
+			}
 
-		_actualGravityDirection = direction;
-		GameManager.Instance.CameraManager.ChangeVCamByDirection(_actualGravityDirection);
-		if (_rotatingCoroutine != null)
-		{
-			StopCoroutine(_rotatingCoroutine);
-		}
+			_actualGravityDirection = direction;
+			GameManager.Instance.CameraManager.ChangeVCamByDirection(_actualGravityDirection);
+			if (_rotatingCoroutine != null)
+			{
+				StopCoroutine(_rotatingCoroutine);
+			}
 
-		_rotatingCoroutine = StartCoroutine(TurnCameraAndPlayer(rotationTime));
+			_rotatingCoroutine = StartCoroutine(TurnCameraAndPlayer(rotationTime));
+		}
 	}
 
 	private IEnumerator TurnCameraAndPlayer(float time)
@@ -181,6 +192,9 @@ public class PlayerController : MonoBehaviour
 		}
 
 		yield return new WaitForSeconds(timeBeforeGravityAgain);
+		_previousGravityDirection = _actualGravityDirection;
+		_isPressingLeft = false;
+		_isPressingRight = false;
 		_canMove = true;
 		_canTurn = _numberGravityUseRemaining > 0;
 		_myCollider.enabled = true;
