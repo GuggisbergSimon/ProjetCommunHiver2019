@@ -17,6 +17,7 @@ public class CameraManager : MonoBehaviour
 
 	void Start()
 	{
+		//setup the rotation of each camera correctly
 		int i = 0;
 		foreach (var cam in FindObjectsOfType<CinemachineVirtualCamera>())
 		{
@@ -25,6 +26,7 @@ public class CameraManager : MonoBehaviour
 			++i;
 		}
 
+		//setup the maincamera
 		_vCam = _vCams[GameManager.Instance.Player.ActualGravityDirection];
 		_vCam.Priority = mainFocusPriority;
 		_noise = _vCam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
