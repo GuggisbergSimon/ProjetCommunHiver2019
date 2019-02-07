@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-//todo rework boxcast to be more precise
-
 public class PlayerController : MonoBehaviour
 {
 	[SerializeField] private float fallMultiplier = 2.5f;
@@ -79,10 +77,11 @@ public class PlayerController : MonoBehaviour
 
 	private void Update()
 	{
+		//handles horizontal input
 		_horizontalInput = Input.GetAxis("Horizontal");
-
 		CheckGrounded();
 
+		//handles jump input
 		if (Input.GetButtonDown("Jump") && _isGrounded)
 		{
 			_isPressingJump = true;
@@ -92,8 +91,11 @@ public class PlayerController : MonoBehaviour
 			_isPressingJump = false;
 		}
 
+		//handles turn input
 		if (_canTurn)
 		{
+			
+			//a ternary operator is used in order to go from the top of the enumlist to the bottom and vice-versa
 			if (Input.GetButtonDown("TurnLeft") && !_isPressingRight)
 			{
 				_isPressingLeft = true;
@@ -114,9 +116,12 @@ public class PlayerController : MonoBehaviour
 	{
 		if (_canMove)
 		{
+			//add gravity force depending on direction
 			_myRigidBody.AddForce(transform.up.normalized * gravityMultiplier * Physics2D.gravity.y);
+			//moves the player depending on direction
 			_myRigidBody.velocity = transform.right.normalized * playerHorizontalSpeed * _horizontalInput +
 									Vector3.Project(_myRigidBody.velocity, transform.up);
+			//executes a jump depending on direction
 			if (_isPressingJump)
 			{
 				_myRigidBody.velocity = transform.up.normalized * jumpSpeed +
@@ -124,12 +129,14 @@ public class PlayerController : MonoBehaviour
 				_isPressingJump = false;
 			}
 
+			//applies fallMultiplier
 			if (Vector3.Dot(Vector3.Project(_myRigidBody.velocity, transform.up).normalized,
 					transform.up.normalized) < 0)
 			{
 				_myRigidBody.velocity += (Vector2) transform.up.normalized * Physics2D.gravity.y *
 										 (fallMultiplier - 1) * Time.deltaTime;
 			}
+			//applies lowJumpMultiplier
 			else if (Vector3.Dot(Vector3.Project(_myRigidBody.velocity, transform.up).normalized,
 						 transform.up.normalized) > 0 && !Input.GetButton("Jump"))
 			{
@@ -142,6 +149,7 @@ public class PlayerController : MonoBehaviour
 	private void OnCollisionEnter2D(Collision2D other)
 	{
 		CheckGrounded();
+		//restores gravity power
 		if (_isGrounded)
 		{
 			_numberGravityUseRemaining = maxNumberGravityUse;
@@ -149,6 +157,7 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
+	//raycast to check if the player is grounded
 	private void CheckGrounded()
 	{
 		_isGrounded = Physics2D.CircleCast(transform.position, radiusGroundCheck, -transform.up, distMaxGroundCheck,
@@ -157,9 +166,10 @@ public class PlayerController : MonoBehaviour
 
 	private void TurnTo(CardinalDirection direction)
 	{
-		//check that the player can not go further than 180°
+		//checks that the player can not go further than 180°
 		if (_actualGravityDirection + ((int) _actualGravityDirection > 1 ? -2 : 2) != _previousGravityDirection)
 		{
+			//setup the first 90° turn
 			if (_canMove)
 			{
 				_canMove = false;
@@ -170,28 +180,30 @@ public class PlayerController : MonoBehaviour
 
 			_actualGravityDirection = direction;
 			GameManager.Instance.CameraManager.ChangeVCamByDirection(_actualGravityDirection);
+			//checks if a coroutine is already running
 			if (_rotatingCoroutine != null)
 			{
 				StopCoroutine(_rotatingCoroutine);
 			}
 
-			_rotatingCoroutine = StartCoroutine(TurnCameraAndPlayer(rotationTime));
+			_rotatingCoroutine = StartCoroutine(TurnPlayer(rotationTime));
 		}
 	}
 
-	private IEnumerator TurnCameraAndPlayer(float time)
+	//Coroutine which turns progressively the player to _actualGravityDirection
+	private IEnumerator TurnPlayer(float time)
 	{
 		float timer = 0.0f;
 		float initRotPlayer = transform.eulerAngles.z;
 		while (timer < time)
 		{
 			timer += Time.deltaTime;
-			float angle = (float) _actualGravityDirection * 90.0f;
-			_myRigidBody.rotation = (Mathf.LerpAngle(initRotPlayer, angle, timer / time));
+			_myRigidBody.rotation = (Mathf.LerpAngle(initRotPlayer, (float) _actualGravityDirection * 90.0f, timer / time));
 			yield return null;
 		}
 
 		yield return new WaitForSeconds(timeBeforeGravityAgain);
+		//restores player move after turning
 		_previousGravityDirection = _actualGravityDirection;
 		_isPressingLeft = false;
 		_isPressingRight = false;
