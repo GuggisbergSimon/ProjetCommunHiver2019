@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -7,9 +8,17 @@ public class GameManager : MonoBehaviour
 	public static GameManager Instance { get; private set; }
 	private PlayerController player;
 	public PlayerController Player => player;
-	private CameraManager cameraManager;
+	private CameraManager _cameraManager;
+	public CameraManager CameraManager => _cameraManager;
+	private UIManager _uiManager;
+	public UIManager UIManager => _uiManager;
+	private bool _fadeOutToBlack = false;
 
-	public CameraManager CameraManager => cameraManager;
+	public bool FadeOutToBlack
+	{
+		get => _fadeOutToBlack;
+		set => _fadeOutToBlack = value;
+	}
 	
 	private void OnEnable()
 	{
@@ -33,13 +42,20 @@ public class GameManager : MonoBehaviour
 	private void OnLevelFinishedLoadingScene(Scene scene, LoadSceneMode mode)
 	{
 		Setup();
+		if (_fadeOutToBlack)
+		{
+			UIManager.FadeToBlack(false);
+			_fadeOutToBlack = false;
+		}
 	}
 
 	private void Setup()
 	{
-		player = FindObjectOfType<PlayerController>();
+		//alternative way to get elements. cons : if there is no element with such tag it creates an error
 		//player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
-		cameraManager = FindObjectOfType<CameraManager>();
+		player = FindObjectOfType<PlayerController>();
+		_cameraManager = FindObjectOfType<CameraManager>();
+		_uiManager = FindObjectOfType<UIManager>();
 	}
 
 	private void Awake()
@@ -53,7 +69,7 @@ public class GameManager : MonoBehaviour
 			Instance = this;
 			DontDestroyOnLoad(gameObject);
 		}
-		
+
 		Setup();
 	}
 
@@ -62,9 +78,24 @@ public class GameManager : MonoBehaviour
 		SceneManager.LoadScene(nameLevel);
 	}
 
-	public void LoadScene(string nameLevel, float fadeinTime, float fadeoutTime,bool fadeinToBlack, bool fadeoutToBlack)
+	public void LoadLevel(string nameLevel, bool fadeInToBlack, bool fadeOutToBlack)
 	{
-		
+		if (fadeInToBlack)
+		{
+			_uiManager.FadeToBlack(true);
+			this._fadeOutToBlack = fadeOutToBlack;
+			StartCoroutine(LoadingLevel(nameLevel));
+		}
+	}
+
+	IEnumerator LoadingLevel(string nameLevel)
+	{
+		while (UIManager.IsFadingToBlack)
+		{
+			yield return null;
+		}
+
+		LoadLevel(nameLevel);
 	}
 
 	public void QuitGame()

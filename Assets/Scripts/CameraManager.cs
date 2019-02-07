@@ -8,22 +8,25 @@ public class CameraManager : MonoBehaviour
 {
 	[SerializeField] private int defaultPriority = 9;
 	[SerializeField] private int mainFocusPriority = 10;
-	private Dictionary<PlayerController.CardinalDirection, CinemachineVirtualCamera> _vCams = new Dictionary<PlayerController.CardinalDirection, CinemachineVirtualCamera>();
+
+	private Dictionary<PlayerController.CardinalDirection, CinemachineVirtualCamera> _vCams =
+		new Dictionary<PlayerController.CardinalDirection, CinemachineVirtualCamera>();
+
 	private CinemachineVirtualCamera _vCam;
 	private CinemachineBasicMultiChannelPerlin _noise;
 
 	void Start()
 	{
+		//setup the rotation of each camera correctly
 		int i = 0;
 		foreach (var cam in FindObjectsOfType<CinemachineVirtualCamera>())
 		{
-			_vCams.Add((PlayerController.CardinalDirection) i,cam);
+			_vCams.Add((PlayerController.CardinalDirection) i, cam);
 			cam.transform.eulerAngles = Vector3.forward * 90 * i;
-			Debug.Log(i + cam.name);
 			++i;
 		}
 
-		;
+		//setup the maincamera
 		_vCam = _vCams[GameManager.Instance.Player.ActualGravityDirection];
 		_vCam.Priority = mainFocusPriority;
 		_noise = _vCam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();

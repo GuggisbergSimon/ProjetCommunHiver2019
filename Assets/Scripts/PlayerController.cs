@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using Cinemachine;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,13 +10,12 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private float playerHorizontalSpeed = 5.0f;
 	[SerializeField] private float gravityMultiplier = 1.0f;
 	[SerializeField] private float jumpSpeed = 3.0f;
-	[SerializeField] private float rotationSpeed = 5.0f;
-    [SerializeField] private float fallingSpeedLimit;
-	[SerializeField] private Transform groundCheck = null;
-	[SerializeField] private float groundRadius = 0.1f;
+	[SerializeField] private float rotationTime = 1.75f;
+	[SerializeField] private float timeBeforeGravityAgain = 0.2f;
+	[SerializeField] private float distMaxGroundCheck = 0.1f;
+	[SerializeField] private float radiusGroundCheck = 0.5f;
 	[SerializeField] private LayerMask layerGround = 0;
-	[SerializeField] private GameObject mainCamera = null;
-	[SerializeField] private float inputBufferTime = 0.1f;
+	[SerializeField] private int maxNumberGravityUse = 1;
 
 	public enum CardinalDirection
 	{
@@ -30,21 +29,23 @@ public class PlayerController : MonoBehaviour
 	private CardinalDirection _actualGravityDirection;
 	public CardinalDirection ActualGravityDirection => _actualGravityDirection;
 	private Coroutine _rotatingCoroutine;
-	private Rigidbody2D _myRigidbody;
+	private Rigidbody2D _myRigidBody;
 	private bool _isGrounded;
 	private bool _isAlive = true;
 	private bool _canTurn = true;
+	private bool _canMove = true;
 	private float _horizontalInput;
 	private bool _isPressingJump;
-	private bool _isPressingLeft;
 	private bool _isPressingRight;
-    private bool _canChangeGravity;
-    private bool _checkIfChangeGravity = true;
-    private bool _maxSpeed = false;
+	private bool _isPressingLeft;
+	private int _numberGravityUseRemaining;
+	private Collider2D _myCollider;
 
 	private void Awake()
 	{
-		_myRigidbody = GetComponent<Rigidbody2D>();
+		_myRigidBody = GetComponent<Rigidbody2D>();
+		_myCollider = GetComponent<Collider2D>();
+		_numberGravityUseRemaining = maxNumberGravityUse;
 
 		//setup correctly the direction the player is positioned at setup
 		float initRot = transform.eulerAngles.z;
@@ -76,8 +77,11 @@ public class PlayerController : MonoBehaviour
 
 	private void Update()
 	{
+		//handles horizontal input
 		_horizontalInput = Input.GetAxis("Horizontal");
-		_isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, layerGround);
+		CheckGrounded();
+
+		//handles jump input
 		if (Input.GetButtonDown("Jump") && _isGrounded)
 		{
 			_isPressingJump = true;
@@ -87,118 +91,125 @@ public class PlayerController : MonoBehaviour
 			_isPressingJump = false;
 		}
 
-		if ((Input.GetButtonDown("TurnLeft") && Input.GetButtonDown("TurnRight")) ||
-		    (_isPressingLeft && Input.GetButtonDown("TurnRight")) ||
-		    (_isPressingRight && Input.GetButtonDown("TurnLeft")))
+		//handles turn input
+		if (_canTurn)
 		{
-			_isPressingLeft = true;
-			_isPressingRight = true;
-			TurnTo(_previousGravityDirection + ((int) _previousGravityDirection < 2 ? 2 : -2));
+			
+			//a ternary operator is used in order to go from the top of the enumlist to the bottom and vice-versa
+			if (Input.GetButtonDown("TurnLeft") && !_isPressingRight)
+			{
+				_isPressingLeft = true;
+				TurnTo(_actualGravityDirection -
+					   (_actualGravityDirection == CardinalDirection.South ? -3 : 1));
+			}
+			else if (Input.GetButtonDown("TurnRight") && !_isPressingLeft)
+			{
+				_isPressingRight = true;
+				TurnTo(_actualGravityDirection +
+					   (_actualGravityDirection == CardinalDirection.West ? -3 : 1));
+			}
 		}
-        if (_canChangeGravity)
-        {
-            if (_canTurn)
-            {
-                if (Input.GetButtonDown("TurnLeft"))
-                {
-                    _isPressingLeft = true;
-                    TurnTo(_actualGravityDirection - (_actualGravityDirection == CardinalDirection.South ? -3 : 1));
-                }
-
-                else if (Input.GetButtonDown("TurnRight"))
-                {
-                    _isPressingRight = true;
-                    TurnTo(_actualGravityDirection + (_actualGravityDirection == CardinalDirection.West ? -3 : 1));
-                }
-            }
-        }
-
-        if (_checkIfChangeGravity)
-        {
-            if (_isGrounded)
-            {
-                _canChangeGravity = true;
-                _checkIfChangeGravity = false;
-            }
-        }
 	}
 
 
 	private void FixedUpdate()
 	{
-		if (_canTurn)
+		if (_canMove)
 		{
-			_myRigidbody.AddForce(transform.up.normalized * gravityMultiplier * Physics2D.gravity.y);
-			_myRigidbody.velocity = transform.right.normalized * playerHorizontalSpeed * _horizontalInput +
-			                        Vector3.Project(_myRigidbody.velocity, transform.up);
+			//add gravity force depending on direction
+			_myRigidBody.AddForce(transform.up.normalized * gravityMultiplier * Physics2D.gravity.y);
+			//moves the player depending on direction
+			_myRigidBody.velocity = transform.right.normalized * playerHorizontalSpeed * _horizontalInput +
+									Vector3.Project(_myRigidBody.velocity, transform.up);
+			//executes a jump depending on direction
 			if (_isPressingJump)
 			{
-				_myRigidbody.velocity = transform.up.normalized * jumpSpeed +
-				                        Vector3.Project(_myRigidbody.velocity, transform.right);
+				_myRigidBody.velocity = transform.up.normalized * jumpSpeed +
+										Vector3.Project(_myRigidBody.velocity, transform.right);
 				_isPressingJump = false;
 			}
 
-			if (Vector3.Dot(Vector3.Project(_myRigidbody.velocity, transform.up).normalized,
-				    transform.up.normalized) < 0)
+			//applies fallMultiplier
+			if (Vector3.Dot(Vector3.Project(_myRigidBody.velocity, transform.up).normalized,
+					transform.up.normalized) < 0)
 			{
-				_myRigidbody.velocity += (Vector2) transform.up.normalized * Physics2D.gravity.y *
-				                         (fallMultiplier - 1) * Time.deltaTime;
+				_myRigidBody.velocity += (Vector2) transform.up.normalized * Physics2D.gravity.y *
+										 (fallMultiplier - 1) * Time.deltaTime;
 			}
-			else if (Vector3.Dot(Vector3.Project(_myRigidbody.velocity, transform.up).normalized,
-				         transform.up.normalized) > 0 && !Input.GetButton("Jump"))
+			//applies lowJumpMultiplier
+			else if (Vector3.Dot(Vector3.Project(_myRigidBody.velocity, transform.up).normalized,
+						 transform.up.normalized) > 0 && !Input.GetButton("Jump"))
 			{
-				_myRigidbody.velocity +=
+				_myRigidBody.velocity +=
 					(Vector2) transform.up.normalized * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
 			}
 		}
 	}
 
-	private IEnumerator ResetPressingTurn(float timeToWait)
+	private void OnCollisionEnter2D(Collision2D other)
 	{
-		yield return new WaitForSeconds(timeToWait);
-		_isPressingRight = false;
-		_isPressingLeft = false;
+		CheckGrounded();
+		//restores gravity power
+		if (_isGrounded)
+		{
+			_numberGravityUseRemaining = maxNumberGravityUse;
+			_canTurn = _numberGravityUseRemaining > 0;
+		}
+	}
+
+	//raycast to check if the player is grounded
+	private void CheckGrounded()
+	{
+		_isGrounded = Physics2D.CircleCast(transform.position, radiusGroundCheck, -transform.up, distMaxGroundCheck,
+			layerGround);
 	}
 
 	private void TurnTo(CardinalDirection direction)
 	{
-		_canTurn = false;
-		_myRigidbody.velocity = Vector2.zero;
-		_actualGravityDirection = direction;
-		GameManager.Instance.CameraManager.ChangeVCamByDirection(_actualGravityDirection);
-		StartCoroutine(ResetPressingTurn(inputBufferTime));
-		if (_rotatingCoroutine != null)
+		//checks that the player can not go further than 180°
+		if (_actualGravityDirection + ((int) _actualGravityDirection > 1 ? -2 : 2) != _previousGravityDirection)
 		{
-			StopCoroutine(_rotatingCoroutine);
-		}
+			//setup the first 90° turn
+			if (_canMove)
+			{
+				_canMove = false;
+				_numberGravityUseRemaining--;
+				_myRigidBody.velocity = Vector2.zero;
+				_myCollider.enabled = false;
+			}
 
-		_rotatingCoroutine = StartCoroutine(TurnCameraAndPlayer(rotationSpeed));
+			_actualGravityDirection = direction;
+			GameManager.Instance.CameraManager.ChangeVCamByDirection(_actualGravityDirection);
+			//checks if a coroutine is already running
+			if (_rotatingCoroutine != null)
+			{
+				StopCoroutine(_rotatingCoroutine);
+			}
+
+			_rotatingCoroutine = StartCoroutine(TurnPlayer(rotationTime));
+		}
 	}
 
-	private IEnumerator TurnCameraAndPlayer(float speedTurn)
+	//Coroutine which turns progressively the player to _actualGravityDirection
+	private IEnumerator TurnPlayer(float time)
 	{
-		float time = (90.0f / speedTurn);
 		float timer = 0.0f;
-		float initRotCam = mainCamera.transform.eulerAngles.z;
 		float initRotPlayer = transform.eulerAngles.z;
-        _canChangeGravity = false;
-
 		while (timer < time)
 		{
-			Vector3 cameraRotation = mainCamera.transform.eulerAngles;
-			float angle = (float) _actualGravityDirection * 90;
-			
-			//mainCamera.transform.eulerAngles = (Vector3.right * cameraRotation.x + Vector3.up * cameraRotation.y +
-			//                                    Vector3.forward * (Mathf.LerpAngle(initRotCam, angle, timer / time)));
-			Vector3 playerRotation = transform.eulerAngles;
-			transform.eulerAngles = (Vector3.right * playerRotation.x + Vector3.up * playerRotation.y +
-			                         Vector3.forward * (Mathf.LerpAngle(initRotPlayer, angle, timer / time)));
 			timer += Time.deltaTime;
+			_myRigidBody.rotation = (Mathf.LerpAngle(initRotPlayer, (float) _actualGravityDirection * 90.0f, timer / time));
 			yield return null;
 		}
-        _checkIfChangeGravity = true;
+
+		yield return new WaitForSeconds(timeBeforeGravityAgain);
+		//restores player move after turning
 		_previousGravityDirection = _actualGravityDirection;
-		_canTurn = true;
+		_isPressingLeft = false;
+		_isPressingRight = false;
+		_canMove = true;
+		_canTurn = _numberGravityUseRemaining > 0;
+		_myCollider.enabled = true;
 	}
 
 	public void Die()
@@ -206,57 +217,7 @@ public class PlayerController : MonoBehaviour
 		if (_isAlive)
 		{
 			_isAlive = false;
+			GameManager.Instance.LoadLevel(SceneManager.GetActiveScene().name, true, true);
 		}
 	}
-
-    private void FreezeFallingSpeed(Rigidbody2D rigidbody2D, CardinalDirection cardinalDirection)
-    {
-        switch (cardinalDirection)
-        {
-            case CardinalDirection.North:
-                FreezeFallingSpeed(rigidbody2D.velocity.y);
-                if (_maxSpeed)
-                {
-                    rigidbody2D.velocity = new Vector2(rigidbody2D.velocity.x, fallingSpeedLimit);
-                }
-                break;
-            case CardinalDirection.South:
-                FreezeFallingSpeed(-rigidbody2D.velocity.y);
-                if (_maxSpeed)
-                {
-                    rigidbody2D.velocity = new Vector2(rigidbody2D.velocity.x, -fallingSpeedLimit);
-                }
-                break;
-            case CardinalDirection.East:
-                FreezeFallingSpeed(rigidbody2D.velocity.x);
-                if (_maxSpeed)
-                {
-                    rigidbody2D.velocity = new Vector2(fallingSpeedLimit, rigidbody2D.velocity.y);
-                }
-                break;
-            case CardinalDirection.West:
-                FreezeFallingSpeed(-rigidbody2D.velocity.x);
-                if (_maxSpeed)
-                {
-                    rigidbody2D.velocity = new Vector2(-fallingSpeedLimit, rigidbody2D.velocity.y);
-                }
-                break;
-        }
-
-    }
-
-    private void FreezeFallingSpeed(float value)
-    {
-        if (value > fallingSpeedLimit)
-        {
-            _maxSpeed = true;
-        }
-        else
-        {
-            _maxSpeed = false;
-        }
-    }
-
-
-
 }
