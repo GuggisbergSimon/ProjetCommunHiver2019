@@ -15,6 +15,7 @@ public class LaserBehaviour : MonoBehaviour
 	[SerializeField] private Color inactiveColor = Color.clear;
 	[SerializeField] private Color activeColor = Color.white;
 	private bool _isActive = true;
+	private SpriteRenderer _mySpriteRenderer;
 	private LineRenderer _myLineRenderer;
 	private BoxCollider2D _myCollider;
 
@@ -29,6 +30,7 @@ public class LaserBehaviour : MonoBehaviour
 	{
 		_myLineRenderer = GetComponent<LineRenderer>();
 		_myCollider = GetComponentInChildren<BoxCollider2D>();
+		_mySpriteRenderer = GetComponentInChildren<SpriteRenderer>();
 		StartCoroutine(SimpleRoutine());
 	}
 
@@ -65,21 +67,21 @@ public class LaserBehaviour : MonoBehaviour
 	{
 		while (true)
 		{
-			//simple routine who alternate between three state, warming up (sign), active, and inactive
-			ChangeLineColor(warmingUpColor);
+			//simple routine who alternate between three state, warming up (sign of attack), active, and inactive
+			ChangeColor(warmingUpColor);
 			if (warmUpTime.CompareTo(0) != 0)
 			{
 				yield return new WaitForSeconds(warmUpTime);
 			}
 
-			ChangeLineColor(activeColor);
+			ChangeColor(activeColor);
 			_isActive = true;
 			if (activeTime.CompareTo(0) != 0)
 			{
 				yield return new WaitForSeconds(activeTime);
 			}
 
-			ChangeLineColor(inactiveColor);
+			ChangeColor(inactiveColor);
 			_isActive = false;
 			if (inactiveTime.CompareTo(0) != 0)
 			{
@@ -88,8 +90,9 @@ public class LaserBehaviour : MonoBehaviour
 		}
 	}
 
-	private void ChangeLineColor(Color color)
+	private void ChangeColor(Color color)
 	{
+		_mySpriteRenderer.color = color;
 		_myLineRenderer.startColor = color;
 		_myLineRenderer.endColor = color;
 	}
