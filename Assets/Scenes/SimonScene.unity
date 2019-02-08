@@ -18985,7 +18985,7 @@ PrefabInstance:
       objectReference: {fileID: 1412621439}
     - target: {fileID: 1122251152, guid: 90ecd07f6b343d24c938c96234a274bc, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.1087866
+      value: -2.1241608
       objectReference: {fileID: 0}
     - target: {fileID: 1122251153, guid: 90ecd07f6b343d24c938c96234a274bc, type: 3}
       propertyPath: m_DefaultBlend.m_Time
