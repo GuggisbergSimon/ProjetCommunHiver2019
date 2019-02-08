@@ -80,6 +80,12 @@ public class PlayerController : MonoBehaviour
 		//handles horizontal input
 		_horizontalInput = Input.GetAxis("Horizontal");
 		CheckGrounded();
+		//restores gravity power
+		if (_isGrounded)
+		{
+			_numberGravityUseRemaining = maxNumberGravityUse;
+			_canTurn = _numberGravityUseRemaining > 0;
+		}
 
 		//handles jump input
 		if (Input.GetButtonDown("Jump") && _isGrounded)
@@ -94,7 +100,6 @@ public class PlayerController : MonoBehaviour
 		//handles turn input
 		if (_canTurn)
 		{
-			
 			//a ternary operator is used in order to go from the top of the enumlist to the bottom and vice-versa
 			if (Input.GetButtonDown("TurnLeft") && !_isPressingRight)
 			{
@@ -146,17 +151,6 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
-	private void OnCollisionEnter2D(Collision2D other)
-	{
-		CheckGrounded();
-		//restores gravity power
-		if (_isGrounded)
-		{
-			_numberGravityUseRemaining = maxNumberGravityUse;
-			_canTurn = _numberGravityUseRemaining > 0;
-		}
-	}
-
 	//raycast to check if the player is grounded
 	private void CheckGrounded()
 	{
@@ -198,7 +192,8 @@ public class PlayerController : MonoBehaviour
 		while (timer < time)
 		{
 			timer += Time.deltaTime;
-			_myRigidBody.rotation = (Mathf.LerpAngle(initRotPlayer, (float) _actualGravityDirection * 90.0f, timer / time));
+			_myRigidBody.rotation =
+				(Mathf.LerpAngle(initRotPlayer, (float) _actualGravityDirection * 90.0f, timer / time));
 			yield return null;
 		}
 
