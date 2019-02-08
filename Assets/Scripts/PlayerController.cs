@@ -77,14 +77,17 @@ public class PlayerController : MonoBehaviour
 
 	private void Update()
 	{
-		//handles horizontal input
-		_horizontalInput = Input.GetAxis("Horizontal");
-		CheckGrounded();
-		//restores gravity power
-		if (_isGrounded)
+		if (_canMove)
 		{
-			_numberGravityUseRemaining = maxNumberGravityUse;
-			_canTurn = _numberGravityUseRemaining > 0;
+			//handles horizontal input
+			_horizontalInput = Input.GetAxis("Horizontal");
+			CheckGrounded();
+			//restores gravity power
+			if (_isGrounded)
+			{
+				_numberGravityUseRemaining = maxNumberGravityUse;
+				_canTurn = _numberGravityUseRemaining > 0;
+			}
 		}
 
 		//handles jump input

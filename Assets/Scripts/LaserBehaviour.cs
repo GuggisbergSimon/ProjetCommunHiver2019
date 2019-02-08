@@ -7,10 +7,10 @@ public class LaserBehaviour : MonoBehaviour
 	[SerializeField] private float warmUpTime = 0.5f;
 	[SerializeField] private float activeTime = 2.0f;
 	[SerializeField] private float inactiveTime = 2.0f;
+	[SerializeField] private float rotationSpeed = 10.0f;
 	[SerializeField] private LayerMask layerGround = 0;
 	[SerializeField] private float distance = 100.0f;
 	private bool _isActive = true;
-	private SpriteRenderer _mySprite;
 	private LineRenderer _myLineRenderer;
 	private BoxCollider2D _myCollider;
 
@@ -18,7 +18,6 @@ public class LaserBehaviour : MonoBehaviour
 	{
 		_myLineRenderer = GetComponent<LineRenderer>();
 		_myCollider = GetComponentInChildren<BoxCollider2D>();
-		_mySprite = GetComponentInChildren<SpriteRenderer>();
 		StartCoroutine(SimpleRoutine());
 	}
 
@@ -28,10 +27,11 @@ public class LaserBehaviour : MonoBehaviour
 		Vector2 currentPos = transform.position;
 		RaycastHit2D hit = Physics2D.Raycast(currentPos, -transform.up, distance,
 			layerGround);
-		transform.rotation = GameManager.Instance.Player.transform.rotation;
+		transform.rotation = Quaternion.RotateTowards(transform.rotation, GameManager.Instance.Player.transform.rotation,
+			rotationSpeed * Time.deltaTime);
 		_myLineRenderer.SetPosition(0, currentPos);
 		_myLineRenderer.SetPosition(1, hit.point);
-		_myCollider.offset =Vector2.down * (hit.point - currentPos).magnitude / 2;
+		_myCollider.offset = Vector2.down * (hit.point - currentPos).magnitude / 2;
 		_myCollider.size = Vector2.right * _myCollider.size + Vector2.up * (hit.point - currentPos).magnitude;
 	}
 
