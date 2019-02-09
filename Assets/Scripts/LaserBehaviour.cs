@@ -57,8 +57,8 @@ public class LaserBehaviour : MonoBehaviour
 			layerGround);
 
 		//adjusts the linerenderer and the collider based on the raycast
-		_myLineRenderer.SetPosition(0, currentPos);
-		_myLineRenderer.SetPosition(1, hit.point);
+		_myLineRenderer.SetPosition(0, Vector3.zero);
+		_myLineRenderer.SetPosition(1, transform.InverseTransformPoint(hit.point));
 		_myCollider.offset = Vector2.down * (hit.point - currentPos).magnitude / 2;
 		_myCollider.size = Vector2.right * _myCollider.size + Vector2.up * (hit.point - currentPos).magnitude;
 	}
