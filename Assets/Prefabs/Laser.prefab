@@ -128,10 +128,15 @@ MonoBehaviour:
   warmUpTime: 1
   activeTime: 2
   inactiveTime: 2
+  rotationSpeed: 1000
   layerGround:
     serializedVersion: 2
     m_Bits: 256
   distance: 100
+  myMode: 0
+  warmingUpColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  inactiveColor: {r: 0, g: 0, b: 0, a: 0}
+  activeColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!61 &7922744736234831716
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -197,7 +202,7 @@ LineRenderer:
   m_SortingOrder: 100
   m_Positions:
   - {x: 0, y: 0, z: 0}
-  - {x: 0, y: 0, z: 1}
+  - {x: 0, y: -3, z: 0}
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 0.3

@@ -7,7 +7,8 @@ public class MovingRoutine : MonoBehaviour
 {
 	[SerializeField] private MovingMode movingMode = 0;
 	[SerializeField] private Point[] points;
-	private int indexPoints;
+	private int _indexPoints = 0;
+	private bool _ascendantOrder = true;
 
 	[Serializable]
 	private struct Point
@@ -20,49 +21,54 @@ public class MovingRoutine : MonoBehaviour
 	private enum MovingMode
 	{
 		PingPong,
-		BackToBeginning,
+		LoopToBeginning,
 		OnlyOnce
 	}
-
+	
 	private void Start()
 	{
-		StartCoroutine(Moving(true));
+		StartCoroutine(Moving());
 	}
 
-	private IEnumerator Moving(bool ascendantOrder)
+	private IEnumerator Moving()
 	{
-		while (indexPoints < points.Length)
+		while (true)
 		{
-			Vector2 initPos = transform.position;
-			float timer = 0.0f;
-			Point actualPoint = points[indexPoints];
-			while (timer < actualPoint.timeToReach)
+			while (_indexPoints < points.Length && _indexPoints >= 0)
 			{
-				timer += Time.deltaTime;
-				transform.position = Vector2.Lerp(initPos, actualPoint.position, timer / actualPoint.timeToReach);
-				yield return null;
+				Vector2 initPos = transform.position;
+				float timer = 0.0f;
+				Point actualPoint = points[_indexPoints];
+				while (timer < actualPoint.timeToReach)
+				{
+					timer += Time.deltaTime;
+					transform.position = Vector2.Lerp(initPos, actualPoint.position, timer / actualPoint.timeToReach);
+					yield return null;
+				}
+				yield return new WaitForSeconds(actualPoint.timeToStop);
+				if (_ascendantOrder)
+				{
+					_indexPoints++;
+				}
+				else
+				{
+					_indexPoints--;
+				}
 			}
-			yield return new WaitForSeconds(actualPoint.timeToStop);
-			if (ascendantOrder)
+
+			if (movingMode == MovingMode.LoopToBeginning)
 			{
-				indexPoints++;
+				_indexPoints = 0;
+			}
+			else if (movingMode == MovingMode.PingPong)
+			{
+				_indexPoints += _ascendantOrder ? -1 : 1;
+				_ascendantOrder = !_ascendantOrder;
 			}
 			else
 			{
-				indexPoints--;
+				break;
 			}
 		}
-
-		if (movingMode == MovingMode.BackToBeginning)
-		{
-			StartCoroutine(Moving(true));
-		}
-		else if (movingMode == MovingMode.PingPong)
-		{
-			StartCoroutine(Moving(!ascendantOrder));
-		}
-		//else : only once : do nothing
 	}
-
-	//todo start coroutin, move from actualpos to point i in a given time, then wait then iterate, i%points.length
 }
