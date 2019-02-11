@@ -14,7 +14,7 @@ public class LaserBehaviour : MonoBehaviour
 	[SerializeField] private Color warmingUpColor = Color.gray;
 	[SerializeField] private Color inactiveColor = Color.clear;
 	[SerializeField] private Color activeColor = Color.white;
-	private bool _isActive = true;
+	[SerializeField] private bool isActive = true;
 	private SpriteRenderer _mySpriteRenderer;
 	private LineRenderer _myLineRenderer;
 	private BoxCollider2D _myCollider;
@@ -23,7 +23,7 @@ public class LaserBehaviour : MonoBehaviour
 	{
 		FollowsPlayerGravity,
 		FollowsPlayer,
-		FollowsRoutine
+		FollowsRoutine	
 	}
 
 	private void Start()
@@ -31,7 +31,14 @@ public class LaserBehaviour : MonoBehaviour
 		_myLineRenderer = GetComponent<LineRenderer>();
 		_myCollider = GetComponentInChildren<BoxCollider2D>();
 		_mySpriteRenderer = GetComponentInChildren<SpriteRenderer>();
-		StartCoroutine(SimpleRoutine());
+		if (isActive)
+		{
+			StartCoroutine(SimpleRoutine());
+		}
+		else
+		{
+			ChangeColor(inactiveColor);
+		}
 	}
 
 	private void Update()
@@ -49,6 +56,10 @@ public class LaserBehaviour : MonoBehaviour
 			Vector2 diff = currentPos - (Vector2) GameManager.Instance.Player.transform.position;
 			focusAngle = Quaternion.Euler(0f, 0f, Mathf.Atan2(diff.y, diff.x) * Mathf.Rad2Deg - 90);
 		}
+		else if (myMode == LaserMode.FollowsRoutine)
+		{
+			//do nothing
+		}
 
 		//limit the rotation through a rotationSpeed
 		//note : it is possible that this speed is 0 or a value so high, turning seems to be instantaneous
@@ -63,6 +74,12 @@ public class LaserBehaviour : MonoBehaviour
 		_myCollider.size = Vector2.right * _myCollider.size + Vector2.up * (hit.point - currentPos).magnitude;
 	}
 
+	public void Activate()
+	{
+		isActive = true;
+		StartCoroutine(SimpleRoutine());
+	}
+
 	private IEnumerator SimpleRoutine()
 	{
 		while (true)
@@ -75,14 +92,14 @@ public class LaserBehaviour : MonoBehaviour
 			}
 
 			ChangeColor(activeColor);
-			_isActive = true;
+			isActive = true;
 			if (activeTime.CompareTo(0) != 0)
 			{
 				yield return new WaitForSeconds(activeTime);
 			}
 
 			ChangeColor(inactiveColor);
-			_isActive = false;
+			isActive = false;
 			if (inactiveTime.CompareTo(0) != 0)
 			{
 				yield return new WaitForSeconds(inactiveTime);
@@ -99,7 +116,7 @@ public class LaserBehaviour : MonoBehaviour
 
 	private void OnTriggerEnter2D(Collider2D other)
 	{
-		if (_isActive && other.CompareTag("Player"))
+		if (isActive && other.CompareTag("Player"))
 		{
 			other.GetComponent<PlayerController>().Die();
 		}

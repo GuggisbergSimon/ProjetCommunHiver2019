@@ -215,6 +215,7 @@ public class PlayerController : MonoBehaviour
 		if (_isAlive)
 		{
 			_isAlive = false;
+			_canMove = false;
 			GameManager.Instance.LoadLevel(SceneManager.GetActiveScene().name, true, true);
 		}
 	}

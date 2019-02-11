@@ -125,18 +125,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edfa5d45b1ebb5a428e864f90c345e9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  warmUpTime: 1
-  activeTime: 2
-  inactiveTime: 2
+  warmUpTime: 0
+  activeTime: 5
+  inactiveTime: 0
   rotationSpeed: 1000
   layerGround:
     serializedVersion: 2
     m_Bits: 256
   distance: 100
-  myMode: 0
+  myMode: 2
   warmingUpColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   inactiveColor: {r: 0, g: 0, b: 0, a: 0}
   activeColor: {r: 1, g: 1, b: 1, a: 1}
+  isActive: 1
 --- !u!61 &7922744736234831716
 BoxCollider2D:
   m_ObjectHideFlags: 0
