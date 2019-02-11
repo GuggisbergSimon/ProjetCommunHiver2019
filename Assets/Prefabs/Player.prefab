@@ -130,7 +130,7 @@ MonoBehaviour:
   lowJumpMultiplier: 2.5
   playerHorizontalSpeed: 5
   gravityMultiplier: 3
-  jumpSpeed: 14
+  jumpSpeed: 11
   rotationTime: 0.3
   timeBeforeGravityAgain: 0.17
   distMaxGroundCheck: 1.1
