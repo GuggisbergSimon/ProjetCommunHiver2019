@@ -11,6 +11,7 @@ public class Door : MonoBehaviour
 	{
 		if (_canBeInteractedWith && Input.GetAxis("Vertical") > 0)
 		{
+			_canBeInteractedWith = false;
 			GameManager.Instance.LoadLevel(nameLevelToLoad, true, true);
 		}
 	}

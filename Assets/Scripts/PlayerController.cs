@@ -152,6 +152,12 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
+	public void StopMoving()
+	{
+		_myRigidBody.velocity=Vector2.zero;
+		_canMove = false;
+	}
+
 	public void RestoreGravityPower()
 	{
 		_numberGravityUseRemaining = maxNumberGravityUse;
