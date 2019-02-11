@@ -85,8 +85,7 @@ public class PlayerController : MonoBehaviour
 			//restores gravity power
 			if (_isGrounded)
 			{
-				_numberGravityUseRemaining = maxNumberGravityUse;
-				_canTurn = _numberGravityUseRemaining > 0;
+				RestoreGravityPower();
 			}
 		}
 
@@ -118,7 +117,6 @@ public class PlayerController : MonoBehaviour
 			}
 		}
 	}
-
 
 	private void FixedUpdate()
 	{
@@ -152,6 +150,12 @@ public class PlayerController : MonoBehaviour
 					(Vector2) transform.up.normalized * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
 			}
 		}
+	}
+
+	public void RestoreGravityPower()
+	{
+		_numberGravityUseRemaining = maxNumberGravityUse;
+		_canTurn = _numberGravityUseRemaining > 0;
 	}
 
 	//raycast to check if the player is grounded
