@@ -82,8 +82,9 @@ public class GameManager : MonoBehaviour
 	{
 		if (fadeInToBlack)
 		{
+			player.StopMoving();
 			_uiManager.FadeToBlack(true);
-			this._fadeOutToBlack = fadeOutToBlack;
+			_fadeOutToBlack = fadeOutToBlack;
 			StartCoroutine(LoadingLevel(nameLevel));
 		}
 	}
