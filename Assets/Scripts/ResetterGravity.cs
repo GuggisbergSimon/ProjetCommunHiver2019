@@ -10,9 +10,11 @@ public class ResetterGravity : MonoBehaviour
 	{
 		if (other.CompareTag("Player") && _isActive)
 		{
-			other.GetComponent<PlayerController>().RestoreGravityPower();
-			_isActive = false;
-			Destroy(gameObject);
+			if (other.GetComponent<PlayerController>().RestoreGravityPower())
+			{
+				_isActive = false;
+				Destroy(gameObject);
+			}
 		}
 	}
 }
