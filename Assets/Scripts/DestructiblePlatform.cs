@@ -13,13 +13,13 @@ public class DestructiblePlatform : MonoBehaviour
 
 	private void Start()
 	{
-		_myCollider = GetComponentInChildren<Collider2D>();
+		_myCollider = GetComponent<Collider2D>();
 		_mySprite = GetComponentInChildren<SpriteRenderer>();
 	}
 
 	private void OnCollisionEnter2D(Collision2D other)
 	{
-		if (_canBeActivated)
+		if (_canBeActivated && other.gameObject.CompareTag("Player"))
 		{
 			StartCoroutine(Destroy());
 		}
@@ -29,8 +29,8 @@ public class DestructiblePlatform : MonoBehaviour
 	{
 		//todo change sprite
 		yield return new WaitForSeconds(beforeDestructingTime);
-		_myCollider.gameObject.SetActive(false);
-		_mySprite.gameObject.SetActive(false);
+		_myCollider.enabled = false;
+		_mySprite.enabled = false;
 		if (destroyedTime >= 0)
 		{
 			if (destroyedTime.CompareTo(0) != 0)
@@ -41,8 +41,8 @@ public class DestructiblePlatform : MonoBehaviour
 			//todo set respawning sprite
 			yield return new WaitForSeconds(respawningTime);
 			_canBeActivated = true;
-			_myCollider.gameObject.SetActive(true);
-			_mySprite.gameObject.SetActive(true);
+			_myCollider.enabled = true;
+			_mySprite.enabled = true;
 		}
 	}
 }

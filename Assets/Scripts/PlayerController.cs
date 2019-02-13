@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private float radiusGroundCheck = 0.5f;
 	[SerializeField] private LayerMask layerGround = 0;
 	[SerializeField] private int maxNumberGravityUse = 1;
+	[SerializeField] private float powerGravityTimeScale = 0.1f;
 
 	public enum CardinalDirection
 	{
@@ -183,6 +184,7 @@ public class PlayerController : MonoBehaviour
 				_numberGravityUseRemaining--;
 				_myRigidBody.velocity = Vector2.zero;
 				_myCollider.enabled = false;
+				//GameManager.Instance.ChangeTimeScale(powerGravityTimeScale);
 			}
 
 			_actualGravityDirection = direction;
@@ -212,6 +214,7 @@ public class PlayerController : MonoBehaviour
 
 		yield return new WaitForSeconds(timeBeforeGravityAgain);
 		//restores player move after turning
+		//GameManager.Instance.ChangeTimeScale(1.0f);
 		_previousGravityDirection = _actualGravityDirection;
 		_isPressingLeft = false;
 		_isPressingRight = false;
