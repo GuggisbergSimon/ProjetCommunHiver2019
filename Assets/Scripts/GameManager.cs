@@ -5,6 +5,8 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+	[SerializeField] private float timeFadeInTimeScale = 0.1f;
+	private Coroutine timeScaleCoroutine;
 	public static GameManager Instance { get; private set; }
 	private PlayerController player;
 	public PlayerController Player => player;
@@ -19,7 +21,7 @@ public class GameManager : MonoBehaviour
 		get => _fadeOutToBlack;
 		set => _fadeOutToBlack = value;
 	}
-	
+
 	private void OnEnable()
 	{
 		SceneManager.sceneLoaded += OnLevelFinishedLoadingScene;
@@ -89,7 +91,7 @@ public class GameManager : MonoBehaviour
 		}
 	}
 
-	IEnumerator LoadingLevel(string nameLevel)
+	private IEnumerator LoadingLevel(string nameLevel)
 	{
 		while (UIManager.IsFadingToBlack)
 		{
@@ -97,6 +99,28 @@ public class GameManager : MonoBehaviour
 		}
 
 		LoadLevel(nameLevel);
+	}
+
+	public void ChangeTimeScale(float timeScale)
+	{
+		if (timeScaleCoroutine != null)
+		{
+			StopCoroutine(timeScaleCoroutine);
+		}
+
+		timeScaleCoroutine = StartCoroutine(ChangingTimeScale(timeScale));
+	}
+
+	private IEnumerator ChangingTimeScale(float timeScale)
+	{
+		float timer = 0.0f;
+		float initTimeScale = Time.timeScale;
+		while (timer < timeFadeInTimeScale)
+		{
+			timer += Time.unscaledDeltaTime;
+			Time.timeScale = Mathf.Lerp(initTimeScale, timeScale, timer / timeFadeInTimeScale);
+			yield return null;
+		}
 	}
 
 	public void QuitGame()

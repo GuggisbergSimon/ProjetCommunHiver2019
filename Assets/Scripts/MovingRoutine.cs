@@ -17,7 +17,7 @@ public class MovingRoutine : MonoBehaviour
 	{
 		public Vector2 position;
 		public float angle;
-		public float timeToReach;
+		public float speedToReach;
 		public float timeToStop;
 	}
 
@@ -43,9 +43,10 @@ public class MovingRoutine : MonoBehaviour
 		{
 			StopCoroutine(_movingCoroutine);
 		}
+
 		_movingCoroutine = StartCoroutine(Moving());
 	}
-	
+
 	private IEnumerator Moving()
 	{
 		while (true)
@@ -56,13 +57,14 @@ public class MovingRoutine : MonoBehaviour
 				Vector3 eulerAngles = transform.eulerAngles;
 				float timer = 0.0f;
 				Point actualPoint = points[_indexPoints];
-				while (timer < actualPoint.timeToReach)
+				float timeToReach = Vector2.Distance(initPos, actualPoint.position) / actualPoint.speedToReach;
+				while (timer < timeToReach)
 				{
 					timer += Time.deltaTime;
-					transform.position = Vector2.Lerp(initPos, actualPoint.position, timer / actualPoint.timeToReach);
+					transform.position = Vector2.Lerp(initPos, actualPoint.position, timer / timeToReach);
 					transform.eulerAngles = Vector3.up * eulerAngles.y + Vector3.right * eulerAngles.x +
 											Vector3.forward * Mathf.LerpAngle(eulerAngles.z, actualPoint.angle,
-												timer / actualPoint.timeToReach);
+												timer / timeToReach);
 					yield return null;
 				}
 

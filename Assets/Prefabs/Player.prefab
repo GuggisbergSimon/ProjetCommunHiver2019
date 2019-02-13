@@ -139,6 +139,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   maxNumberGravityUse: 1
+  maxFallingSpeed: 1000
 --- !u!50 &7278362155401064619
 Rigidbody2D:
   serializedVersion: 4
