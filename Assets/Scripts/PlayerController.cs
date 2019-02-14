@@ -106,7 +106,7 @@ public class PlayerController : MonoBehaviour
 		}
 
 		//handles turn input
-		if (_canTurn)
+		if (_canTurn && _numberGravityUseRemaining > 0)
 		{
 			//a ternary operator is used in order to go from the top of the enumlist to the bottom and vice-versa
 			if (Input.GetButtonDown("TurnLeft") && !_isPressingRight)
@@ -161,8 +161,9 @@ public class PlayerController : MonoBehaviour
 					transform.up.normalized) < 0)
 			{
 				//todo to perfect
-				Vector3 projectionVelocity = Vector3.Project(_myRigidBody.velocity,transform.up);
-				_myRigidBody.velocity /= projectionVelocity.magnitude / projectionVelocity.normalized.magnitude * maxFallingSpeed;
+				Vector3 projectionVelocity = Vector3.Project(_myRigidBody.velocity, transform.up);
+				_myRigidBody.velocity /= projectionVelocity.magnitude / projectionVelocity.normalized.magnitude *
+										 maxFallingSpeed;
 			}
 		}
 	}
@@ -178,13 +179,17 @@ public class PlayerController : MonoBehaviour
 		if (_numberGravityUseRemaining < maxNumberGravityUse)
 		{
 			_numberGravityUseRemaining = maxNumberGravityUse;
-			_canTurn = _numberGravityUseRemaining > 0;
 			return true;
 		}
 		else
 		{
 			return false;
 		}
+	}
+
+	public void ToggleTurningUse(bool value)
+	{
+		_canTurn = value;
 	}
 
 	//raycast to check if the player is grounded
@@ -203,7 +208,6 @@ public class PlayerController : MonoBehaviour
 			if (_canMove)
 			{
 				_canMove = false;
-				_numberGravityUseRemaining--;
 				_myRigidBody.velocity = Vector2.zero;
 				_myCollider.enabled = false;
 				//GameManager.Instance.ChangeTimeScale(powerGravityTimeScale);
@@ -241,8 +245,8 @@ public class PlayerController : MonoBehaviour
 		_isPressingLeft = false;
 		_isPressingRight = false;
 		_canMove = true;
-		_canTurn = _numberGravityUseRemaining > 0;
 		_myCollider.enabled = true;
+		_numberGravityUseRemaining--;
 	}
 
 	public void Die()
