@@ -241,6 +241,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Laser
       objectReference: {fileID: 0}
+    - target: {fileID: 7922744736234831718, guid: a80735bd3f46a9d439b6ccb242a7fc3b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7922744736234831717, guid: a80735bd3f46a9d439b6ccb242a7fc3b,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -18851,17 +18856,17 @@ PrefabInstance:
     - target: {fileID: 3634994115706705210, guid: b735e3ed64986ec4eb52c40f9bd0320e,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3634994115706705215, guid: b735e3ed64986ec4eb52c40f9bd0320e,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -4
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3634994115706705215, guid: b735e3ed64986ec4eb52c40f9bd0320e,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3634994115706705215, guid: b735e3ed64986ec4eb52c40f9bd0320e,
         type: 3}
@@ -19158,6 +19163,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: NoGravityZone
       objectReference: {fileID: 0}
+    - target: {fileID: 8304943103517684853, guid: c421166c9b4823b4cbdde47ab39edbfe,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8304943103517684851, guid: c421166c9b4823b4cbdde47ab39edbfe,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -19227,10 +19237,15 @@ PrefabInstance:
       propertyPath: m_Name
       value: DestructibleAndMovingPlatform
       objectReference: {fileID: 0}
+    - target: {fileID: 8890301536615535162, guid: 34fe727e5c27d2e4db274ef609f386f9,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8890301536615535160, guid: 34fe727e5c27d2e4db274ef609f386f9,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8890301536615535160, guid: 34fe727e5c27d2e4db274ef609f386f9,
         type: 3}

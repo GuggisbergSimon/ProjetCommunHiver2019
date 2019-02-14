@@ -83,6 +83,7 @@ public class PlayerController : MonoBehaviour
 
 	private void Update()
 	{
+		
 		if (_canMove)
 		{
 			//handles horizontal input
@@ -92,6 +93,10 @@ public class PlayerController : MonoBehaviour
 			if (_isGrounded)
 			{
 				RestoreGravityPower();
+				//if up/down,
+				//move camera up/down a up until a given height/lenght
+				//else if there was a input released,
+				//move smoothly to originalposition
 			}
 		}
 
@@ -160,7 +165,7 @@ public class PlayerController : MonoBehaviour
 					Vector3.Project(_myRigidBody.velocity, transform.up).normalized,
 					transform.up.normalized) < 0)
 			{
-				//todo to perfect
+				//todo to perfect, has an erratic behaviour
 				Vector3 projectionVelocity = Vector3.Project(_myRigidBody.velocity, transform.up);
 				_myRigidBody.velocity /= projectionVelocity.magnitude / projectionVelocity.normalized.magnitude *
 										 maxFallingSpeed;
