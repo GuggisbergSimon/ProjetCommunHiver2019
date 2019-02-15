@@ -24,9 +24,9 @@ public class UIManager : MonoBehaviour
 		Color tempColor = blackPanel.color;
 		while (timer < time)
 		{
+			timer += Time.unscaledDeltaTime;
 			tempColor.a = Mathf.Lerp(value ? 0.0f : 1.0f, value ? 1.0f : 0.0f, timer / time);
 			blackPanel.color = tempColor;
-			timer += Time.unscaledDeltaTime;
 			yield return null;
 		}
 
