@@ -15,12 +15,13 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private float distMaxGroundCheck = 0.1f;
 	[SerializeField] private float radiusGroundCheck = 0.5f;
 	[SerializeField] private LayerMask layerGround = 0;
-
+	[SerializeField] private Transform cameraAim = null;
 	[SerializeField] private int maxNumberGravityUse = 1;
-
-	//[SerializeField] private float powerGravityTimeScale = 0.1f;
 	[SerializeField] private float maxFallingSpeed = 5.0f;
 
+	
+	//[SerializeField] private float powerGravityTimeScale = 0.1f;
+	
 	public enum CardinalDirection
 	{
 		South,
@@ -29,6 +30,7 @@ public class PlayerController : MonoBehaviour
 		West
 	}
 
+	public Transform CameraAim => cameraAim;
 	private CardinalDirection _previousGravityDirection;
 	private CardinalDirection _actualGravityDirection;
 	public CardinalDirection ActualGravityDirection => _actualGravityDirection;
@@ -39,6 +41,7 @@ public class PlayerController : MonoBehaviour
 	private bool _canTurn = true;
 	private bool _canMove = true;
 	private float _horizontalInput;
+	private float _verticalInput;
 	private bool _isPressingJump;
 	private bool _isPressingRight;
 	private bool _isPressingLeft;
@@ -83,7 +86,6 @@ public class PlayerController : MonoBehaviour
 
 	private void Update()
 	{
-		
 		if (_canMove)
 		{
 			//handles horizontal input
@@ -93,10 +95,19 @@ public class PlayerController : MonoBehaviour
 			if (_isGrounded)
 			{
 				RestoreGravityPower();
-				//if up/down,
-				//move camera up/down a up until a given height/lenght
-				//else if there was a input released,
-				//move smoothly to originalposition
+				if (_verticalInput.CompareTo(0)!=0 && Input.GetAxis("Vertical").CompareTo(0)==0)
+				{
+					GameManager.Instance.CameraManager.MoveAim(Vector2.zero);
+				}
+				_verticalInput = Input.GetAxis("Vertical");
+				if (_verticalInput > 0)
+				{
+					GameManager.Instance.CameraManager.MoveAim(Vector2.up);
+				}
+				else if (_verticalInput < 0)
+				{
+					GameManager.Instance.CameraManager.MoveAim(Vector2.down);
+				}
 			}
 		}
 
@@ -260,6 +271,7 @@ public class PlayerController : MonoBehaviour
 		{
 			_isAlive = false;
 			_canMove = false;
+			_canTurn = false;
 			GameManager.Instance.LoadLevel(SceneManager.GetActiveScene().name, true, true);
 		}
 	}

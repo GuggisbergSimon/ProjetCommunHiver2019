@@ -303,9 +303,9 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a80735bd3f46a9d439b6ccb242a7fc3b, type: 3}
---- !u!4 &221499813 stripped
+--- !u!4 &209105827 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 7278362155401064617, guid: 66ec3452024136b4bac7199316a10c66,
+  m_CorrespondingSourceObject: {fileID: 209105827, guid: 66ec3452024136b4bac7199316a10c66,
     type: 3}
   m_PrefabInstance: {fileID: 636734768}
   m_PrefabAsset: {fileID: 0}
@@ -19105,7 +19105,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Follow
       value: 
-      objectReference: {fileID: 221499813}
+      objectReference: {fileID: 209105827}
     - target: {fileID: 8189616496569966798, guid: 90ecd07f6b343d24c938c96234a274bc,
         type: 3}
       propertyPath: m_BoundingShape2D
@@ -19115,7 +19115,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Follow
       value: 
-      objectReference: {fileID: 221499813}
+      objectReference: {fileID: 209105827}
     - target: {fileID: 8189616496585790142, guid: 90ecd07f6b343d24c938c96234a274bc,
         type: 3}
       propertyPath: m_BoundingShape2D
@@ -19125,7 +19125,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Follow
       value: 
-      objectReference: {fileID: 221499813}
+      objectReference: {fileID: 209105827}
     - target: {fileID: 8189616497879735397, guid: 90ecd07f6b343d24c938c96234a274bc,
         type: 3}
       propertyPath: m_BoundingShape2D
@@ -19135,7 +19135,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Follow
       value: 
-      objectReference: {fileID: 221499813}
+      objectReference: {fileID: 209105827}
     - target: {fileID: 8189616496254777097, guid: 90ecd07f6b343d24c938c96234a274bc,
         type: 3}
       propertyPath: m_BoundingShape2D
@@ -19145,10 +19145,36 @@ PrefabInstance:
       propertyPath: m_LocalPosition.x
       value: -2.1214952
       objectReference: {fileID: 0}
-    - target: {fileID: 1122251153, guid: 90ecd07f6b343d24c938c96234a274bc, type: 3}
-      propertyPath: m_DefaultBlend.m_Time
-      value: 0.15
-      objectReference: {fileID: 0}
+    - target: {fileID: 2885397173601431602, guid: 90ecd07f6b343d24c938c96234a274bc,
+        type: 3}
+      propertyPath: m_Follow
+      value: 
+      objectReference: {fileID: 209105827}
+    - target: {fileID: 2885397173601431600, guid: 90ecd07f6b343d24c938c96234a274bc,
+        type: 3}
+      propertyPath: m_BoundingShape2D
+      value: 
+      objectReference: {fileID: 1412621439}
+    - target: {fileID: 1064923021987536515, guid: 90ecd07f6b343d24c938c96234a274bc,
+        type: 3}
+      propertyPath: m_Follow
+      value: 
+      objectReference: {fileID: 209105827}
+    - target: {fileID: 1064923021987536513, guid: 90ecd07f6b343d24c938c96234a274bc,
+        type: 3}
+      propertyPath: m_BoundingShape2D
+      value: 
+      objectReference: {fileID: 1412621439}
+    - target: {fileID: 5576698948552094119, guid: 90ecd07f6b343d24c938c96234a274bc,
+        type: 3}
+      propertyPath: m_Follow
+      value: 
+      objectReference: {fileID: 209105827}
+    - target: {fileID: 5576698948552094117, guid: 90ecd07f6b343d24c938c96234a274bc,
+        type: 3}
+      propertyPath: m_BoundingShape2D
+      value: 
+      objectReference: {fileID: 1412621439}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 90ecd07f6b343d24c938c96234a274bc, type: 3}
 --- !u!1001 &8304943103815248791
