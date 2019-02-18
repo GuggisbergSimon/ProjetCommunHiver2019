@@ -132,7 +132,7 @@ MonoBehaviour:
   gravityMultiplier: 3
   jumpSpeed: 11
   rotationTime: 0.3
-  timeBeforeGravityAgain: 0.17
+  timeBeforeGravityAgain: 0.05
   distMaxGroundCheck: 1.1
   radiusGroundCheck: 0.25
   layerGround:
