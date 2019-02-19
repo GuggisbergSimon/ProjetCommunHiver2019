@@ -19,9 +19,9 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private int maxNumberGravityUse = 1;
 	[SerializeField] private float maxFallingSpeed = 5.0f;
 
-	
+
 	//[SerializeField] private float powerGravityTimeScale = 0.1f;
-	
+
 	public enum CardinalDirection
 	{
 		South,
@@ -47,7 +47,7 @@ public class PlayerController : MonoBehaviour
 	private bool _isPressingLeft;
 	private int _numberGravityUseRemaining;
 
-	public int NumberGravityUseRemaining => _numberGravityUseRemaining;
+	//public int NumberGravityUseRemaining => _numberGravityUseRemaining;
 	private Collider2D _myCollider;
 
 	private void Awake()
@@ -95,10 +95,11 @@ public class PlayerController : MonoBehaviour
 			if (_isGrounded)
 			{
 				RestoreGravityPower();
-				if (_verticalInput.CompareTo(0)!=0 && Input.GetAxis("Vertical").CompareTo(0)==0)
+				/*if (_verticalInput.CompareTo(0) != 0 && Input.GetAxis("Vertical").CompareTo(0) == 0)
 				{
 					GameManager.Instance.CameraManager.MoveAim(Vector2.zero);
 				}
+
 				_verticalInput = Input.GetAxis("Vertical");
 				if (_verticalInput > 0)
 				{
@@ -107,8 +108,18 @@ public class PlayerController : MonoBehaviour
 				else if (_verticalInput < 0)
 				{
 					GameManager.Instance.CameraManager.MoveAim(Vector2.down);
-				}
+				}*/
 			}
+		}
+		
+		//handles zoom/dezoom of map
+		if (Input.GetAxis("Vertical").CompareTo(0)!=0)
+		{
+			bool value = Input.GetAxis("Vertical") > 0;
+			_canMove = !value;
+			_canTurn = !value;
+			GameManager.Instance.CameraManager.ToggleGlobalCamera(value);
+			return;
 		}
 
 		//handles jump input
@@ -129,14 +140,20 @@ public class PlayerController : MonoBehaviour
 			{
 				_isPressingLeft = true;
 				TurnTo(_actualGravityDirection -
-					   (_actualGravityDirection == CardinalDirection.South ? -3 : 1));
+				       (_actualGravityDirection == CardinalDirection.South ? -3 : 1));
 			}
 			else if (Input.GetButtonDown("TurnRight") && !_isPressingLeft)
 			{
 				_isPressingRight = true;
 				TurnTo(_actualGravityDirection +
-					   (_actualGravityDirection == CardinalDirection.West ? -3 : 1));
+				       (_actualGravityDirection == CardinalDirection.West ? -3 : 1));
 			}
+		}
+
+		//handles retry input
+		if (Input.GetButtonDown("Retry"))
+		{
+			Die();
 		}
 	}
 
@@ -144,42 +161,42 @@ public class PlayerController : MonoBehaviour
 	{
 		if (_canMove)
 		{
+			Vector3 projectionVelocityUp = Vector3.Project(_myRigidBody.velocity, transform.up);
 			//add gravity force depending on direction
 			_myRigidBody.AddForce(transform.up.normalized * gravityMultiplier * Physics2D.gravity.y);
 			//moves the player depending on direction
 			_myRigidBody.velocity = transform.right.normalized * playerHorizontalSpeed * _horizontalInput +
-									Vector3.Project(_myRigidBody.velocity, transform.up);
+			                        projectionVelocityUp;
 			//executes a jump depending on direction
 			if (_isPressingJump)
 			{
 				_myRigidBody.velocity = transform.up.normalized * jumpSpeed +
-										Vector3.Project(_myRigidBody.velocity, transform.right);
+				                        Vector3.Project(_myRigidBody.velocity, transform.right);
 				_isPressingJump = false;
 			}
 
 			//applies fallMultiplier
 			if (Vector3.Dot(Vector3.Project(_myRigidBody.velocity, transform.up).normalized,
-					transform.up.normalized) < 0)
+				    transform.up.normalized) < 0)
 			{
 				_myRigidBody.velocity += (Vector2) transform.up.normalized * Physics2D.gravity.y *
-										 (fallMultiplier - 1) * Time.deltaTime;
+				                         (fallMultiplier - 1) * Time.deltaTime;
 			}
 			//applies lowJumpMultiplier
-			else if (Vector3.Dot(Vector3.Project(_myRigidBody.velocity, transform.up).normalized,
-						 transform.up.normalized) > 0 && !Input.GetButton("Jump"))
+			else if (Vector3.Dot(projectionVelocityUp.normalized, transform.up.normalized) > 0 &&
+			         !Input.GetButton("Jump"))
 			{
 				_myRigidBody.velocity +=
 					(Vector2) transform.up.normalized * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
 			}
 
-			if (Vector3.Project(_myRigidBody.velocity, transform.up).magnitude > maxFallingSpeed && Vector3.Dot(
-					Vector3.Project(_myRigidBody.velocity, transform.up).normalized,
-					transform.up.normalized) < 0)
+			//applies maxSpeed
+			if (projectionVelocityUp.magnitude > maxFallingSpeed &&
+			    Vector3.Dot(projectionVelocityUp.normalized, transform.up.normalized) <
+			    0)
 			{
-				//todo to perfect, has an erratic behaviour
-				Vector3 projectionVelocity = Vector3.Project(_myRigidBody.velocity, transform.up);
-				_myRigidBody.velocity /= projectionVelocity.magnitude / projectionVelocity.normalized.magnitude *
-										 maxFallingSpeed;
+				_myRigidBody.velocity *=
+					projectionVelocityUp.normalized.magnitude * maxFallingSpeed / projectionVelocityUp.magnitude;
 			}
 		}
 	}
