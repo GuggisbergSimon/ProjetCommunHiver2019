@@ -15,10 +15,6 @@ public class DestructiblePlatform : MonoBehaviour
 	{
 		_myCollider = GetComponent<Collider2D>();
 		_mySprite = GetComponentInChildren<SpriteRenderer>();
-        if (beforeDestructingTime < 0)
-        {
-            _canBeActivated = false;
-        }
 	}
 
 	private void OnCollisionEnter2D(Collision2D other)
