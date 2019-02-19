@@ -1,6 +1,6 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using Cinemachine;
 
@@ -8,10 +8,12 @@ public class CameraManager : MonoBehaviour
 {
 	[SerializeField] private int defaultPriority = 9;
 	[SerializeField] private int mainFocusPriority = 10;
-
+	[SerializeField] private float maxHeightLookUp = 4.0f;
+	[SerializeField] private float lookUpSpeed = 10.0f;
 	private Dictionary<PlayerController.CardinalDirection, CinemachineVirtualCamera> _vCams =
 		new Dictionary<PlayerController.CardinalDirection, CinemachineVirtualCamera>();
 
+	private Coroutine lookingUpCoroutine;
 	private CinemachineVirtualCamera _vCam;
 	private CinemachineBasicMultiChannelPerlin _noise;
 
@@ -37,6 +39,30 @@ public class CameraManager : MonoBehaviour
 		_vCam.Priority = defaultPriority;
 		_vCam = _vCams[direction];
 		_vCam.Priority = mainFocusPriority;
+	}
+
+	public void MoveAim(Vector2 direction)
+	{
+		//move slowly player.aim in given direction, up til maxheight to given speed;
+		if (lookingUpCoroutine != null)
+		{
+			StopCoroutine(lookingUpCoroutine);
+		}
+
+		lookingUpCoroutine = StartCoroutine(MovingAim(direction));
+	}
+
+	private IEnumerator MovingAim(Vector2 direction)
+	{
+		float time = maxHeightLookUp / lookUpSpeed;
+		float timer = 0.0f;
+		Vector2 initPos = GameManager.Instance.Player.CameraAim.localPosition;
+		while (timer < time)
+		{
+			timer += Time.unscaledDeltaTime;
+			GameManager.Instance.Player.CameraAim.localPosition = Vector2.Lerp(initPos,direction*maxHeightLookUp, timer / time);
+			yield return null;
+		}
 	}
 
 	public void Noise(float amplitudeGain, float frequencyGain)
