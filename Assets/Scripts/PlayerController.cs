@@ -139,6 +139,12 @@ public class PlayerController : MonoBehaviour
 				       (_actualGravityDirection == CardinalDirection.West ? -3 : 1));
 			}
 		}
+
+		//handles retry input
+		if (Input.GetButtonDown("Retry"))
+		{
+			Die();
+		}
 	}
 
 	private void FixedUpdate()
@@ -176,7 +182,7 @@ public class PlayerController : MonoBehaviour
 
 			//applies maxSpeed
 			if (projectionVelocityUp.magnitude > maxFallingSpeed &&
-			    Vector3.Dot(Vector3.Project(_myRigidBody.velocity, transform.up).normalized, transform.up.normalized) <
+			    Vector3.Dot(projectionVelocityUp.normalized, transform.up.normalized) <
 			    0)
 			{
 				_myRigidBody.velocity *=
