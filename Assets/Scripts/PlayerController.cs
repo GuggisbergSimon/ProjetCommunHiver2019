@@ -225,6 +225,15 @@ public class PlayerController : MonoBehaviour
 		_canTurn = value;
 	}
 
+    public bool GetGrounded
+    {
+        get
+        {
+            return _isGrounded;
+        }
+        
+    }
+
 	//raycast to check if the player is grounded
 	private void CheckGrounded()
 	{

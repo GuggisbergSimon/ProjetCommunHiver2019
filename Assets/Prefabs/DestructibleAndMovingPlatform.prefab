@@ -90,6 +90,7 @@ GameObject:
   - component: {fileID: 8890301536615535160}
   - component: {fileID: 8890301536615535163}
   - component: {fileID: 8890301536615535161}
+  - component: {fileID: 3221130707056526703}
   - component: {fileID: 8890301536615535166}
   m_Layer: 8
   m_Name: DestructibleAndMovingPlatform
@@ -155,6 +156,18 @@ MonoBehaviour:
   beforeDestructingTime: 1
   destroyedTime: 1
   respawningTime: 1
+--- !u!114 &3221130707056526703
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8890301536615535162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b36b59993512d5e46805dc9513c6c8f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!61 &8890301536615535166
 BoxCollider2D:
   m_ObjectHideFlags: 0
