@@ -19113,15 +19113,15 @@ PrefabInstance:
       objectReference: {fileID: 1412621439}
     - target: {fileID: 1122251152, guid: 90ecd07f6b343d24c938c96234a274bc, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -2.1241608
       objectReference: {fileID: 0}
     - target: {fileID: 1122251152, guid: 90ecd07f6b343d24c938c96234a274bc, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.5
+      value: -3.8
       objectReference: {fileID: 0}
     - target: {fileID: 1122251151, guid: 90ecd07f6b343d24c938c96234a274bc, type: 3}
       propertyPath: orthographic size
-      value: 7.6
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1064923021987536515, guid: 90ecd07f6b343d24c938c96234a274bc,
         type: 3}

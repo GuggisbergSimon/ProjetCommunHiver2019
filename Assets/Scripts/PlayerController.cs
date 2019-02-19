@@ -111,6 +111,16 @@ public class PlayerController : MonoBehaviour
 				}*/
 			}
 		}
+		
+		//handles zoom/dezoom of map
+		if (Input.GetAxis("Vertical").CompareTo(0)!=0)
+		{
+			bool value = Input.GetAxis("Vertical") > 0;
+			_canMove = !value;
+			_canTurn = !value;
+			GameManager.Instance.CameraManager.ToggleGlobalCamera(value);
+			return;
+		}
 
 		//handles jump input
 		if (Input.GetButtonDown("Jump") && _isGrounded)
@@ -144,15 +154,6 @@ public class PlayerController : MonoBehaviour
 		if (Input.GetButtonDown("Retry"))
 		{
 			Die();
-		}
-
-		//handles zoom/dezoom of map
-		if (Input.GetAxis("Vertical").CompareTo(0)!=0)
-		{
-			bool value = Input.GetAxis("Vertical") > 0;
-			_canMove = !value;
-			_canTurn = !value;
-			GameManager.Instance.CameraManager.ToggleGlobalCamera(value);
 		}
 	}
 
