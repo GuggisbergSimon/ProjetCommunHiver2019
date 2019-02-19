@@ -10,6 +10,8 @@ public class CameraManager : MonoBehaviour
 	[SerializeField] private int mainFocusPriority = 10;
 	[SerializeField] private float maxHeightLookUp = 4.0f;
 	[SerializeField] private float lookUpSpeed = 10.0f;
+	[SerializeField] private CinemachineVirtualCamera[] gravityCams = null;
+	[SerializeField] private CinemachineVirtualCamera globalCam = null;
 	private Dictionary<PlayerController.CardinalDirection, CinemachineVirtualCamera> _vCams =
 		new Dictionary<PlayerController.CardinalDirection, CinemachineVirtualCamera>();
 
@@ -21,16 +23,18 @@ public class CameraManager : MonoBehaviour
 	{
 		//setup the rotation of each camera correctly
 		int i = 0;
-		foreach (var cam in FindObjectsOfType<CinemachineVirtualCamera>())
+		foreach (var cam in gravityCams)
 		{
 			_vCams.Add((PlayerController.CardinalDirection) i, cam);
 			cam.transform.eulerAngles = Vector3.forward * 90 * i;
+			cam.Priority = defaultPriority;
 			++i;
 		}
 
 		//setup the maincamera
 		_vCam = _vCams[GameManager.Instance.Player.ActualGravityDirection];
 		_vCam.Priority = mainFocusPriority;
+		globalCam.Priority = defaultPriority;
 		_noise = _vCam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
 	}
 
@@ -39,6 +43,18 @@ public class CameraManager : MonoBehaviour
 		_vCam.Priority = defaultPriority;
 		_vCam = _vCams[direction];
 		_vCam.Priority = mainFocusPriority;
+	}
+
+	public void ToggleGlobalCamera(bool value)
+	{
+		if (value)
+		{
+			globalCam.Priority = mainFocusPriority + 1;
+		}
+		else
+		{
+			globalCam.Priority = defaultPriority;
+		}
 	}
 
 	public void MoveAim(Vector2 direction)

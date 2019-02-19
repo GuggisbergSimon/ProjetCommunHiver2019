@@ -47,7 +47,7 @@ public class PlayerController : MonoBehaviour
 	private bool _isPressingLeft;
 	private int _numberGravityUseRemaining;
 
-	public int NumberGravityUseRemaining => _numberGravityUseRemaining;
+	//public int NumberGravityUseRemaining => _numberGravityUseRemaining;
 	private Collider2D _myCollider;
 
 	private void Awake()
@@ -95,7 +95,7 @@ public class PlayerController : MonoBehaviour
 			if (_isGrounded)
 			{
 				RestoreGravityPower();
-				if (_verticalInput.CompareTo(0) != 0 && Input.GetAxis("Vertical").CompareTo(0) == 0)
+				/*if (_verticalInput.CompareTo(0) != 0 && Input.GetAxis("Vertical").CompareTo(0) == 0)
 				{
 					GameManager.Instance.CameraManager.MoveAim(Vector2.zero);
 				}
@@ -108,7 +108,7 @@ public class PlayerController : MonoBehaviour
 				else if (_verticalInput < 0)
 				{
 					GameManager.Instance.CameraManager.MoveAim(Vector2.down);
-				}
+				}*/
 			}
 		}
 
@@ -144,6 +144,15 @@ public class PlayerController : MonoBehaviour
 		if (Input.GetButtonDown("Retry"))
 		{
 			Die();
+		}
+
+		//handles zoom/dezoom of map
+		if (Input.GetAxis("Vertical").CompareTo(0)!=0)
+		{
+			bool value = Input.GetAxis("Vertical") > 0;
+			_canMove = !value;
+			_canTurn = !value;
+			GameManager.Instance.CameraManager.ToggleGlobalCamera(value);
 		}
 	}
 
