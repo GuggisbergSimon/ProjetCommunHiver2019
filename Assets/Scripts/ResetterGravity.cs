@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class ResetterGravity : MonoBehaviour
 {
-	//todo to implement
 	[SerializeField] private float timeRespawn = 2.0f;
 	private bool _isActive = true;
 	private SpriteRenderer _mySprite;

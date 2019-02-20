@@ -14,8 +14,10 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private float timeBeforeGravityAgain = 0.2f;
 	[SerializeField] private float distMaxGroundCheck = 0.1f;
 	[SerializeField] private float radiusGroundCheck = 0.5f;
+
 	[SerializeField] private LayerMask layerGround = 0;
-	[SerializeField] private Transform cameraAim = null;
+
+	//[SerializeField] private Transform cameraAim = null;
 	[SerializeField] private int maxNumberGravityUse = 1;
 	[SerializeField] private float maxFallingSpeed = 5.0f;
 
@@ -30,7 +32,7 @@ public class PlayerController : MonoBehaviour
 		West
 	}
 
-	public Transform CameraAim => cameraAim;
+	//public Transform CameraAim => cameraAim;
 	private CardinalDirection _previousGravityDirection;
 	private CardinalDirection _actualGravityDirection;
 	public CardinalDirection ActualGravityDirection => _actualGravityDirection;
@@ -46,6 +48,7 @@ public class PlayerController : MonoBehaviour
 	private bool _isPressingRight;
 	private bool _isPressingLeft;
 	private int _numberGravityUseRemaining;
+	private Vector3 previousVelocity;
 
 	//public int NumberGravityUseRemaining => _numberGravityUseRemaining;
 	private Collider2D _myCollider;
@@ -111,16 +114,29 @@ public class PlayerController : MonoBehaviour
 				}*/
 			}
 		}
-		
+
 		//handles zoom/dezoom of map
-		if (Input.GetAxis("Vertical").CompareTo(0)!=0)
+		if (_isGrounded && Input.GetAxisRaw("Vertical") >= 0 &&
+			Input.GetAxisRaw("Vertical").CompareTo(_verticalInput) != 0)
 		{
-			bool value = Input.GetAxis("Vertical") > 0;
-			_canMove = !value;
-			_canTurn = !value;
-			GameManager.Instance.CameraManager.ToggleGlobalCamera(value);
+			_verticalInput = Input.GetAxisRaw("Vertical");
+			bool isPressingUp = _verticalInput > 0;
+			if (isPressingUp)
+			{
+				previousVelocity = _myRigidBody.velocity;
+				_myRigidBody.velocity = Vector2.zero;
+			}
+			else
+			{
+				_myRigidBody.velocity = previousVelocity;
+			}
+
+			_canMove = !isPressingUp;
+			_canTurn = !isPressingUp;
+			GameManager.Instance.CameraManager.ToggleGlobalCamera(isPressingUp);
 			return;
 		}
+
 
 		//handles jump input
 		if (Input.GetButtonDown("Jump") && _isGrounded)
@@ -140,13 +156,13 @@ public class PlayerController : MonoBehaviour
 			{
 				_isPressingLeft = true;
 				TurnTo(_actualGravityDirection -
-				       (_actualGravityDirection == CardinalDirection.South ? -3 : 1));
+					   (_actualGravityDirection == CardinalDirection.South ? -3 : 1));
 			}
 			else if (Input.GetButtonDown("TurnRight") && !_isPressingLeft)
 			{
 				_isPressingRight = true;
 				TurnTo(_actualGravityDirection +
-				       (_actualGravityDirection == CardinalDirection.West ? -3 : 1));
+					   (_actualGravityDirection == CardinalDirection.West ? -3 : 1));
 			}
 		}
 
@@ -166,25 +182,25 @@ public class PlayerController : MonoBehaviour
 			_myRigidBody.AddForce(transform.up.normalized * gravityMultiplier * Physics2D.gravity.y);
 			//moves the player depending on direction
 			_myRigidBody.velocity = transform.right.normalized * playerHorizontalSpeed * _horizontalInput +
-			                        projectionVelocityUp;
+									projectionVelocityUp;
 			//executes a jump depending on direction
 			if (_isPressingJump)
 			{
 				_myRigidBody.velocity = transform.up.normalized * jumpSpeed +
-				                        Vector3.Project(_myRigidBody.velocity, transform.right);
+										Vector3.Project(_myRigidBody.velocity, transform.right);
 				_isPressingJump = false;
 			}
 
 			//applies fallMultiplier
 			if (Vector3.Dot(Vector3.Project(_myRigidBody.velocity, transform.up).normalized,
-				    transform.up.normalized) < 0)
+					transform.up.normalized) < 0)
 			{
 				_myRigidBody.velocity += (Vector2) transform.up.normalized * Physics2D.gravity.y *
-				                         (fallMultiplier - 1) * Time.deltaTime;
+										 (fallMultiplier - 1) * Time.deltaTime;
 			}
 			//applies lowJumpMultiplier
 			else if (Vector3.Dot(projectionVelocityUp.normalized, transform.up.normalized) > 0 &&
-			         !Input.GetButton("Jump"))
+					 !Input.GetButton("Jump"))
 			{
 				_myRigidBody.velocity +=
 					(Vector2) transform.up.normalized * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
@@ -192,8 +208,8 @@ public class PlayerController : MonoBehaviour
 
 			//applies maxSpeed
 			if (projectionVelocityUp.magnitude > maxFallingSpeed &&
-			    Vector3.Dot(projectionVelocityUp.normalized, transform.up.normalized) <
-			    0)
+				Vector3.Dot(projectionVelocityUp.normalized, transform.up.normalized) <
+				0)
 			{
 				_myRigidBody.velocity *=
 					projectionVelocityUp.normalized.magnitude * maxFallingSpeed / projectionVelocityUp.magnitude;
@@ -225,14 +241,10 @@ public class PlayerController : MonoBehaviour
 		_canTurn = value;
 	}
 
-    public bool GetGrounded
-    {
-        get
-        {
-            return _isGrounded;
-        }
-        
-    }
+	public bool GetGrounded
+	{
+		get { return _isGrounded; }
+	}
 
 	//raycast to check if the player is grounded
 	private void CheckGrounded()
