@@ -321,6 +321,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 7278362155401064612, guid: 66ec3452024136b4bac7199316a10c66,
+        type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7278362155401064617, guid: 66ec3452024136b4bac7199316a10c66,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -374,6 +379,20 @@ PrefabInstance:
     - target: {fileID: 7278362155401064617, guid: 66ec3452024136b4bac7199316a10c66,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 209105826, guid: 66ec3452024136b4bac7199316a10c66, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7278362154666824560, guid: 66ec3452024136b4bac7199316a10c66,
+        type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7278362155585125617, guid: 66ec3452024136b4bac7199316a10c66,
+        type: 3}
+      propertyPath: m_Layer
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -4053,7 +4072,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1297657296}
   - component: {fileID: 1297657297}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4134,7 +4153,7 @@ GameObject:
   - component: {fileID: 1376055976}
   - component: {fileID: 1376055975}
   - component: {fileID: 1376055974}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: ReactToGravity
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4201,9 +4220,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotationSpeed: 1000
-  radiusGroundCheck: 1
-  distMaxGroundCheck: 1
-  layerGround:
+  radiusGroundCheck: 0.5
+  distMaxGroundCheck: 0.6
+  layerGroundMask:
     serializedVersion: 2
     m_Bits: 256
 --- !u!4 &1376055977
