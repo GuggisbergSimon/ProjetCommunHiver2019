@@ -14,15 +14,10 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private float timeBeforeGravityAgain = 0.2f;
 	[SerializeField] private float distMaxGroundCheck = 0.1f;
 	[SerializeField] private float radiusGroundCheck = 0.5f;
-
+	[SerializeField] private bool noVomitMode = false;
 	[SerializeField] private LayerMask layerGround = 0;
-
-	//[SerializeField] private Transform cameraAim = null;
 	[SerializeField] private int maxNumberGravityUse = 1;
 	[SerializeField] private float maxFallingSpeed = 5.0f;
-
-
-	//[SerializeField] private float powerGravityTimeScale = 0.1f;
 
 	public enum CardinalDirection
 	{
@@ -32,7 +27,6 @@ public class PlayerController : MonoBehaviour
 		West
 	}
 
-	//public Transform CameraAim => cameraAim;
 	private CardinalDirection _previousGravityDirection;
 	private CardinalDirection _actualGravityDirection;
 	public CardinalDirection ActualGravityDirection => _actualGravityDirection;
@@ -42,6 +36,7 @@ public class PlayerController : MonoBehaviour
 	private bool _isAlive = true;
 	private bool _canTurn = true;
 	private bool _canMove = true;
+	private Vector2 _inputs;
 	private float _horizontalInput;
 	private float _verticalInput;
 	private bool _isPressingJump;
@@ -49,8 +44,6 @@ public class PlayerController : MonoBehaviour
 	private bool _isPressingLeft;
 	private int _numberGravityUseRemaining;
 	private Vector3 previousVelocity;
-
-	//public int NumberGravityUseRemaining => _numberGravityUseRemaining;
 	private Collider2D _myCollider;
 
 	private void Awake()
@@ -89,35 +82,38 @@ public class PlayerController : MonoBehaviour
 
 	private void Update()
 	{
+		_inputs = Vector2.right * Input.GetAxis("Horizontal") + Vector2.up * Input.GetAxisRaw("Vertical");
+		if (noVomitMode)
+		{
+			//cases when walking on ground/ceiling
+			if ((int) _actualGravityDirection % 2 == 0)
+			{
+				_inputs *= Vector2.right * ((int) _actualGravityDirection > 1 ? -1 : 1) + Vector2.up;
+			}
+			//handle cases when walking on walls
+			else
+			{
+				//_inputs = Vector2.right * ((int) _actualGravityDirection > 1 ? -1 : 1) * _inputs.y +
+				//		  Vector2.up * _inputs.x;
+			}
+		}
+
+		//todo change inputs depending on current gravity
 		if (_canMove)
 		{
 			//handles horizontal input
-			_horizontalInput = Input.GetAxis("Horizontal");
+			_horizontalInput = _inputs.x;
 			CheckGrounded();
 			//restores gravity power
 			if (_isGrounded)
 			{
 				RestoreGravityPower();
-				/*if (_verticalInput.CompareTo(0) != 0 && Input.GetAxis("Vertical").CompareTo(0) == 0)
-				{
-					GameManager.Instance.CameraManager.MoveAim(Vector2.zero);
-				}
-
-				_verticalInput = Input.GetAxis("Vertical");
-				if (_verticalInput > 0)
-				{
-					GameManager.Instance.CameraManager.MoveAim(Vector2.up);
-				}
-				else if (_verticalInput < 0)
-				{
-					GameManager.Instance.CameraManager.MoveAim(Vector2.down);
-				}*/
 			}
 		}
 
 		//handles zoom/dezoom of map
-		if (_isGrounded && Input.GetAxisRaw("Vertical") >= 0 &&
-			Input.GetAxisRaw("Vertical").CompareTo(_verticalInput) != 0)
+		if (_isGrounded && _inputs.y >= 0 &&
+			_inputs.y.CompareTo(_verticalInput) != 0)
 		{
 			_verticalInput = Input.GetAxisRaw("Vertical");
 			bool isPressingUp = _verticalInput > 0;
@@ -264,11 +260,14 @@ public class PlayerController : MonoBehaviour
 				_canMove = false;
 				_myRigidBody.velocity = Vector2.zero;
 				_myCollider.enabled = false;
-				//GameManager.Instance.ChangeTimeScale(powerGravityTimeScale);
 			}
 
 			_actualGravityDirection = direction;
-			GameManager.Instance.CameraManager.ChangeVCamByDirection(_actualGravityDirection);
+			if (!noVomitMode)
+			{
+				GameManager.Instance.CameraManager.ChangeVCamByDirection(_actualGravityDirection);
+			}
+
 			//checks if a coroutine is already running
 			if (_rotatingCoroutine != null)
 			{
@@ -294,7 +293,6 @@ public class PlayerController : MonoBehaviour
 
 		yield return new WaitForSeconds(timeBeforeGravityAgain);
 		//restores player move after turning
-		//GameManager.Instance.ChangeTimeScale(1.0f);
 		_previousGravityDirection = _actualGravityDirection;
 		_isPressingLeft = false;
 		_isPressingRight = false;
