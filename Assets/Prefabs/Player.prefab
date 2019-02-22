@@ -171,7 +171,7 @@ MonoBehaviour:
     m_Bits: 256
   cameraAim: {fileID: 209105827}
   maxNumberGravityUse: 1
-  maxFallingSpeed: 1000
+  maxFallingSpeed: 23
 --- !u!50 &7278362155401064619
 Rigidbody2D:
   serializedVersion: 4
