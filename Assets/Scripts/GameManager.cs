@@ -5,8 +5,8 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-	[SerializeField] private float timeFadeInTimeScale = 0.1f;
-	private Coroutine timeScaleCoroutine;
+	[SerializeField] private float fadeInTimescaleTime = 0.1f;
+	private Coroutine _timeScaleCoroutine;
 	public static GameManager Instance { get; private set; }
 	private PlayerController player;
 	public PlayerController Player => player;
@@ -103,22 +103,22 @@ public class GameManager : MonoBehaviour
 
 	public void ChangeTimeScale(float timeScale)
 	{
-		if (timeScaleCoroutine != null)
+		if (_timeScaleCoroutine != null)
 		{
-			StopCoroutine(timeScaleCoroutine);
+			StopCoroutine(_timeScaleCoroutine);
 		}
 
-		timeScaleCoroutine = StartCoroutine(ChangingTimeScale(timeScale));
+		_timeScaleCoroutine = StartCoroutine(ChangingTimeScale(timeScale));
 	}
 
 	private IEnumerator ChangingTimeScale(float timeScale)
 	{
 		float timer = 0.0f;
 		float initTimeScale = Time.timeScale;
-		while (timer < timeFadeInTimeScale)
+		while (timer < fadeInTimescaleTime)
 		{
 			timer += Time.unscaledDeltaTime;
-			Time.timeScale = Mathf.Lerp(initTimeScale, timeScale, timer / timeFadeInTimeScale);
+			Time.timeScale = Mathf.Lerp(initTimeScale, timeScale, timer / fadeInTimescaleTime);
 			yield return null;
 		}
 	}

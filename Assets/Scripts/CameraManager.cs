@@ -28,6 +28,7 @@ public class CameraManager : MonoBehaviour
 			_vCams.Add((PlayerController.CardinalDirection) i, cam);
 			cam.transform.eulerAngles = Vector3.forward * 90 * i;
 			cam.Priority = defaultPriority;
+			cam.Follow = GameManager.Instance.Player.transform;
 			++i;
 		}
 
@@ -57,7 +58,7 @@ public class CameraManager : MonoBehaviour
 		}
 	}
 
-	public void MoveAim(Vector2 direction)
+	/*public void MoveAim(Vector2 direction)
 	{
 		//move slowly player.aim in given direction, up til maxheight to given speed;
 		if (lookingUpCoroutine != null)
@@ -79,7 +80,7 @@ public class CameraManager : MonoBehaviour
 			GameManager.Instance.Player.CameraAim.localPosition = Vector2.Lerp(initPos,direction*maxHeightLookUp, timer / time);
 			yield return null;
 		}
-	}
+	}*/
 
 	public void Noise(float amplitudeGain, float frequencyGain)
 	{
