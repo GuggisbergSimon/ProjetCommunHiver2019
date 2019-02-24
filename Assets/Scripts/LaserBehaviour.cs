@@ -10,7 +10,7 @@ public class LaserBehaviour : MonoBehaviour
 	[SerializeField] private float rotationSpeed = 10.0f;
 	[SerializeField] private LayerMask layerGround = 0;
 	[SerializeField] private float distance = 100.0f;
-	[SerializeField] private LaserMode myMode = 0;
+	[SerializeField] private LaserMode myAim = 0;
 	[SerializeField] private Color warmingUpColor = Color.gray;
 	[SerializeField] private Color inactiveColor = Color.clear;
 	[SerializeField] private Color activeColor = Color.white;
@@ -23,7 +23,7 @@ public class LaserBehaviour : MonoBehaviour
 	{
 		FollowsPlayerGravity,
 		FollowsPlayer,
-		FollowsRoutine	
+		FollowsNothing	
 	}
 
 	private void Start()
@@ -46,17 +46,17 @@ public class LaserBehaviour : MonoBehaviour
 		Quaternion focusAngle = new Quaternion();
 		Vector2 currentPos = transform.position;
 
-		if (myMode == LaserMode.FollowsPlayerGravity)
+		if (myAim == LaserMode.FollowsPlayerGravity)
 		{
 			focusAngle = GameManager.Instance.Player.transform.rotation;
 		}
-		else if (myMode == LaserMode.FollowsPlayer)
+		else if (myAim == LaserMode.FollowsPlayer)
 		{
 			//calculate the angle between the player and the laser
 			Vector2 diff = currentPos - (Vector2) GameManager.Instance.Player.transform.position;
 			focusAngle = Quaternion.Euler(0f, 0f, Mathf.Atan2(diff.y, diff.x) * Mathf.Rad2Deg - 90);
 		}
-		else if (myMode == LaserMode.FollowsRoutine)
+		else if (myAim == LaserMode.FollowsNothing)
 		{
 			//do nothing
 		}

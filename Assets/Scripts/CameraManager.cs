@@ -28,6 +28,7 @@ public class CameraManager : MonoBehaviour
 			_vCams.Add((PlayerController.CardinalDirection) i, cam);
 			cam.transform.eulerAngles = Vector3.forward * 90 * i;
 			cam.Priority = defaultPriority;
+			cam.Follow = GameManager.Instance.Player.transform;
 			++i;
 		}
 

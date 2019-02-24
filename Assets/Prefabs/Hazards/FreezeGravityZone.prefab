@@ -93,7 +93,7 @@ SpriteShapeRenderer:
   m_SortingOrder: 0
   m_Color: {r: 1, g: 1, b: 1, a: 0.5019608}
   m_MaskInteraction: 0
-  m_ShapeTexture: {fileID: 2800000, guid: 3a8b1bce5a849dc4cad5d9a995c1a19b, type: 3}
+  m_ShapeTexture: {fileID: 2800000, guid: 6339b2f998129574787935ddc89ec5e2, type: 3}
   m_Sprites:
   - {fileID: 0}
   - {fileID: 0}

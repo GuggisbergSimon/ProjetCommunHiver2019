@@ -90,15 +90,8 @@ public class PlayerController : MonoBehaviour
 			{
 				_inputs *= Vector2.right * ((int) _actualGravityDirection > 1 ? -1 : 1) + Vector2.up;
 			}
-			//handle cases when walking on walls
-			else
-			{
-				//_inputs = Vector2.right * ((int) _actualGravityDirection > 1 ? -1 : 1) * _inputs.y +
-				//		  Vector2.up * _inputs.x;
-			}
 		}
 
-		//todo change inputs depending on current gravity
 		if (_canMove)
 		{
 			//handles horizontal input
