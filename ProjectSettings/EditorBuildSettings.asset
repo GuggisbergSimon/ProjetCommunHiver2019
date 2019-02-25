@@ -6,22 +6,22 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/NormalLaserLevels/Level1.1.unity
+    path: Assets/Scenes/NormalLaser/Level1.1.unity
     guid: d7f22c19b6618f743b6dd43ae14ccac9
   - enabled: 1
-    path: Assets/Scenes/NormalLaserLevels/Level1.2.unity
+    path: Assets/Scenes/NormalLaser/Level1.2.unity
     guid: 7bfd5854e769ac0499c3644e9079387d
   - enabled: 1
-    path: Assets/Scenes/NormalLaserLevels/Level1.3.unity
+    path: Assets/Scenes/NormalLaser/Level1.3.unity
     guid: 6f63268c3f2c93649a01c114bf3dc056
   - enabled: 1
-    path: Assets/Scenes/Level1.4.unity
+    path: Assets/Scenes/TurningLaser/Level1.4.unity
     guid: 96192fd9c9d1859459efcd6532dac96f
   - enabled: 1
-    path: Assets/Scenes/NormalLaserLevels/Level1.5.unity
+    path: Assets/Scenes/NormalLaser/Level1.5.unity
     guid: ac3d057a54b9675469ae56b3ec8d1fa8
   - enabled: 1
-    path: Assets/Scenes/Level1.6.unity
+    path: Assets/Scenes/GravityLimiter/Level1.6.unity
     guid: a61bb54ded345f244bae394ab5668cd2
   - enabled: 1
     path: Assets/Scenes/GravityResetter/Level1.7.unity
