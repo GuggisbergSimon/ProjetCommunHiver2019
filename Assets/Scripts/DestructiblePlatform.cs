@@ -30,7 +30,7 @@ public class DestructiblePlatform : MonoBehaviour
 		{
 			_timerShaking += Time.deltaTime;
 			_mySprite.transform.position = _initSpritePos +
-			                               Vector2.right * (Mathf.Sin(_timerShaking * speedShaking) * amplitudeShaking);
+			                               (Vector2) transform.right * (Mathf.Sin(_timerShaking * speedShaking) * amplitudeShaking);
 		}
 	}
 
