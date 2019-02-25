@@ -16,6 +16,9 @@ public class GameManager : MonoBehaviour
 	public UIManager UIManager => _uiManager;
 	private bool _fadeOutToBlack = false;
 	private bool _isQuitting;
+	private bool _noVomitModeEnabled;
+
+	public bool NoVomitModeEnabled => _noVomitModeEnabled;
 
 	public bool FadeOutToBlack
 	{
@@ -79,6 +82,11 @@ public class GameManager : MonoBehaviour
 	public void LoadLevel(string nameLevel)
 	{
 		SceneManager.LoadScene(nameLevel);
+	}
+
+	public void NoVomitMode(bool value)
+	{
+		_noVomitModeEnabled = value;
 	}
 
 	public void LoadLevelFadeInAndOut(string nameLevel)

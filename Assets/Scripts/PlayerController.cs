@@ -52,7 +52,7 @@ public class PlayerController : MonoBehaviour
 		_myRigidBody = GetComponent<Rigidbody2D>();
 		_myCollider = GetComponent<Collider2D>();
 		_numberGravityUseRemaining = maxNumberGravityUse;
-
+		noVomitMode = GameManager.Instance.NoVomitModeEnabled;
 		//setup correctly the direction the player is positioned at setup
 		float initRot = transform.eulerAngles.z;
 		if (Mathf.Abs(initRot) < 45)
@@ -123,13 +123,13 @@ public class PlayerController : MonoBehaviour
 			{
 				_isPressingLeft = true;
 				TurnTo(_actualGravityDirection -
-					   (_actualGravityDirection == CardinalDirection.South ? -3 : 1));
+				       (_actualGravityDirection == CardinalDirection.South ? -3 : 1));
 			}
 			else if (Input.GetButtonDown("TurnRight") && !_isPressingLeft)
 			{
 				_isPressingRight = true;
 				TurnTo(_actualGravityDirection +
-					   (_actualGravityDirection == CardinalDirection.West ? -3 : 1));
+				       (_actualGravityDirection == CardinalDirection.West ? -3 : 1));
 			}
 		}
 
@@ -146,7 +146,7 @@ public class PlayerController : MonoBehaviour
 			foreach (var item in _interactives)
 			{
 				if ((closestToPlayer.transform.position - transform.position).magnitude >
-					(item.transform.position - transform.position).magnitude)
+				    (item.transform.position - transform.position).magnitude)
 				{
 					closestToPlayer = item;
 				}
@@ -158,8 +158,7 @@ public class PlayerController : MonoBehaviour
 		}
 
 		//handles zoom/dezoom of map
-		if (_isGrounded && _inputs.y >= 0 &&
-			_inputs.y.CompareTo(_verticalInput) != 0)
+		if (_isGrounded && _inputs.y >= 0 && _inputs.y.CompareTo(_verticalInput) != 0)
 		{
 			_verticalInput = Input.GetAxisRaw("Vertical");
 			bool isPressingUp = _verticalInput > 0;
@@ -223,25 +222,25 @@ public class PlayerController : MonoBehaviour
 			_myRigidBody.AddForce(transform.up.normalized * gravityMultiplier * Physics2D.gravity.y);
 			//moves the player depending on direction
 			_myRigidBody.velocity = transform.right.normalized * playerHorizontalSpeed * _horizontalInput +
-									projectionVelocityUp;
+			                        projectionVelocityUp;
 			//executes a jump depending on direction
 			if (_isPressingJump)
 			{
 				_myRigidBody.velocity = transform.up.normalized * jumpSpeed +
-										Vector3.Project(_myRigidBody.velocity, transform.right);
+				                        Vector3.Project(_myRigidBody.velocity, transform.right);
 				_isPressingJump = false;
 			}
 
 			//applies fallMultiplier
 			if (Vector3.Dot(Vector3.Project(_myRigidBody.velocity, transform.up).normalized,
-					transform.up.normalized) < 0)
+				    transform.up.normalized) < 0)
 			{
 				_myRigidBody.velocity += (Vector2) transform.up.normalized * Physics2D.gravity.y *
-										 (fallMultiplier - 1) * Time.deltaTime;
+				                         (fallMultiplier - 1) * Time.deltaTime;
 			}
 			//applies lowJumpMultiplier
 			else if (Vector3.Dot(projectionVelocityUp.normalized, transform.up.normalized) > 0 &&
-					 !Input.GetButton("Jump"))
+			         !Input.GetButton("Jump"))
 			{
 				_myRigidBody.velocity +=
 					(Vector2) transform.up.normalized * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
@@ -249,8 +248,8 @@ public class PlayerController : MonoBehaviour
 
 			//applies maxSpeed
 			if (projectionVelocityUp.magnitude > maxFallingSpeed &&
-				Vector3.Dot(projectionVelocityUp.normalized, transform.up.normalized) <
-				0)
+			    Vector3.Dot(projectionVelocityUp.normalized, transform.up.normalized) <
+			    0)
 			{
 				_myRigidBody.velocity *=
 					projectionVelocityUp.normalized.magnitude * maxFallingSpeed / projectionVelocityUp.magnitude;

@@ -662,7 +662,7 @@ MonoBehaviour:
   jumpSpeed: 11
   rotationTime: 0.1
   timeBeforeGravityAgain: 0.1
-  distMaxGroundCheck: 1.1
+  distMaxGroundCheck: 0.3
   radiusGroundCheck: 0.25
   noVomitMode: 0
   layerGround:
