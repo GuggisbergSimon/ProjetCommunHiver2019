@@ -27,6 +27,7 @@ public class PlayerController : MonoBehaviour
 		West
 	}
 
+	private List<GameObject> _interactives = new List<GameObject>();
 	private CardinalDirection _previousGravityDirection;
 	private CardinalDirection _actualGravityDirection;
 	public CardinalDirection ActualGravityDirection => _actualGravityDirection;
@@ -104,29 +105,6 @@ public class PlayerController : MonoBehaviour
 			}
 		}
 
-		//handles zoom/dezoom of map
-		if (_isGrounded && _inputs.y >= 0 &&
-			_inputs.y.CompareTo(_verticalInput) != 0)
-		{
-			_verticalInput = Input.GetAxisRaw("Vertical");
-			bool isPressingUp = _verticalInput > 0;
-			if (isPressingUp)
-			{
-				previousVelocity = _myRigidBody.velocity;
-				_myRigidBody.velocity = Vector2.zero;
-			}
-			else
-			{
-				_myRigidBody.velocity = previousVelocity;
-			}
-
-			_canMove = !isPressingUp;
-			_canTurn = !isPressingUp;
-			GameManager.Instance.CameraManager.ToggleGlobalCamera(isPressingUp);
-			return;
-		}
-
-
 		//handles jump input
 		if (Input.GetButtonDown("Jump") && _isGrounded)
 		{
@@ -159,6 +137,80 @@ public class PlayerController : MonoBehaviour
 		if (Input.GetButtonDown("Retry"))
 		{
 			Die();
+		}
+
+		//code for interacting with _interactives
+		if (_interactives.Count > 0 && Input.GetAxisRaw("Vertical") > 0 && _isGrounded)
+		{
+			GameObject closestToPlayer = _interactives[0];
+			foreach (var item in _interactives)
+			{
+				if ((closestToPlayer.transform.position - transform.position).magnitude >
+					(item.transform.position - transform.position).magnitude)
+				{
+					closestToPlayer = item;
+				}
+			}
+
+			ResetVelocityAndInput();
+			closestToPlayer.GetComponent<Interactive>().Interact();
+			return;
+		}
+
+		//handles zoom/dezoom of map
+		if (_isGrounded && _inputs.y >= 0 &&
+			_inputs.y.CompareTo(_verticalInput) != 0)
+		{
+			_verticalInput = Input.GetAxisRaw("Vertical");
+			bool isPressingUp = _verticalInput > 0;
+			if (isPressingUp)
+			{
+				previousVelocity = _myRigidBody.velocity;
+				_myRigidBody.velocity = Vector2.zero;
+			}
+			else
+			{
+				_myRigidBody.velocity = previousVelocity;
+			}
+
+			ToggleFreeze(!isPressingUp);
+			GameManager.Instance.CameraManager.ToggleGlobalCamera(isPressingUp);
+		}
+	}
+
+	private void ToggleFreeze(bool value)
+	{
+		_canMove = value;
+		_canTurn = value;
+		if (value)
+		{
+			ResetVelocityAndInput();
+		}
+	}
+
+	private void ResetVelocityAndInput()
+	{
+		_myRigidBody.velocity = Vector2.zero;
+		_horizontalInput = 0;
+		_verticalInput = 0;
+		_isPressingJump = false;
+		_isPressingLeft = false;
+		_isPressingRight = false;
+	}
+
+	private void OnTriggerEnter2D(Collider2D other)
+	{
+		if (other.gameObject.CompareTag("Interactive") && !_interactives.Contains(other.gameObject))
+		{
+			_interactives.Add(other.gameObject);
+		}
+	}
+
+	private void OnTriggerExit2D(Collider2D other)
+	{
+		if (other.gameObject.CompareTag("Interactive") && _interactives.Contains(other.gameObject))
+		{
+			_interactives.Remove(other.gameObject);
 		}
 	}
 
