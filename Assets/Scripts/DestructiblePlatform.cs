@@ -44,7 +44,6 @@ public class DestructiblePlatform : MonoBehaviour
 
 	IEnumerator Destroy()
 	{
-		//todo change sprite
 		_isShaking = true;
 		_timerShaking = 0.0f;
 		yield return new WaitForSeconds(beforeDestructingTime);

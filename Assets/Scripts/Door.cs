@@ -9,9 +9,11 @@ public class Door : MonoBehaviour
 
 	private void Update()
 	{
+		//todo move that part of the code in playerController
 		if (_canBeInteractedWith && Input.GetAxis("Vertical") > 0)
 		{
 			_canBeInteractedWith = false;
+			GameManager.Instance.CameraManager.CanToggleGlobalVcam = false;
 			GameManager.Instance.LoadLevel(nameLevelToLoad, true, true);
 		}
 	}
