@@ -52,7 +52,6 @@ public class PlayerController : MonoBehaviour
 		_myRigidBody = GetComponent<Rigidbody2D>();
 		_myCollider = GetComponent<Collider2D>();
 		_numberGravityUseRemaining = maxNumberGravityUse;
-		noVomitMode = GameManager.Instance.NoVomitModeEnabled;
 		//setup correctly the direction the player is positioned at setup
 		float initRot = transform.eulerAngles.z;
 		if (Mathf.Abs(initRot) < 45)
@@ -79,6 +78,11 @@ public class PlayerController : MonoBehaviour
 		}
 
 		_previousGravityDirection = _actualGravityDirection;
+	}
+
+	private void Start()
+	{
+		noVomitMode = GameManager.Instance.NoVomitModeEnabled;
 	}
 
 	private void Update()
