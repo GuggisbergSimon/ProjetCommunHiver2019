@@ -8,8 +8,6 @@ public class CameraManager : MonoBehaviour
 {
 	[SerializeField] private int defaultPriority = 9;
 	[SerializeField] private int mainFocusPriority = 10;
-	[SerializeField] private float maxHeightLookUp = 4.0f;
-	[SerializeField] private float lookUpSpeed = 10.0f;
 	[SerializeField] private CinemachineVirtualCamera[] gravityCams = null;
 	[SerializeField] private CinemachineVirtualCamera globalCam = null;
 

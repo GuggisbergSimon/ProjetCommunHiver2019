@@ -6,7 +6,7 @@ using UnityEngine;
 public class MovingRoutine : MonoBehaviour
 {
 	[SerializeField] private MovingMode movingMode = 0;
-	[SerializeField] private Point[] points;
+	[SerializeField] private Point[] points = null;
 	[SerializeField] private bool isActive = true;
 	private int _indexPoints = 0;
 	private bool _ascendantOrder = true;
@@ -63,8 +63,8 @@ public class MovingRoutine : MonoBehaviour
 					timer += Time.deltaTime;
 					transform.position = Vector2.Lerp(initPos, actualPoint.position, timer / timeToReach);
 					transform.eulerAngles = Vector3.up * eulerAngles.y + Vector3.right * eulerAngles.x +
-											Vector3.forward * Mathf.LerpAngle(eulerAngles.z, actualPoint.angle,
-												timer / timeToReach);
+					                        Vector3.forward * Mathf.LerpAngle(eulerAngles.z, actualPoint.angle,
+						                        timer / timeToReach);
 					yield return null;
 				}
 
