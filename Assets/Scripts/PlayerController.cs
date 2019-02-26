@@ -18,6 +18,7 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private LayerMask layerGround = 0;
 	[SerializeField] private int maxNumberGravityUse = 1;
 	[SerializeField] private float maxFallingSpeed = 5.0f;
+	[SerializeField] private float deadZoneVertical = 0.5f;
 
 	public enum CardinalDirection
 	{
@@ -144,7 +145,7 @@ public class PlayerController : MonoBehaviour
 		}
 
 		//code for interacting with _interactives
-		if (_interactives.Count > 0 && Input.GetAxisRaw("Vertical") > 0 && _isGrounded)
+		if (_interactives.Count > 0 && Input.GetAxisRaw("Vertical") > deadZoneVertical && _isGrounded)
 		{
 			GameObject closestToPlayer = _interactives[0];
 			foreach (var item in _interactives)
@@ -162,11 +163,11 @@ public class PlayerController : MonoBehaviour
 		}
 
 		//handles zoom/dezoom of map
-		if (_isGrounded && _inputs.y >= 0 && _inputs.y.CompareTo(_verticalInput) != 0)
+		if (_isGrounded && _inputs.y <= 0)
 		{
 			_verticalInput = Input.GetAxisRaw("Vertical");
-			bool isPressingUp = _verticalInput > 0;
-			if (isPressingUp)
+			bool isPressingDown = _verticalInput < -deadZoneVertical;
+			if (isPressingDown)
 			{
 				previousVelocity = _myRigidBody.velocity;
 				_myRigidBody.velocity = Vector2.zero;
@@ -175,16 +176,17 @@ public class PlayerController : MonoBehaviour
 			{
 				_myRigidBody.velocity = previousVelocity;
 			}
+			
+			ToggleFreeze(isPressingDown);
 
-			ToggleFreeze(!isPressingUp);
-			GameManager.Instance.CameraManager.ToggleGlobalCamera(isPressingUp);
+			GameManager.Instance.CameraManager.ToggleGlobalCamera(isPressingDown);
 		}
 	}
 
 	private void ToggleFreeze(bool value)
 	{
-		_canMove = value;
-		_canTurn = value;
+		_canMove = !value;
+		_canTurn = !value;
 		if (value)
 		{
 			ResetVelocityAndInput();
