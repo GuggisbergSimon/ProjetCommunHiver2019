@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Timers;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,6 +9,10 @@ public class UIManager : MonoBehaviour
 {
 	[SerializeField] private float fadingToBlackTime = 0.5f;
 	[SerializeField] private Image blackPanel = null;
+	[SerializeField] private GameObject dialoguePanel = null;
+	[SerializeField] private TextMeshProUGUI textDisplayed = null;
+	private Coroutine _currentDialogue;
+	private Message _currentMessage;
 	private bool _isFadingToBlack;
 	public bool IsFadingToBlack => _isFadingToBlack;
 
@@ -32,5 +37,48 @@ public class UIManager : MonoBehaviour
 
 		blackPanel.gameObject.SetActive(value);
 		_isFadingToBlack = false;
+	}
+
+	public void PrintMessage(Message message)
+	{
+		dialoguePanel.SetActive(true);
+		if (_currentDialogue != null)
+		{
+			StopCoroutine(_currentDialogue);
+		}
+
+		_currentMessage = message;
+
+		textDisplayed.color = _currentMessage.color;
+		if (message.timeBetweenLetters.CompareTo(0) != 0)
+		{
+			_currentDialogue = StartCoroutine(PrintLetterByLetter());
+		}
+		else
+		{
+			PrintAll();
+		}
+	}
+
+	public void CloseMessage()
+	{
+		dialoguePanel.SetActive(false);
+	}
+
+	private IEnumerator PrintLetterByLetter()
+	{
+		textDisplayed.text = "";
+		for (int i = 0; i < _currentMessage.text.Length; i++)
+		{
+			textDisplayed.text += _currentMessage.text[i];
+			//todo play a sound here
+			yield return new WaitForSeconds(_currentMessage.timeBetweenLetters);
+		}
+	}
+
+	private void PrintAll()
+	{
+		textDisplayed.text = _currentMessage.text;
+		//todo play a sound here
 	}
 }
