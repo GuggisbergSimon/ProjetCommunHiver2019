@@ -128,7 +128,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   timeRespawn: 2
   speedFloating: 2
-  amplitudeFloating: 0.5
+  amplitudeFloating: 0.1
 --- !u!60 &7143527853424877584
 PolygonCollider2D:
   m_ObjectHideFlags: 0
