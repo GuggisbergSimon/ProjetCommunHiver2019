@@ -27,6 +27,7 @@ public class PlayerController : MonoBehaviour
 		West
 	}
 
+	private List<GameObject> _interactives = new List<GameObject>();
 	private CardinalDirection _previousGravityDirection;
 	private CardinalDirection _actualGravityDirection;
 	public CardinalDirection ActualGravityDirection => _actualGravityDirection;
@@ -51,7 +52,6 @@ public class PlayerController : MonoBehaviour
 		_myRigidBody = GetComponent<Rigidbody2D>();
 		_myCollider = GetComponent<Collider2D>();
 		_numberGravityUseRemaining = maxNumberGravityUse;
-
 		//setup correctly the direction the player is positioned at setup
 		float initRot = transform.eulerAngles.z;
 		if (Mathf.Abs(initRot) < 45)
@@ -80,6 +80,11 @@ public class PlayerController : MonoBehaviour
 		_previousGravityDirection = _actualGravityDirection;
 	}
 
+	private void Start()
+	{
+		noVomitMode = GameManager.Instance.NoVomitModeEnabled;
+	}
+
 	private void Update()
 	{
 		_inputs = Vector2.right * Input.GetAxis("Horizontal") + Vector2.up * Input.GetAxisRaw("Vertical");
@@ -104,29 +109,6 @@ public class PlayerController : MonoBehaviour
 			}
 		}
 
-		//handles zoom/dezoom of map
-		if (_isGrounded && _inputs.y >= 0 &&
-			_inputs.y.CompareTo(_verticalInput) != 0)
-		{
-			_verticalInput = Input.GetAxisRaw("Vertical");
-			bool isPressingUp = _verticalInput > 0;
-			if (isPressingUp)
-			{
-				previousVelocity = _myRigidBody.velocity;
-				_myRigidBody.velocity = Vector2.zero;
-			}
-			else
-			{
-				_myRigidBody.velocity = previousVelocity;
-			}
-
-			_canMove = !isPressingUp;
-			_canTurn = !isPressingUp;
-			GameManager.Instance.CameraManager.ToggleGlobalCamera(isPressingUp);
-			return;
-		}
-
-
 		//handles jump input
 		if (Input.GetButtonDown("Jump") && _isGrounded)
 		{
@@ -145,13 +127,13 @@ public class PlayerController : MonoBehaviour
 			{
 				_isPressingLeft = true;
 				TurnTo(_actualGravityDirection -
-					   (_actualGravityDirection == CardinalDirection.South ? -3 : 1));
+				       (_actualGravityDirection == CardinalDirection.South ? -3 : 1));
 			}
 			else if (Input.GetButtonDown("TurnRight") && !_isPressingLeft)
 			{
 				_isPressingRight = true;
 				TurnTo(_actualGravityDirection +
-					   (_actualGravityDirection == CardinalDirection.West ? -3 : 1));
+				       (_actualGravityDirection == CardinalDirection.West ? -3 : 1));
 			}
 		}
 
@@ -159,6 +141,79 @@ public class PlayerController : MonoBehaviour
 		if (Input.GetButtonDown("Retry"))
 		{
 			Die();
+		}
+
+		//code for interacting with _interactives
+		if (_interactives.Count > 0 && Input.GetAxisRaw("Vertical") > 0 && _isGrounded)
+		{
+			GameObject closestToPlayer = _interactives[0];
+			foreach (var item in _interactives)
+			{
+				if ((closestToPlayer.transform.position - transform.position).magnitude >
+				    (item.transform.position - transform.position).magnitude)
+				{
+					closestToPlayer = item;
+				}
+			}
+
+			ResetVelocityAndInput();
+			closestToPlayer.GetComponent<Interactive>().Interact();
+			return;
+		}
+
+		//handles zoom/dezoom of map
+		if (_isGrounded && _inputs.y >= 0 && _inputs.y.CompareTo(_verticalInput) != 0)
+		{
+			_verticalInput = Input.GetAxisRaw("Vertical");
+			bool isPressingUp = _verticalInput > 0;
+			if (isPressingUp)
+			{
+				previousVelocity = _myRigidBody.velocity;
+				_myRigidBody.velocity = Vector2.zero;
+			}
+			else
+			{
+				_myRigidBody.velocity = previousVelocity;
+			}
+
+			ToggleFreeze(!isPressingUp);
+			GameManager.Instance.CameraManager.ToggleGlobalCamera(isPressingUp);
+		}
+	}
+
+	private void ToggleFreeze(bool value)
+	{
+		_canMove = value;
+		_canTurn = value;
+		if (value)
+		{
+			ResetVelocityAndInput();
+		}
+	}
+
+	private void ResetVelocityAndInput()
+	{
+		_myRigidBody.velocity = Vector2.zero;
+		_horizontalInput = 0;
+		_verticalInput = 0;
+		_isPressingJump = false;
+		_isPressingLeft = false;
+		_isPressingRight = false;
+	}
+
+	private void OnTriggerEnter2D(Collider2D other)
+	{
+		if (other.gameObject.CompareTag("Interactive") && !_interactives.Contains(other.gameObject))
+		{
+			_interactives.Add(other.gameObject);
+		}
+	}
+
+	private void OnTriggerExit2D(Collider2D other)
+	{
+		if (other.gameObject.CompareTag("Interactive") && _interactives.Contains(other.gameObject))
+		{
+			_interactives.Remove(other.gameObject);
 		}
 	}
 
@@ -171,25 +226,25 @@ public class PlayerController : MonoBehaviour
 			_myRigidBody.AddForce(transform.up.normalized * gravityMultiplier * Physics2D.gravity.y);
 			//moves the player depending on direction
 			_myRigidBody.velocity = transform.right.normalized * playerHorizontalSpeed * _horizontalInput +
-									projectionVelocityUp;
+			                        projectionVelocityUp;
 			//executes a jump depending on direction
 			if (_isPressingJump)
 			{
 				_myRigidBody.velocity = transform.up.normalized * jumpSpeed +
-										Vector3.Project(_myRigidBody.velocity, transform.right);
+				                        Vector3.Project(_myRigidBody.velocity, transform.right);
 				_isPressingJump = false;
 			}
 
 			//applies fallMultiplier
 			if (Vector3.Dot(Vector3.Project(_myRigidBody.velocity, transform.up).normalized,
-					transform.up.normalized) < 0)
+				    transform.up.normalized) < 0)
 			{
 				_myRigidBody.velocity += (Vector2) transform.up.normalized * Physics2D.gravity.y *
-										 (fallMultiplier - 1) * Time.deltaTime;
+				                         (fallMultiplier - 1) * Time.deltaTime;
 			}
 			//applies lowJumpMultiplier
 			else if (Vector3.Dot(projectionVelocityUp.normalized, transform.up.normalized) > 0 &&
-					 !Input.GetButton("Jump"))
+			         !Input.GetButton("Jump"))
 			{
 				_myRigidBody.velocity +=
 					(Vector2) transform.up.normalized * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
@@ -197,8 +252,8 @@ public class PlayerController : MonoBehaviour
 
 			//applies maxSpeed
 			if (projectionVelocityUp.magnitude > maxFallingSpeed &&
-				Vector3.Dot(projectionVelocityUp.normalized, transform.up.normalized) <
-				0)
+			    Vector3.Dot(projectionVelocityUp.normalized, transform.up.normalized) <
+			    0)
 			{
 				_myRigidBody.velocity *=
 					projectionVelocityUp.normalized.magnitude * maxFallingSpeed / projectionVelocityUp.magnitude;

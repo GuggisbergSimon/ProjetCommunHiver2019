@@ -15,7 +15,6 @@ public class LaserBehaviour : MonoBehaviour
 	[SerializeField] private Color inactiveColor = Color.clear;
 	[SerializeField] private Color activeColor = Color.white;
 	[SerializeField] private bool isActive = true;
-	//private SpriteRenderer _mySpriteRenderer;
 	private LineRenderer _myLineRenderer;
 	private BoxCollider2D _myCollider;
 
@@ -30,7 +29,6 @@ public class LaserBehaviour : MonoBehaviour
 	{
 		_myLineRenderer = GetComponent<LineRenderer>();
 		_myCollider = GetComponentInChildren<BoxCollider2D>();
-		//_mySpriteRenderer = GetComponentInChildren<SpriteRenderer>();
 		if (isActive)
 		{
 			StartCoroutine(SimpleRoutine());

@@ -6,8 +6,8 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
 	[SerializeField] private float fadeInTimescaleTime = 0.1f;
-	private Coroutine _timeScaleCoroutine;
 	public static GameManager Instance { get; private set; }
+	private Coroutine _timeScaleCoroutine;
 	private PlayerController player;
 	public PlayerController Player => player;
 	private CameraManager _cameraManager;
@@ -15,6 +15,10 @@ public class GameManager : MonoBehaviour
 	private UIManager _uiManager;
 	public UIManager UIManager => _uiManager;
 	private bool _fadeOutToBlack = false;
+	private bool _isQuitting;
+	private bool _noVomitModeEnabled;
+
+	public bool NoVomitModeEnabled => _noVomitModeEnabled;
 
 	public bool FadeOutToBlack
 	{
@@ -80,6 +84,18 @@ public class GameManager : MonoBehaviour
 		SceneManager.LoadScene(nameLevel);
 	}
 
+	public void NoVomitMode(bool value)
+	{
+		_noVomitModeEnabled = value;
+	}
+
+	public void LoadLevelFadeInAndOut(string nameLevel)
+	{
+		UIManager.FadeToBlack(true);
+		_fadeOutToBlack = true;
+		StartCoroutine(LoadingLevel(nameLevel));
+	}
+
 	public void LoadLevel(string nameLevel, bool fadeInToBlack, bool fadeOutToBlack)
 	{
 		if (fadeInToBlack)
@@ -88,6 +104,11 @@ public class GameManager : MonoBehaviour
 			_uiManager.FadeToBlack(true);
 			_fadeOutToBlack = fadeOutToBlack;
 			StartCoroutine(LoadingLevel(nameLevel));
+		}
+		else
+		{
+			_fadeOutToBlack = fadeOutToBlack;
+			LoadLevel(nameLevel);
 		}
 	}
 
@@ -123,12 +144,26 @@ public class GameManager : MonoBehaviour
 		}
 	}
 
-	public void QuitGame()
+	private IEnumerator QuittingGame()
 	{
+		while (UIManager.IsFadingToBlack)
+		{
+			yield return null;
+		}
 #if UNITY_EDITOR
 		UnityEditor.EditorApplication.isPlaying = false;
 #else
 		Application.Quit();
 #endif
+	}
+
+	public void QuitGame()
+	{
+		if (!_isQuitting)
+		{
+			_isQuitting = true;
+			_uiManager.FadeToBlack(true);
+			StartCoroutine(QuittingGame());
+		}
 	}
 }

@@ -19,8 +19,8 @@ public class UIManager : MonoBehaviour
 	private IEnumerator FadingToBlack(bool value, float time)
 	{
 		_isFadingToBlack = true;
+		blackPanel.gameObject.SetActive(true);
 		float timer = 0.0f;
-
 		Color tempColor = blackPanel.color;
 		while (timer < time)
 		{
@@ -30,6 +30,7 @@ public class UIManager : MonoBehaviour
 			yield return null;
 		}
 
+		blackPanel.gameObject.SetActive(value);
 		_isFadingToBlack = false;
 	}
 }
