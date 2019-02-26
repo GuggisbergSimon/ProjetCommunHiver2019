@@ -45,7 +45,7 @@ public class PlayerController : MonoBehaviour
 	private bool _isPressingRight;
 	private bool _isPressingLeft;
 	private int _numberGravityUseRemaining;
-	private Vector3 previousVelocity;
+	private Vector3 _previousVelocity;
 	private Collider2D _myCollider;
 
 	private void Awake()
@@ -169,12 +169,12 @@ public class PlayerController : MonoBehaviour
 			bool isPressingDown = _verticalInput < -deadZoneVertical;
 			if (isPressingDown)
 			{
-				previousVelocity = _myRigidBody.velocity;
+				_previousVelocity = _myRigidBody.velocity;
 				_myRigidBody.velocity = Vector2.zero;
 			}
 			else
 			{
-				_myRigidBody.velocity = previousVelocity;
+				_myRigidBody.velocity = _previousVelocity;
 			}
 			
 			ToggleFreeze(isPressingDown);
@@ -309,7 +309,7 @@ public class PlayerController : MonoBehaviour
 			{
 				_canMove = false;
 				_myRigidBody.velocity = Vector2.zero;
-				_myCollider.enabled = false;
+				//_myCollider.enabled = false;
 			}
 
 			_actualGravityDirection = direction;
@@ -347,7 +347,7 @@ public class PlayerController : MonoBehaviour
 		_isPressingLeft = false;
 		_isPressingRight = false;
 		_canMove = true;
-		_myCollider.enabled = true;
+		//_myCollider.enabled = true;
 		_numberGravityUseRemaining--;
 	}
 
