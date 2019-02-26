@@ -14,6 +14,8 @@ public class LaserBehaviour : MonoBehaviour
 	[SerializeField] private Color warmingUpColor = Color.gray;
 	[SerializeField] private Color inactiveColor = Color.clear;
 	[SerializeField] private Color activeColor = Color.white;
+	[SerializeField] private Color activeColorAlt = Color.red;
+	[SerializeField] private float changeActiveColorSpeed = 1.0f;
 	[SerializeField] private bool isActive = true;
 	private LineRenderer _myLineRenderer;
 	private BoxCollider2D _myCollider;
@@ -70,6 +72,12 @@ public class LaserBehaviour : MonoBehaviour
 		_myLineRenderer.SetPosition(1, transform.InverseTransformPoint(hit.point));
 		_myCollider.offset = Vector2.down * (hit.point - currentPos).magnitude / 2;
 		_myCollider.size = Vector2.right * _myCollider.size + Vector2.up * (hit.point - currentPos).magnitude;
+
+		if (isActive)
+		{
+			Debug.Log(Mathf.Sin(Time.time * changeActiveColorSpeed) * 0.5f + 0.5f);
+			ChangeColor(Color.Lerp(activeColor, activeColorAlt, Mathf.Sin(Time.time * changeActiveColorSpeed) * 0.5f + 0.5f));
+		}
 	}
 
 	public void Activate()
@@ -107,7 +115,6 @@ public class LaserBehaviour : MonoBehaviour
 
 	private void ChangeColor(Color color)
 	{
-		//_mySpriteRenderer.color = color;
 		_myLineRenderer.startColor = color;
 		_myLineRenderer.endColor = color;
 	}
