@@ -24,6 +24,7 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private AudioClip gravityUseSound = null;
 	[SerializeField] private AudioClip[] jumpSounds = null;
 	[SerializeField] private AudioClip stepSound = null;
+	[SerializeField] private float gravityTimeScale = 0.1f;
 
 	public enum CardinalDirection
 	{
@@ -323,6 +324,7 @@ public class PlayerController : MonoBehaviour
 			//setup the first 90° turn
 			if (_canMove)
 			{
+				GameManager.Instance.ChangeTimeScale(gravityTimeScale);
 				_isGrounded = false;
 				_myAudioSource.PlayOneShot(gravityUseSound);
 				_canMove = false;
@@ -353,8 +355,9 @@ public class PlayerController : MonoBehaviour
 		while (timer < time)
 		{
 			timer += Time.deltaTime;
-			_myRigidBody.rotation =
-				(Mathf.LerpAngle(initRotPlayer, (float) _actualGravityDirection * 90.0f, timer / time));
+			transform.eulerAngles = Vector3.forward *
+									(Mathf.LerpAngle(initRotPlayer, (float) _actualGravityDirection * 90.0f,
+										timer / time));
 			yield return null;
 		}
 
@@ -365,6 +368,7 @@ public class PlayerController : MonoBehaviour
 		_isPressingRight = false;
 		_canMove = true;
 		_numberGravityUseRemaining--;
+		GameManager.Instance.ChangeTimeScale(1.0f);
 	}
 
 	public void Die()

@@ -129,7 +129,14 @@ public class GameManager : MonoBehaviour
 			StopCoroutine(_timeScaleCoroutine);
 		}
 
-		_timeScaleCoroutine = StartCoroutine(ChangingTimeScale(timeScale));
+		if (fadeInTimescaleTime.CompareTo(0) > 0)
+		{
+			_timeScaleCoroutine = StartCoroutine(ChangingTimeScale(timeScale));
+		}
+		else
+		{
+			Time.timeScale = timeScale;
+		}
 	}
 
 	private IEnumerator ChangingTimeScale(float timeScale)
