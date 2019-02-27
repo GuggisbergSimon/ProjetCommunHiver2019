@@ -10,6 +10,8 @@ public class CameraManager : MonoBehaviour
 	[SerializeField] private int mainFocusPriority = 10;
 	[SerializeField] private CinemachineVirtualCamera[] gravityCams = null;
 	[SerializeField] private CinemachineVirtualCamera globalCam = null;
+	[SerializeField] private AudioClip zoomInSound = null;
+	[SerializeField] private AudioClip zoomOutSound = null;
 
 	private Dictionary<PlayerController.CardinalDirection, CinemachineVirtualCamera> _vCams =
 		new Dictionary<PlayerController.CardinalDirection, CinemachineVirtualCamera>();
@@ -18,6 +20,7 @@ public class CameraManager : MonoBehaviour
 	private CinemachineVirtualCamera _vCam;
 	private CinemachineBasicMultiChannelPerlin _noise;
 	private bool _canToggleGlobalVcam = true;
+	private AudioSource _myAudioSource;
 
 	public bool CanToggleGlobalVcam
 	{
@@ -43,6 +46,7 @@ public class CameraManager : MonoBehaviour
 		_vCam.Priority = mainFocusPriority;
 		globalCam.Priority = defaultPriority;
 		_noise = _vCam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
+		_myAudioSource = GetComponent<AudioSource>();
 	}
 
 	public void ChangeVCamByDirection(PlayerController.CardinalDirection direction)
@@ -58,10 +62,12 @@ public class CameraManager : MonoBehaviour
 		{
 			if (value)
 			{
+				_myAudioSource.PlayOneShot(zoomOutSound);
 				globalCam.Priority = mainFocusPriority + 1;
 			}
 			else
 			{
+				_myAudioSource.PlayOneShot(zoomInSound);
 				globalCam.Priority = defaultPriority;
 			}
 		}
