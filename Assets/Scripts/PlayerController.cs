@@ -18,6 +18,12 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private LayerMask layerGround = 0;
 	[SerializeField] private int maxNumberGravityUse = 1;
 	[SerializeField] private float maxFallingSpeed = 5.0f;
+	[SerializeField] private float deadZoneVertical = 0.5f;
+	[SerializeField] private AudioClip gravityBackSound = null;
+	[SerializeField] private AudioClip gravityNoUseSound = null;
+	[SerializeField] private AudioClip gravityUseSound = null;
+	[SerializeField] private AudioClip[] jumpSounds = null;
+	[SerializeField] private AudioClip stepSound = null;
 
 	public enum CardinalDirection
 	{
@@ -34,6 +40,7 @@ public class PlayerController : MonoBehaviour
 	private Coroutine _rotatingCoroutine;
 	private Rigidbody2D _myRigidBody;
 	private bool _isGrounded;
+	private bool _previousIsGrounded;
 	private bool _isAlive = true;
 	private bool _canTurn = true;
 	private bool _canMove = true;
@@ -44,13 +51,13 @@ public class PlayerController : MonoBehaviour
 	private bool _isPressingRight;
 	private bool _isPressingLeft;
 	private int _numberGravityUseRemaining;
-	private Vector3 previousVelocity;
-	private Collider2D _myCollider;
+	private Vector3 _previousVelocity;
+	private AudioSource _myAudioSource;
 
 	private void Awake()
 	{
 		_myRigidBody = GetComponent<Rigidbody2D>();
-		_myCollider = GetComponent<Collider2D>();
+		_myAudioSource = GetComponent<AudioSource>();
 		_numberGravityUseRemaining = maxNumberGravityUse;
 		//setup correctly the direction the player is positioned at setup
 		float initRot = transform.eulerAngles.z;
@@ -103,8 +110,9 @@ public class PlayerController : MonoBehaviour
 			_horizontalInput = _inputs.x;
 			CheckGrounded();
 			//restores gravity power
-			if (_isGrounded)
+			if (_isGrounded && _previousIsGrounded != _isGrounded)
 			{
+				_myAudioSource.PlayOneShot(stepSound);
 				RestoreGravityPower();
 			}
 		}
@@ -127,14 +135,20 @@ public class PlayerController : MonoBehaviour
 			{
 				_isPressingLeft = true;
 				TurnTo(_actualGravityDirection -
-				       (_actualGravityDirection == CardinalDirection.South ? -3 : 1));
+					   (_actualGravityDirection == CardinalDirection.South ? -3 : 1));
 			}
 			else if (Input.GetButtonDown("TurnRight") && !_isPressingLeft)
 			{
 				_isPressingRight = true;
 				TurnTo(_actualGravityDirection +
-				       (_actualGravityDirection == CardinalDirection.West ? -3 : 1));
+					   (_actualGravityDirection == CardinalDirection.West ? -3 : 1));
 			}
+		}
+		//handles when player try to turn but can't
+		else if (Input.GetButtonDown("TurnLeft") || Input.GetButtonDown("TurnRight"))
+		{
+			//todo to test properly
+			_myAudioSource.PlayOneShot(gravityNoUseSound);
 		}
 
 		//handles retry input
@@ -144,13 +158,13 @@ public class PlayerController : MonoBehaviour
 		}
 
 		//code for interacting with _interactives
-		if (_interactives.Count > 0 && Input.GetAxisRaw("Vertical") > 0 && _isGrounded)
+		if (_interactives.Count > 0 && Input.GetAxisRaw("Vertical") > deadZoneVertical && _isGrounded)
 		{
 			GameObject closestToPlayer = _interactives[0];
 			foreach (var item in _interactives)
 			{
 				if ((closestToPlayer.transform.position - transform.position).magnitude >
-				    (item.transform.position - transform.position).magnitude)
+					(item.transform.position - transform.position).magnitude)
 				{
 					closestToPlayer = item;
 				}
@@ -162,29 +176,30 @@ public class PlayerController : MonoBehaviour
 		}
 
 		//handles zoom/dezoom of map
-		if (_isGrounded && _inputs.y >= 0 && _inputs.y.CompareTo(_verticalInput) != 0)
+		if (_isGrounded && _inputs.y <= 0)
 		{
 			_verticalInput = Input.GetAxisRaw("Vertical");
-			bool isPressingUp = _verticalInput > 0;
-			if (isPressingUp)
+			bool isPressingDown = _verticalInput < -deadZoneVertical;
+			if (isPressingDown)
 			{
-				previousVelocity = _myRigidBody.velocity;
+				_previousVelocity = _myRigidBody.velocity;
 				_myRigidBody.velocity = Vector2.zero;
 			}
 			else
 			{
-				_myRigidBody.velocity = previousVelocity;
+				_myRigidBody.velocity = _previousVelocity;
 			}
 
-			ToggleFreeze(!isPressingUp);
-			GameManager.Instance.CameraManager.ToggleGlobalCamera(isPressingUp);
+			ToggleFreeze(isPressingDown);
+
+			GameManager.Instance.CameraManager.ToggleGlobalCamera(isPressingDown);
 		}
 	}
 
 	private void ToggleFreeze(bool value)
 	{
-		_canMove = value;
-		_canTurn = value;
+		_canMove = !value;
+		_canTurn = !value;
 		if (value)
 		{
 			ResetVelocityAndInput();
@@ -226,25 +241,26 @@ public class PlayerController : MonoBehaviour
 			_myRigidBody.AddForce(transform.up.normalized * gravityMultiplier * Physics2D.gravity.y);
 			//moves the player depending on direction
 			_myRigidBody.velocity = transform.right.normalized * playerHorizontalSpeed * _horizontalInput +
-			                        projectionVelocityUp;
+									projectionVelocityUp;
 			//executes a jump depending on direction
 			if (_isPressingJump)
 			{
+				_myAudioSource.PlayOneShot(jumpSounds[Random.Range(0, jumpSounds.Length)]);
 				_myRigidBody.velocity = transform.up.normalized * jumpSpeed +
-				                        Vector3.Project(_myRigidBody.velocity, transform.right);
+										Vector3.Project(_myRigidBody.velocity, transform.right);
 				_isPressingJump = false;
 			}
 
 			//applies fallMultiplier
 			if (Vector3.Dot(Vector3.Project(_myRigidBody.velocity, transform.up).normalized,
-				    transform.up.normalized) < 0)
+					transform.up.normalized) < 0)
 			{
 				_myRigidBody.velocity += (Vector2) transform.up.normalized * Physics2D.gravity.y *
-				                         (fallMultiplier - 1) * Time.deltaTime;
+										 (fallMultiplier - 1) * Time.deltaTime;
 			}
 			//applies lowJumpMultiplier
 			else if (Vector3.Dot(projectionVelocityUp.normalized, transform.up.normalized) > 0 &&
-			         !Input.GetButton("Jump"))
+					 !Input.GetButton("Jump"))
 			{
 				_myRigidBody.velocity +=
 					(Vector2) transform.up.normalized * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
@@ -252,8 +268,8 @@ public class PlayerController : MonoBehaviour
 
 			//applies maxSpeed
 			if (projectionVelocityUp.magnitude > maxFallingSpeed &&
-			    Vector3.Dot(projectionVelocityUp.normalized, transform.up.normalized) <
-			    0)
+				Vector3.Dot(projectionVelocityUp.normalized, transform.up.normalized) <
+				0)
 			{
 				_myRigidBody.velocity *=
 					projectionVelocityUp.normalized.magnitude * maxFallingSpeed / projectionVelocityUp.magnitude;
@@ -271,6 +287,7 @@ public class PlayerController : MonoBehaviour
 	{
 		if (_numberGravityUseRemaining < maxNumberGravityUse)
 		{
+			_myAudioSource.PlayOneShot(gravityBackSound);
 			_numberGravityUseRemaining = maxNumberGravityUse;
 			return true;
 		}
@@ -293,6 +310,7 @@ public class PlayerController : MonoBehaviour
 	//raycast to check if the player is grounded
 	private void CheckGrounded()
 	{
+		_previousIsGrounded = _isGrounded;
 		_isGrounded = Physics2D.CircleCast(transform.position, radiusGroundCheck, -transform.up, distMaxGroundCheck,
 			layerGround);
 	}
@@ -305,9 +323,10 @@ public class PlayerController : MonoBehaviour
 			//setup the first 90° turn
 			if (_canMove)
 			{
+				_isGrounded = false;
+				_myAudioSource.PlayOneShot(gravityUseSound);
 				_canMove = false;
 				_myRigidBody.velocity = Vector2.zero;
-				_myCollider.enabled = false;
 			}
 
 			_actualGravityDirection = direction;
@@ -345,7 +364,6 @@ public class PlayerController : MonoBehaviour
 		_isPressingLeft = false;
 		_isPressingRight = false;
 		_canMove = true;
-		_myCollider.enabled = true;
 		_numberGravityUseRemaining--;
 	}
 
