@@ -109,6 +109,21 @@ PrefabInstance:
       propertyPath: m_Name
       value: Platform Destructible
       objectReference: {fileID: 0}
+    - target: {fileID: 8890301536615535161, guid: 34fe727e5c27d2e4db274ef609f386f9,
+        type: 3}
+      propertyPath: speedShaking
+      value: 1000
+      objectReference: {fileID: 0}
+    - target: {fileID: 8890301536615535161, guid: 34fe727e5c27d2e4db274ef609f386f9,
+        type: 3}
+      propertyPath: amplitudeShaking
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 8890301536615535161, guid: 34fe727e5c27d2e4db274ef609f386f9,
+        type: 3}
+      propertyPath: beforeDestructingTime
+      value: 1.5
+      objectReference: {fileID: 0}
     - target: {fileID: 8890301536615535160, guid: 34fe727e5c27d2e4db274ef609f386f9,
         type: 3}
       propertyPath: m_LocalPosition.x
