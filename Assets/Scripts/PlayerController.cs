@@ -14,7 +14,6 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private float timeBeforeGravityAgain = 0.2f;
 	[SerializeField] private float distMaxGroundCheck = 0.1f;
 	[SerializeField] private float radiusGroundCheck = 0.5f;
-	[SerializeField] private bool noVomitMode = false;
 	[SerializeField] private LayerMask layerGround = 0;
 	[SerializeField] private int maxNumberGravityUse = 1;
 	[SerializeField] private float maxFallingSpeed = 5.0f;
@@ -25,6 +24,12 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private AudioClip[] jumpSounds = null;
 	[SerializeField] private AudioClip stepSound = null;
 	[SerializeField] private float gravityTimeScale = 0.1f;
+	[SerializeField] private float amplitudeShakeGravityUse = 1.0f;
+	[SerializeField] private float frequencyShakeGravityUse = 1.0f;
+	[SerializeField] private float timeShakeGravityUse = 1.0f;
+	[SerializeField] private TrailRenderer[] myTrails = null;
+	[SerializeField] private Gradient gradientTrailPowerOn = null;
+	[SerializeField] private Gradient gradientTrailPowerOff = null;
 
 	public enum CardinalDirection
 	{
@@ -88,15 +93,10 @@ public class PlayerController : MonoBehaviour
 		_previousGravityDirection = _actualGravityDirection;
 	}
 
-	private void Start()
-	{
-		noVomitMode = GameManager.Instance.NoVomitModeEnabled;
-	}
-
 	private void Update()
 	{
 		_inputs = Vector2.right * Input.GetAxis("Horizontal") + Vector2.up * Input.GetAxisRaw("Vertical");
-		if (noVomitMode)
+		if (GameManager.Instance.NoVomitModeEnabled)
 		{
 			//cases when walking on ground/ceiling
 			if ((int) _actualGravityDirection % 2 == 0)
@@ -136,13 +136,13 @@ public class PlayerController : MonoBehaviour
 			{
 				_isPressingLeft = true;
 				TurnTo(_actualGravityDirection -
-					   (_actualGravityDirection == CardinalDirection.South ? -3 : 1));
+				       (_actualGravityDirection == CardinalDirection.South ? -3 : 1));
 			}
 			else if (Input.GetButtonDown("TurnRight") && !_isPressingLeft)
 			{
 				_isPressingRight = true;
 				TurnTo(_actualGravityDirection +
-					   (_actualGravityDirection == CardinalDirection.West ? -3 : 1));
+				       (_actualGravityDirection == CardinalDirection.West ? -3 : 1));
 			}
 		}
 		//handles when player try to turn but can't
@@ -165,7 +165,7 @@ public class PlayerController : MonoBehaviour
 			foreach (var item in _interactives)
 			{
 				if ((closestToPlayer.transform.position - transform.position).magnitude >
-					(item.transform.position - transform.position).magnitude)
+				    (item.transform.position - transform.position).magnitude)
 				{
 					closestToPlayer = item;
 				}
@@ -242,26 +242,26 @@ public class PlayerController : MonoBehaviour
 			_myRigidBody.AddForce(transform.up.normalized * gravityMultiplier * Physics2D.gravity.y);
 			//moves the player depending on direction
 			_myRigidBody.velocity = transform.right.normalized * playerHorizontalSpeed * _horizontalInput +
-									projectionVelocityUp;
+			                        projectionVelocityUp;
 			//executes a jump depending on direction
 			if (_isPressingJump)
 			{
 				_myAudioSource.PlayOneShot(jumpSounds[Random.Range(0, jumpSounds.Length)]);
 				_myRigidBody.velocity = transform.up.normalized * jumpSpeed +
-										Vector3.Project(_myRigidBody.velocity, transform.right);
+				                        Vector3.Project(_myRigidBody.velocity, transform.right);
 				_isPressingJump = false;
 			}
 
 			//applies fallMultiplier
 			if (Vector3.Dot(Vector3.Project(_myRigidBody.velocity, transform.up).normalized,
-					transform.up.normalized) < 0)
+				    transform.up.normalized) < 0)
 			{
 				_myRigidBody.velocity += (Vector2) transform.up.normalized * Physics2D.gravity.y *
-										 (fallMultiplier - 1) * Time.deltaTime;
+				                         (fallMultiplier - 1) * Time.deltaTime;
 			}
 			//applies lowJumpMultiplier
 			else if (Vector3.Dot(projectionVelocityUp.normalized, transform.up.normalized) > 0 &&
-					 !Input.GetButton("Jump"))
+			         !Input.GetButton("Jump"))
 			{
 				_myRigidBody.velocity +=
 					(Vector2) transform.up.normalized * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
@@ -269,8 +269,8 @@ public class PlayerController : MonoBehaviour
 
 			//applies maxSpeed
 			if (projectionVelocityUp.magnitude > maxFallingSpeed &&
-				Vector3.Dot(projectionVelocityUp.normalized, transform.up.normalized) <
-				0)
+			    Vector3.Dot(projectionVelocityUp.normalized, transform.up.normalized) <
+			    0)
 			{
 				_myRigidBody.velocity *=
 					projectionVelocityUp.normalized.magnitude * maxFallingSpeed / projectionVelocityUp.magnitude;
@@ -290,6 +290,11 @@ public class PlayerController : MonoBehaviour
 		{
 			_myAudioSource.PlayOneShot(gravityBackSound);
 			_numberGravityUseRemaining = maxNumberGravityUse;
+			foreach (var trail in myTrails)
+			{
+				trail.colorGradient = gradientTrailPowerOn;
+			}
+
 			return true;
 		}
 		else
@@ -332,10 +337,13 @@ public class PlayerController : MonoBehaviour
 			}
 
 			_actualGravityDirection = direction;
-			if (!noVomitMode)
+			if (!GameManager.Instance.NoVomitModeEnabled)
 			{
 				GameManager.Instance.CameraManager.ChangeVCamByDirection(_actualGravityDirection);
 			}
+
+			GameManager.Instance.CameraManager.Shake(amplitudeShakeGravityUse, frequencyShakeGravityUse,
+				timeShakeGravityUse);
 
 			//checks if a coroutine is already running
 			if (_rotatingCoroutine != null)
@@ -356,8 +364,8 @@ public class PlayerController : MonoBehaviour
 		{
 			timer += Time.deltaTime;
 			transform.eulerAngles = Vector3.forward *
-									(Mathf.LerpAngle(initRotPlayer, (float) _actualGravityDirection * 90.0f,
-										timer / time));
+			                        (Mathf.LerpAngle(initRotPlayer, (float) _actualGravityDirection * 90.0f,
+				                        timer / time));
 			yield return null;
 		}
 
@@ -369,6 +377,10 @@ public class PlayerController : MonoBehaviour
 		_canMove = true;
 		_numberGravityUseRemaining--;
 		GameManager.Instance.ChangeTimeScale(1.0f);
+		foreach (var trail in myTrails)
+		{
+			trail.colorGradient = gradientTrailPowerOff;
+		}
 	}
 
 	public void Die()

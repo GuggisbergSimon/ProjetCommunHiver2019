@@ -16,7 +16,8 @@ public class CameraManager : MonoBehaviour
 	private Dictionary<PlayerController.CardinalDirection, CinemachineVirtualCamera> _vCams =
 		new Dictionary<PlayerController.CardinalDirection, CinemachineVirtualCamera>();
 
-	private Coroutine lookingUpCoroutine;
+	private Coroutine _lookingUpCoroutine;
+	private Coroutine _shakingCoroutine;
 	private CinemachineVirtualCamera _vCam;
 	private CinemachineBasicMultiChannelPerlin _noise;
 	private bool _canToggleGlobalVcam = true;
@@ -45,7 +46,6 @@ public class CameraManager : MonoBehaviour
 		_vCam = _vCams[GameManager.Instance.Player.ActualGravityDirection];
 		_vCam.Priority = mainFocusPriority;
 		globalCam.Priority = defaultPriority;
-		_noise = _vCam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
 		_myAudioSource = GetComponent<AudioSource>();
 	}
 
@@ -73,7 +73,25 @@ public class CameraManager : MonoBehaviour
 		}
 	}
 
-	public void Noise(float amplitudeGain, float frequencyGain)
+	public void Shake(float amplitudeGain, float frequencyGain, float time)
+	{
+		if (_shakingCoroutine != null)
+		{
+			StopCoroutine(_shakingCoroutine);
+		}
+
+		StartCoroutine(Shaking(amplitudeGain, frequencyGain, time));
+	}
+
+	private IEnumerator Shaking(float amplitudeGain, float frequencyGain, float time)
+	{
+		_noise = _vCam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
+		Noise(amplitudeGain, frequencyGain);
+		yield return new WaitForSeconds(time);
+		Noise(0.0f, 0.0f);
+	}
+
+	private void Noise(float amplitudeGain, float frequencyGain)
 	{
 		_noise.m_AmplitudeGain = amplitudeGain;
 		_noise.m_FrequencyGain = frequencyGain;
