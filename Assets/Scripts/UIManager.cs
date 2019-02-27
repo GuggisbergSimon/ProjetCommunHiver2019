@@ -71,7 +71,6 @@ public class UIManager : MonoBehaviour
 		for (int i = 0; i < _currentMessage.text.Length; i++)
 		{
 			textDisplayed.text += _currentMessage.text[i];
-			//todo play a sound here
 			yield return new WaitForSeconds(_currentMessage.timeBetweenLetters);
 		}
 	}
@@ -79,6 +78,5 @@ public class UIManager : MonoBehaviour
 	private void PrintAll()
 	{
 		textDisplayed.text = _currentMessage.text;
-		//todo play a sound here
 	}
 }

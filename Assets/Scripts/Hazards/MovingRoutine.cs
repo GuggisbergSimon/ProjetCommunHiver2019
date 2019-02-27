@@ -11,6 +11,7 @@ public class MovingRoutine : MonoBehaviour
 	private int _indexPoints = 0;
 	private bool _ascendantOrder = true;
 	private Coroutine _movingCoroutine;
+	private AudioSource _myAudioSource;
 
 	[Serializable]
 	private struct Point
@@ -30,6 +31,7 @@ public class MovingRoutine : MonoBehaviour
 
 	private void Start()
 	{
+		_myAudioSource = GetComponent<AudioSource>();
 		if (isActive)
 		{
 			Activate();
@@ -49,10 +51,16 @@ public class MovingRoutine : MonoBehaviour
 
 	private IEnumerator Moving()
 	{
+		_myAudioSource.Play();
 		while (true)
 		{
 			while (_indexPoints < points.Length && _indexPoints >= 0)
 			{
+				if (!_myAudioSource.isPlaying)
+				{
+					_myAudioSource.Play();
+				}
+
 				Vector2 initPos = transform.position;
 				Vector3 eulerAngles = transform.eulerAngles;
 				float timer = 0.0f;
@@ -63,12 +71,18 @@ public class MovingRoutine : MonoBehaviour
 					timer += Time.deltaTime;
 					transform.position = Vector2.Lerp(initPos, actualPoint.position, timer / timeToReach);
 					transform.eulerAngles = Vector3.up * eulerAngles.y + Vector3.right * eulerAngles.x +
-					                        Vector3.forward * Mathf.LerpAngle(eulerAngles.z, actualPoint.angle,
-						                        timer / timeToReach);
+											Vector3.forward * Mathf.LerpAngle(eulerAngles.z, actualPoint.angle,
+												timer / timeToReach);
 					yield return null;
 				}
 
+				if (actualPoint.timeToStop > 0)
+				{
+					_myAudioSource.Stop();
+				}
+
 				yield return new WaitForSeconds(actualPoint.timeToStop);
+
 				if (_ascendantOrder)
 				{
 					_indexPoints++;
@@ -90,6 +104,7 @@ public class MovingRoutine : MonoBehaviour
 			}
 			else if (movingMode == MovingMode.OnlyOnce)
 			{
+				_myAudioSource.Stop();
 				isActive = false;
 				break;
 			}

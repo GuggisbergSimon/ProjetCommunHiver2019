@@ -11,12 +11,14 @@ public class ResetterGravity : MonoBehaviour
 	private SpriteRenderer _mySprite;
 	private Vector2 _initPos;
 	private ParticleSystem _myParticleSystem;
+	private AudioSource _myAudioSource;
 
 	private void Start()
 	{
 		_mySprite = GetComponentInChildren<SpriteRenderer>();
 		_initPos = transform.position;
 		_myParticleSystem = GetComponent<ParticleSystem>();
+		_myAudioSource = GetComponent<AudioSource>();
 	}
 
 	private void Update()
@@ -34,6 +36,7 @@ public class ResetterGravity : MonoBehaviour
 				_isActive = false;
 				_mySprite.enabled = false;
 				_myParticleSystem.Stop();
+				_myAudioSource.Stop();
 				if (timeRespawn < 0)
 				{
 					Destroy(gameObject);
@@ -49,6 +52,7 @@ public class ResetterGravity : MonoBehaviour
 	private IEnumerator Respawn()
 	{
 		yield return new WaitForSeconds(timeRespawn);
+		_myAudioSource.Play();
 		_isActive = true;
 		_mySprite.enabled = true;
 		_myParticleSystem.Play();

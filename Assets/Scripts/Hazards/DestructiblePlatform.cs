@@ -10,18 +10,22 @@ public class DestructiblePlatform : MonoBehaviour
 	[SerializeField] private float respawningTime = 1.0f;
 	[SerializeField] private float speedShaking = 1.0f;
 	[SerializeField] private float amplitudeShaking = 1.0f;
+	[SerializeField] private AudioClip crumblingBeforeSound = null;
+	[SerializeField] private AudioClip crumblingAfterSound = null;
 	private bool _canBeActivated = true;
 	private Collider2D _myCollider;
 	private SpriteRenderer _mySprite;
 	private bool _isShaking;
 	private float _timerShaking;
 	private Vector2 _initSpritePos;
+	private AudioSource _myAudioSource;
 
 	private void Start()
 	{
 		_initSpritePos = transform.position;
 		_myCollider = GetComponent<Collider2D>();
 		_mySprite = GetComponentInChildren<SpriteRenderer>();
+		_myAudioSource = GetComponent<AudioSource>();
 	}
 
 	private void Update()
@@ -30,7 +34,8 @@ public class DestructiblePlatform : MonoBehaviour
 		{
 			_timerShaking += Time.deltaTime;
 			_mySprite.transform.position = _initSpritePos +
-			                               (Vector2) transform.right * (Mathf.Sin(_timerShaking * speedShaking) * amplitudeShaking);
+										   (Vector2) transform.right *
+										   (Mathf.Sin(_timerShaking * speedShaking) * amplitudeShaking);
 		}
 	}
 
@@ -44,12 +49,17 @@ public class DestructiblePlatform : MonoBehaviour
 
 	IEnumerator Destroy()
 	{
+		//crumbles
 		_isShaking = true;
 		_timerShaking = 0.0f;
+		_myAudioSource.PlayOneShot(crumblingBeforeSound);
 		yield return new WaitForSeconds(beforeDestructingTime);
+		
+		//is destroyed
 		_myCollider.enabled = false;
 		_mySprite.enabled = false;
 		_isShaking = false;
+		_myAudioSource.PlayOneShot(crumblingAfterSound);
 		if (destroyedTime >= 0)
 		{
 			if (destroyedTime.CompareTo(0) != 0)
@@ -59,6 +69,8 @@ public class DestructiblePlatform : MonoBehaviour
 
 			//todo set respawning sprite
 			yield return new WaitForSeconds(respawningTime);
+			
+			//respawns
 			_canBeActivated = true;
 			_myCollider.enabled = true;
 			_mySprite.enabled = true;

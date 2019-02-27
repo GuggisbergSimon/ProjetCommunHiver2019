@@ -19,6 +19,7 @@ public class LaserBehaviour : MonoBehaviour
 	[SerializeField] private bool isActive = true;
 	private LineRenderer _myLineRenderer;
 	private BoxCollider2D _myCollider;
+	private AudioSource _myAudioSource;
 
 	private enum LaserMode
 	{
@@ -31,6 +32,7 @@ public class LaserBehaviour : MonoBehaviour
 	{
 		_myLineRenderer = GetComponent<LineRenderer>();
 		_myCollider = GetComponentInChildren<BoxCollider2D>();
+		_myAudioSource = GetComponent<AudioSource>();
 		if (isActive)
 		{
 			StartCoroutine(SimpleRoutine());
@@ -97,6 +99,7 @@ public class LaserBehaviour : MonoBehaviour
 			}
 
 			ChangeColor(activeColor);
+			_myAudioSource.Play();
 			isActive = true;
 			if (activeTime.CompareTo(0) != 0)
 			{
@@ -104,6 +107,7 @@ public class LaserBehaviour : MonoBehaviour
 			}
 
 			ChangeColor(inactiveColor);
+			_myAudioSource.Stop();
 			isActive = false;
 			if (inactiveTime.CompareTo(0) != 0)
 			{
