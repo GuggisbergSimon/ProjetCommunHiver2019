@@ -23,6 +23,7 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private AudioClip gravityNoUseSound = null;
 	[SerializeField] private AudioClip gravityUseSound = null;
 	[SerializeField] private AudioClip[] jumpSounds = null;
+	[SerializeField] private AudioClip stepSound = null;
 
 	public enum CardinalDirection
 	{
@@ -39,6 +40,7 @@ public class PlayerController : MonoBehaviour
 	private Coroutine _rotatingCoroutine;
 	private Rigidbody2D _myRigidBody;
 	private bool _isGrounded;
+	private bool _previousIsGrounded;
 	private bool _isAlive = true;
 	private bool _canTurn = true;
 	private bool _canMove = true;
@@ -108,8 +110,9 @@ public class PlayerController : MonoBehaviour
 			_horizontalInput = _inputs.x;
 			CheckGrounded();
 			//restores gravity power
-			if (_isGrounded)
+			if (_isGrounded && _previousIsGrounded != _isGrounded)
 			{
+				_myAudioSource.PlayOneShot(stepSound);
 				RestoreGravityPower();
 			}
 		}
@@ -307,6 +310,7 @@ public class PlayerController : MonoBehaviour
 	//raycast to check if the player is grounded
 	private void CheckGrounded()
 	{
+		_previousIsGrounded = _isGrounded;
 		_isGrounded = Physics2D.CircleCast(transform.position, radiusGroundCheck, -transform.up, distMaxGroundCheck,
 			layerGround);
 	}
@@ -319,6 +323,7 @@ public class PlayerController : MonoBehaviour
 			//setup the first 90° turn
 			if (_canMove)
 			{
+				_isGrounded = false;
 				_myAudioSource.PlayOneShot(gravityUseSound);
 				_canMove = false;
 				_myRigidBody.velocity = Vector2.zero;
