@@ -154,8 +154,6 @@ public class PlayerController : MonoBehaviour
 		//handles when player try to turn but can't
 		else if (Input.GetButtonDown("TurnLeft") || Input.GetButtonDown("TurnRight"))
 		{
-			//todo to test properly
-			Debug.Log(powerOffColor.ToString());
 			FlashColor(powerOffColor);
 			_myAudioSource.PlayOneShot(gravityNoUseSound);
 		}

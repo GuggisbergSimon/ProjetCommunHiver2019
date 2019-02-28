@@ -9,7 +9,7 @@ public class CameraManager : MonoBehaviour
 	[SerializeField] private int defaultPriority = 9;
 	[SerializeField] private int mainFocusPriority = 10;
 	[SerializeField] private CinemachineVirtualCamera[] gravityCams = null;
-	[SerializeField] private CinemachineVirtualCamera globalCam = null;
+	[SerializeField] CinemachineVirtualCamera[] globalCams = null;
 	[SerializeField] private AudioClip zoomInSound = null;
 	[SerializeField] private AudioClip zoomOutSound = null;
 
@@ -19,6 +19,7 @@ public class CameraManager : MonoBehaviour
 	private Coroutine _lookingUpCoroutine;
 	private Coroutine _shakingCoroutine;
 	private CinemachineVirtualCamera _vCam;
+	private CinemachineVirtualCamera _globalCam;
 	private CinemachineBasicMultiChannelPerlin _noise;
 	private bool _canToggleGlobalVcam = true;
 	private AudioSource _myAudioSource;
@@ -42,17 +43,25 @@ public class CameraManager : MonoBehaviour
 			++i;
 		}
 
+		foreach (var globalCam in globalCams)
+		{
+			globalCam.Priority = defaultPriority;
+		}
+
 		//setup the maincamera
 		_vCam = _vCams[GameManager.Instance.Player.ActualGravityDirection];
+		_globalCam = globalCams[0];
 		_vCam.Priority = mainFocusPriority;
-		globalCam.Priority = defaultPriority;
+		_globalCam.Priority = defaultPriority;
 		_myAudioSource = GetComponent<AudioSource>();
 	}
 
 	public void ChangeVCamByDirection(PlayerController.CardinalDirection direction)
 	{
 		_vCam.Priority = defaultPriority;
+		_globalCam.Priority = defaultPriority;
 		_vCam = _vCams[direction];
+		_globalCam = globalCams[(int) direction];
 		_vCam.Priority = mainFocusPriority;
 	}
 
@@ -63,12 +72,12 @@ public class CameraManager : MonoBehaviour
 			if (value)
 			{
 				_myAudioSource.PlayOneShot(zoomOutSound);
-				globalCam.Priority = mainFocusPriority + 1;
+				_globalCam.Priority = mainFocusPriority + 1;
 			}
 			else
 			{
 				_myAudioSource.PlayOneShot(zoomInSound);
-				globalCam.Priority = defaultPriority;
+				_globalCam.Priority = defaultPriority;
 			}
 		}
 	}
@@ -80,7 +89,7 @@ public class CameraManager : MonoBehaviour
 			StopCoroutine(_shakingCoroutine);
 		}
 
-		StartCoroutine(Shaking(amplitudeGain, frequencyGain, time));
+		_shakingCoroutine = StartCoroutine(Shaking(amplitudeGain, frequencyGain, time));
 	}
 
 	private IEnumerator Shaking(float amplitudeGain, float frequencyGain, float time)
