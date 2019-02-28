@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Experimental.UIElements;
 using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
@@ -14,7 +15,6 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private float timeBeforeGravityAgain = 0.2f;
 	[SerializeField] private float distMaxGroundCheck = 0.1f;
 	[SerializeField] private float radiusGroundCheck = 0.5f;
-	[SerializeField] private bool noVomitMode = false;
 	[SerializeField] private LayerMask layerGround = 0;
 	[SerializeField] private int maxNumberGravityUse = 1;
 	[SerializeField] private float maxFallingSpeed = 5.0f;
@@ -24,6 +24,16 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private AudioClip gravityUseSound = null;
 	[SerializeField] private AudioClip[] jumpSounds = null;
 	[SerializeField] private AudioClip stepSound = null;
+	[SerializeField] private float gravityTimeScale = 0.1f;
+	[SerializeField] private float amplitudeShakeGravityUse = 1.0f;
+	[SerializeField] private float frequencyShakeGravityUse = 1.0f;
+	[SerializeField] private float timeShakeGravityUse = 1.0f;
+	[SerializeField] private TrailRenderer[] myTrails = null;
+	[SerializeField] private Gradient gradientTrailPowerOn = null;
+	[SerializeField] private Gradient gradientTrailPowerOff = null;
+	[SerializeField] private Color powerOnColor = Color.magenta;
+	[SerializeField] private Color powerOffColor = Color.grey;
+	[SerializeField] private float timeFlashColor = 0.1f;
 
 	public enum CardinalDirection
 	{
@@ -38,6 +48,7 @@ public class PlayerController : MonoBehaviour
 	private CardinalDirection _actualGravityDirection;
 	public CardinalDirection ActualGravityDirection => _actualGravityDirection;
 	private Coroutine _rotatingCoroutine;
+	private Coroutine flashColorCoroutine;
 	private Rigidbody2D _myRigidBody;
 	private bool _isGrounded;
 	private bool _previousIsGrounded;
@@ -51,13 +62,14 @@ public class PlayerController : MonoBehaviour
 	private bool _isPressingRight;
 	private bool _isPressingLeft;
 	private int _numberGravityUseRemaining;
-	private Vector3 _previousVelocity;
 	private AudioSource _myAudioSource;
+	private SpriteRenderer _mySpriteRenderer;
 
 	private void Awake()
 	{
 		_myRigidBody = GetComponent<Rigidbody2D>();
 		_myAudioSource = GetComponent<AudioSource>();
+		_mySpriteRenderer = GetComponentInChildren<SpriteRenderer>();
 		_numberGravityUseRemaining = maxNumberGravityUse;
 		//setup correctly the direction the player is positioned at setup
 		float initRot = transform.eulerAngles.z;
@@ -87,15 +99,10 @@ public class PlayerController : MonoBehaviour
 		_previousGravityDirection = _actualGravityDirection;
 	}
 
-	private void Start()
-	{
-		noVomitMode = GameManager.Instance.NoVomitModeEnabled;
-	}
-
 	private void Update()
 	{
 		_inputs = Vector2.right * Input.GetAxis("Horizontal") + Vector2.up * Input.GetAxisRaw("Vertical");
-		if (noVomitMode)
+		if (GameManager.Instance.NoVomitModeEnabled)
 		{
 			//cases when walking on ground/ceiling
 			if ((int) _actualGravityDirection % 2 == 0)
@@ -148,6 +155,8 @@ public class PlayerController : MonoBehaviour
 		else if (Input.GetButtonDown("TurnLeft") || Input.GetButtonDown("TurnRight"))
 		{
 			//todo to test properly
+			Debug.Log(powerOffColor.ToString());
+			FlashColor(powerOffColor);
 			_myAudioSource.PlayOneShot(gravityNoUseSound);
 		}
 
@@ -179,18 +188,18 @@ public class PlayerController : MonoBehaviour
 		if (_isGrounded && _inputs.y <= 0)
 		{
 			_verticalInput = Input.GetAxisRaw("Vertical");
+
 			bool isPressingDown = _verticalInput < -deadZoneVertical;
+			ToggleFreeze(isPressingDown);
 			if (isPressingDown)
 			{
-				_previousVelocity = _myRigidBody.velocity;
-				_myRigidBody.velocity = Vector2.zero;
+				CheckGrounded();
+				if (!_isGrounded)
+				{
+					isPressingDown = false;
+					ToggleFreeze(false);
+				}
 			}
-			else
-			{
-				_myRigidBody.velocity = _previousVelocity;
-			}
-
-			ToggleFreeze(isPressingDown);
 
 			GameManager.Instance.CameraManager.ToggleGlobalCamera(isPressingDown);
 		}
@@ -289,6 +298,13 @@ public class PlayerController : MonoBehaviour
 		{
 			_myAudioSource.PlayOneShot(gravityBackSound);
 			_numberGravityUseRemaining = maxNumberGravityUse;
+			foreach (var trail in myTrails)
+			{
+				trail.colorGradient = gradientTrailPowerOn;
+			}
+
+			FlashColor(powerOnColor);
+
 			return true;
 		}
 		else
@@ -315,6 +331,23 @@ public class PlayerController : MonoBehaviour
 			layerGround);
 	}
 
+	private void FlashColor(Color color)
+	{
+		if (flashColorCoroutine != null)
+		{
+			StopCoroutine(flashColorCoroutine);
+		}
+
+		StartCoroutine(FlashingColor(color, timeFlashColor));
+	}
+
+	private IEnumerator FlashingColor(Color color, float time)
+	{
+		_mySpriteRenderer.color = color;
+		yield return new WaitForSeconds(time);
+		_mySpriteRenderer.color = Color.white;
+	}
+
 	private void TurnTo(CardinalDirection direction)
 	{
 		//checks that the player can not go further than 180°
@@ -323,6 +356,7 @@ public class PlayerController : MonoBehaviour
 			//setup the first 90° turn
 			if (_canMove)
 			{
+				GameManager.Instance.ChangeTimeScale(gravityTimeScale);
 				_isGrounded = false;
 				_myAudioSource.PlayOneShot(gravityUseSound);
 				_canMove = false;
@@ -330,10 +364,13 @@ public class PlayerController : MonoBehaviour
 			}
 
 			_actualGravityDirection = direction;
-			if (!noVomitMode)
+			if (!GameManager.Instance.NoVomitModeEnabled)
 			{
 				GameManager.Instance.CameraManager.ChangeVCamByDirection(_actualGravityDirection);
 			}
+
+			GameManager.Instance.CameraManager.Shake(amplitudeShakeGravityUse, frequencyShakeGravityUse,
+				timeShakeGravityUse);
 
 			//checks if a coroutine is already running
 			if (_rotatingCoroutine != null)
@@ -353,8 +390,9 @@ public class PlayerController : MonoBehaviour
 		while (timer < time)
 		{
 			timer += Time.deltaTime;
-			_myRigidBody.rotation =
-				(Mathf.LerpAngle(initRotPlayer, (float) _actualGravityDirection * 90.0f, timer / time));
+			transform.eulerAngles = Vector3.forward *
+									(Mathf.LerpAngle(initRotPlayer, (float) _actualGravityDirection * 90.0f,
+										timer / time));
 			yield return null;
 		}
 
@@ -365,6 +403,11 @@ public class PlayerController : MonoBehaviour
 		_isPressingRight = false;
 		_canMove = true;
 		_numberGravityUseRemaining--;
+		GameManager.Instance.ChangeTimeScale(1.0f);
+		foreach (var trail in myTrails)
+		{
+			trail.colorGradient = gradientTrailPowerOff;
+		}
 	}
 
 	public void Die()
@@ -374,6 +417,7 @@ public class PlayerController : MonoBehaviour
 			_isAlive = false;
 			_canMove = false;
 			_canTurn = false;
+			GameManager.Instance.DeathsCounter++;
 			GameManager.Instance.LoadLevel(SceneManager.GetActiveScene().name, true, true);
 		}
 	}
