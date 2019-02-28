@@ -34,6 +34,7 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private Color powerOnColor = Color.magenta;
 	[SerializeField] private Color powerOffColor = Color.grey;
 	[SerializeField] private float timeFlashColor = 0.1f;
+	[SerializeField] private SpriteRenderer interactivePrompt = null;
 
 	public enum CardinalDirection
 	{
@@ -227,6 +228,7 @@ public class PlayerController : MonoBehaviour
 	{
 		if (other.gameObject.CompareTag("Interactive") && !_interactives.Contains(other.gameObject))
 		{
+			interactivePrompt.enabled = true;
 			_interactives.Add(other.gameObject);
 		}
 	}
@@ -236,6 +238,10 @@ public class PlayerController : MonoBehaviour
 		if (other.gameObject.CompareTag("Interactive") && _interactives.Contains(other.gameObject))
 		{
 			_interactives.Remove(other.gameObject);
+			if (_interactives.Count < 1)
+			{
+				interactivePrompt.enabled = false;
+			}
 		}
 	}
 
