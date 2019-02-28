@@ -17,6 +17,21 @@ public class GameManager : MonoBehaviour
 	private bool _fadeOutToBlack = false;
 	private bool _isQuitting;
 	private bool _noVomitModeEnabled;
+	private int _deathsCounter;
+	private float _globalTimer;
+	private bool _isTimerRunning;
+
+	public int DeathsCounter
+	{
+		get => _deathsCounter;
+		set => _deathsCounter = value;
+	}
+
+	public float GlobalTimer
+	{
+		get => _globalTimer;
+		set => _globalTimer = value;
+	}
 
 	public bool NoVomitModeEnabled => _noVomitModeEnabled;
 
@@ -24,6 +39,17 @@ public class GameManager : MonoBehaviour
 	{
 		get => _fadeOutToBlack;
 		set => _fadeOutToBlack = value;
+	}
+
+	public void ResetDeathsCounterAndTimer()
+	{
+		_deathsCounter = 0;
+		_globalTimer = 0.0f;
+	}
+
+	public void ToggleTimer(bool value)
+	{
+		_isTimerRunning = value;
 	}
 
 	private void OnEnable()
@@ -81,6 +107,10 @@ public class GameManager : MonoBehaviour
 
 	public void LoadLevel(string nameLevel)
 	{
+		if (_isTimerRunning)
+		{
+			_globalTimer += Time.timeSinceLevelLoad;
+		}
 		SceneManager.LoadScene(nameLevel);
 	}
 
@@ -129,7 +159,14 @@ public class GameManager : MonoBehaviour
 			StopCoroutine(_timeScaleCoroutine);
 		}
 
-		_timeScaleCoroutine = StartCoroutine(ChangingTimeScale(timeScale));
+		if (fadeInTimescaleTime.CompareTo(0) > 0)
+		{
+			_timeScaleCoroutine = StartCoroutine(ChangingTimeScale(timeScale));
+		}
+		else
+		{
+			Time.timeScale = timeScale;
+		}
 	}
 
 	private IEnumerator ChangingTimeScale(float timeScale)
