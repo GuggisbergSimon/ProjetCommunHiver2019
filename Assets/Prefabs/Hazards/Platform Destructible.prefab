@@ -109,21 +109,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Platform Destructible
       objectReference: {fileID: 0}
-    - target: {fileID: 8890301536615535161, guid: 34fe727e5c27d2e4db274ef609f386f9,
-        type: 3}
-      propertyPath: speedShaking
-      value: 1000
-      objectReference: {fileID: 0}
-    - target: {fileID: 8890301536615535161, guid: 34fe727e5c27d2e4db274ef609f386f9,
-        type: 3}
-      propertyPath: amplitudeShaking
-      value: 0.05
-      objectReference: {fileID: 0}
-    - target: {fileID: 8890301536615535161, guid: 34fe727e5c27d2e4db274ef609f386f9,
-        type: 3}
-      propertyPath: beforeDestructingTime
-      value: 1.5
-      objectReference: {fileID: 0}
     - target: {fileID: 8890301536615535160, guid: 34fe727e5c27d2e4db274ef609f386f9,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -191,14 +176,29 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8890301536615535161, guid: 34fe727e5c27d2e4db274ef609f386f9,
         type: 3}
+      propertyPath: beforeDestructingTime
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8890301536615535161, guid: 34fe727e5c27d2e4db274ef609f386f9,
+        type: 3}
+      propertyPath: speedShaking
+      value: 1000
+      objectReference: {fileID: 0}
+    - target: {fileID: 8890301536615535161, guid: 34fe727e5c27d2e4db274ef609f386f9,
+        type: 3}
+      propertyPath: amplitudeShaking
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 8890301536615535161, guid: 34fe727e5c27d2e4db274ef609f386f9,
+        type: 3}
       propertyPath: crumblingBeforeSound
       value: 
-      objectReference: {fileID: 8300000, guid: 7b98391be830d7f4da91c9b9cacfae94, type: 3}
+      objectReference: {fileID: 8300000, guid: 75066804319f731499875658cd0071a3, type: 3}
     - target: {fileID: 8890301536615535161, guid: 34fe727e5c27d2e4db274ef609f386f9,
         type: 3}
       propertyPath: crumblingAfterSound
       value: 
-      objectReference: {fileID: 8300000, guid: 75066804319f731499875658cd0071a3, type: 3}
+      objectReference: {fileID: 8300000, guid: 7b98391be830d7f4da91c9b9cacfae94, type: 3}
     m_RemovedComponents:
     - {fileID: 8890301536615535163, guid: 34fe727e5c27d2e4db274ef609f386f9, type: 3}
     - {fileID: 3221130707056526703, guid: 34fe727e5c27d2e4db274ef609f386f9, type: 3}
