@@ -33,4 +33,9 @@ public class ButtonInterface : MonoBehaviour
 	{
 		GameManager.Instance.ResetDeathsCounterAndTimer();
 	}
+
+	public void PlayMusicLevels()
+	{
+		GameManager.Instance.PlayMusicLevels();
+	}
 }

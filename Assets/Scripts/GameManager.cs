@@ -1,15 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
 	[SerializeField] private float fadeInTimescaleTime = 0.1f;
+	[SerializeField] private AudioClip menuMusic = null;
+	[SerializeField] private AudioClip levelMusic = null;
+	[SerializeField] private AudioClip finalLevelMusic = null;
+	[SerializeField] private AudioClip endMusic = null;
+
 	public static GameManager Instance { get; private set; }
 	private Coroutine _timeScaleCoroutine;
-	private PlayerController player;
-	public PlayerController Player => player;
+	private PlayerController _player;
+	public PlayerController Player => _player;
 	private CameraManager _cameraManager;
 	public CameraManager CameraManager => _cameraManager;
 	private UIManager _uiManager;
@@ -20,6 +26,7 @@ public class GameManager : MonoBehaviour
 	private int _deathsCounter;
 	private float _globalTimer;
 	private bool _isTimerRunning;
+	private AudioSource _myAudioSource;
 
 	public int DeathsCounter
 	{
@@ -79,13 +86,27 @@ public class GameManager : MonoBehaviour
 			UIManager.FadeToBlack(false);
 			_fadeOutToBlack = false;
 		}
+
+		string sceneName = SceneManager.GetActiveScene().name;
+		if (sceneName.Equals("MainMenu"))
+		{
+			PlayMusic(menuMusic);
+		}
+		else if (sceneName.Equals("End"))
+		{
+			PlayMusic(endMusic);
+		}
+		else if (sceneName.Equals("FinalLevel"))
+		{
+			PlayMusic(finalLevelMusic);
+		}
 	}
 
 	private void Setup()
 	{
 		//alternative way to get elements. cons : if there is no element with such tag it creates an error
-		//player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
-		player = FindObjectOfType<PlayerController>();
+		//_player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+		_player = FindObjectOfType<PlayerController>();
 		_cameraManager = FindObjectOfType<CameraManager>();
 		_uiManager = FindObjectOfType<UIManager>();
 	}
@@ -102,6 +123,7 @@ public class GameManager : MonoBehaviour
 			DontDestroyOnLoad(gameObject);
 		}
 
+		_myAudioSource = GetComponent<AudioSource>();
 		Setup();
 	}
 
@@ -120,6 +142,17 @@ public class GameManager : MonoBehaviour
 		_noVomitModeEnabled = value;
 	}
 
+	public void PlayMusicLevels()
+	{
+		PlayMusic(levelMusic);
+	}
+
+	private void PlayMusic(AudioClip clip)
+	{
+		_myAudioSource.clip = clip;
+		_myAudioSource.Play();
+	}
+
 	public void LoadLevelFadeInAndOut(string nameLevel)
 	{
 		UIManager.FadeToBlack(true);
@@ -131,7 +164,7 @@ public class GameManager : MonoBehaviour
 	{
 		if (fadeInToBlack)
 		{
-			player.StopMoving();
+			_player.StopMoving();
 			_uiManager.FadeToBlack(true);
 			StartCoroutine(LoadingLevel(nameLevel));
 		}
