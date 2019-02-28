@@ -124,7 +124,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8904059a4db50da4c8d37af7daf3ddde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  message: {fileID: 0}
+  message: {fileID: 11400000, guid: c4c52fc4219a993489232f159c06752a, type: 2}
 --- !u!61 &1496332355702155437
 BoxCollider2D:
   m_ObjectHideFlags: 0

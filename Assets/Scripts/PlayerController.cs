@@ -59,6 +59,7 @@ public class PlayerController : MonoBehaviour
 	private Vector2 _inputs;
 	private float _horizontalInput;
 	private float _verticalInput;
+	private bool _isPressingDown;
 	private bool _isPressingJump;
 	private bool _isPressingRight;
 	private bool _isPressingLeft;
@@ -186,21 +187,22 @@ public class PlayerController : MonoBehaviour
 		//handles zoom/dezoom of map
 		if (_isGrounded && _inputs.y <= 0)
 		{
-			_verticalInput = Input.GetAxisRaw("Vertical");
+			if (_isPressingDown != Input.GetAxisRaw("Vertical") < 0)
+			{
+				_isPressingDown = Input.GetAxisRaw("Vertical") < 0;
+				ToggleFreeze(_isPressingDown);
+				GameManager.Instance.CameraManager.ToggleGlobalCamera(_isPressingDown);
+			}
 
-			bool isPressingDown = _verticalInput < -deadZoneVertical;
-			ToggleFreeze(isPressingDown);
-			if (isPressingDown)
+			if (_isPressingDown)
 			{
 				CheckGrounded();
 				if (!_isGrounded)
 				{
-					isPressingDown = false;
 					ToggleFreeze(false);
+					GameManager.Instance.CameraManager.ToggleGlobalCamera(false);
 				}
 			}
-
-			GameManager.Instance.CameraManager.ToggleGlobalCamera(isPressingDown);
 		}
 	}
 
