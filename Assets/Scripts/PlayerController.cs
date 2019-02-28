@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Experimental.UIElements;
 using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
@@ -61,7 +62,6 @@ public class PlayerController : MonoBehaviour
 	private bool _isPressingRight;
 	private bool _isPressingLeft;
 	private int _numberGravityUseRemaining;
-	private Vector3 _previousVelocity;
 	private AudioSource _myAudioSource;
 	private SpriteRenderer _mySpriteRenderer;
 
@@ -188,18 +188,18 @@ public class PlayerController : MonoBehaviour
 		if (_isGrounded && _inputs.y <= 0)
 		{
 			_verticalInput = Input.GetAxisRaw("Vertical");
+
 			bool isPressingDown = _verticalInput < -deadZoneVertical;
+			ToggleFreeze(isPressingDown);
 			if (isPressingDown)
 			{
-				_previousVelocity = _myRigidBody.velocity;
-				_myRigidBody.velocity = Vector2.zero;
+				CheckGrounded();
+				if (!_isGrounded)
+				{
+					isPressingDown = false;
+					ToggleFreeze(false);
+				}
 			}
-			else
-			{
-				_myRigidBody.velocity = _previousVelocity;
-			}
-
-			ToggleFreeze(isPressingDown);
 
 			GameManager.Instance.CameraManager.ToggleGlobalCamera(isPressingDown);
 		}
