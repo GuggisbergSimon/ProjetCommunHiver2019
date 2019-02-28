@@ -49,7 +49,7 @@ public class PlayerController : MonoBehaviour
 	private CardinalDirection _actualGravityDirection;
 	public CardinalDirection ActualGravityDirection => _actualGravityDirection;
 	private Coroutine _rotatingCoroutine;
-	private Coroutine flashColorCoroutine;
+	private Coroutine _flashColorCoroutine;
 	private Rigidbody2D _myRigidBody;
 	private bool _isGrounded;
 	private bool _previousIsGrounded;
@@ -58,7 +58,6 @@ public class PlayerController : MonoBehaviour
 	private bool _canMove = true;
 	private Vector2 _inputs;
 	private float _horizontalInput;
-	private float _verticalInput;
 	private bool _isPressingDown;
 	private bool _isPressingJump;
 	private bool _isPressingRight;
@@ -220,7 +219,6 @@ public class PlayerController : MonoBehaviour
 	{
 		_myRigidBody.velocity = Vector2.zero;
 		_horizontalInput = 0;
-		_verticalInput = 0;
 		_isPressingJump = false;
 		_isPressingLeft = false;
 		_isPressingRight = false;
@@ -339,9 +337,9 @@ public class PlayerController : MonoBehaviour
 
 	private void FlashColor(Color color)
 	{
-		if (flashColorCoroutine != null)
+		if (_flashColorCoroutine != null)
 		{
-			StopCoroutine(flashColorCoroutine);
+			StopCoroutine(_flashColorCoroutine);
 		}
 
 		StartCoroutine(FlashingColor(color, timeFlashColor));
