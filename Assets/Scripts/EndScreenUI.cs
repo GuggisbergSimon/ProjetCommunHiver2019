@@ -10,7 +10,7 @@ public class EndScreenUI : MonoBehaviour
 
 	private void Start()
 	{
-		deathsNumber.text = GameManager.Instance.DeathsCounter.ToString()+ " deaths";
-		deathsNumber.text = timeCounter.ToString()+" seconds";
+		deathsNumber.text = GameManager.Instance.DeathsCounter + " deaths";
+		timeCounter.text = GameManager.Instance.GlobalTimer + " seconds";
 	}
 }

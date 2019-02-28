@@ -111,6 +111,7 @@ public class GameManager : MonoBehaviour
 		{
 			_globalTimer += Time.timeSinceLevelLoad;
 		}
+
 		SceneManager.LoadScene(nameLevel);
 	}
 
@@ -132,14 +133,14 @@ public class GameManager : MonoBehaviour
 		{
 			player.StopMoving();
 			_uiManager.FadeToBlack(true);
-			_fadeOutToBlack = fadeOutToBlack;
 			StartCoroutine(LoadingLevel(nameLevel));
 		}
 		else
 		{
-			_fadeOutToBlack = fadeOutToBlack;
 			LoadLevel(nameLevel);
 		}
+
+		_fadeOutToBlack = fadeOutToBlack;
 	}
 
 	private IEnumerator LoadingLevel(string nameLevel)

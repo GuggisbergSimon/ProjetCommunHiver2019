@@ -6,6 +6,6 @@ public class AutoLoad : MonoBehaviour
 {
 	private void Start()
 	{
-		GameManager.Instance.LoadLevel("MainMenu");
+		GameManager.Instance.LoadLevel("MainMenu", false, true);
 	}
 }
