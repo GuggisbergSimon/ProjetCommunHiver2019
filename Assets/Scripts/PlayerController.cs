@@ -24,6 +24,7 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private AudioClip gravityUseSound = null;
 	[SerializeField] private AudioClip[] jumpSounds = null;
 	[SerializeField] private AudioClip stepSound = null;
+	[SerializeField] private AudioClip deathSound = null;
 	[SerializeField] private float gravityTimeScale = 0.1f;
 	[SerializeField] private float amplitudeShakeGravityUse = 1.0f;
 	[SerializeField] private float frequencyShakeGravityUse = 1.0f;
@@ -143,13 +144,13 @@ public class PlayerController : MonoBehaviour
 			{
 				_isPressingLeft = true;
 				TurnTo(_actualGravityDirection -
-					   (_actualGravityDirection == CardinalDirection.South ? -3 : 1));
+				       (_actualGravityDirection == CardinalDirection.South ? -3 : 1));
 			}
 			else if (Input.GetButtonDown("TurnRight") && !_isPressingLeft)
 			{
 				_isPressingRight = true;
 				TurnTo(_actualGravityDirection +
-					   (_actualGravityDirection == CardinalDirection.West ? -3 : 1));
+				       (_actualGravityDirection == CardinalDirection.West ? -3 : 1));
 			}
 		}
 		//handles when player try to turn but can't
@@ -172,7 +173,7 @@ public class PlayerController : MonoBehaviour
 			foreach (var item in _interactives)
 			{
 				if ((closestToPlayer.transform.position - transform.position).magnitude >
-					(item.transform.position - transform.position).magnitude)
+				    (item.transform.position - transform.position).magnitude)
 				{
 					closestToPlayer = item;
 				}
@@ -254,26 +255,26 @@ public class PlayerController : MonoBehaviour
 			_myRigidBody.AddForce(transform.up.normalized * gravityMultiplier * Physics2D.gravity.y);
 			//moves the player depending on direction
 			_myRigidBody.velocity = transform.right.normalized * playerHorizontalSpeed * _horizontalInput +
-									projectionVelocityUp;
+			                        projectionVelocityUp;
 			//executes a jump depending on direction
 			if (_isPressingJump)
 			{
 				_myAudioSource.PlayOneShot(jumpSounds[Random.Range(0, jumpSounds.Length)]);
 				_myRigidBody.velocity = transform.up.normalized * jumpSpeed +
-										Vector3.Project(_myRigidBody.velocity, transform.right);
+				                        Vector3.Project(_myRigidBody.velocity, transform.right);
 				_isPressingJump = false;
 			}
 
 			//applies fallMultiplier
 			if (Vector3.Dot(Vector3.Project(_myRigidBody.velocity, transform.up).normalized,
-					transform.up.normalized) < 0)
+				    transform.up.normalized) < 0)
 			{
 				_myRigidBody.velocity += (Vector2) transform.up.normalized * Physics2D.gravity.y *
-										 (fallMultiplier - 1) * Time.deltaTime;
+				                         (fallMultiplier - 1) * Time.deltaTime;
 			}
 			//applies lowJumpMultiplier
 			else if (Vector3.Dot(projectionVelocityUp.normalized, transform.up.normalized) > 0 &&
-					 !Input.GetButton("Jump"))
+			         !Input.GetButton("Jump"))
 			{
 				_myRigidBody.velocity +=
 					(Vector2) transform.up.normalized * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
@@ -281,8 +282,8 @@ public class PlayerController : MonoBehaviour
 
 			//applies maxSpeed
 			if (projectionVelocityUp.magnitude > maxFallingSpeed &&
-				Vector3.Dot(projectionVelocityUp.normalized, transform.up.normalized) <
-				0)
+			    Vector3.Dot(projectionVelocityUp.normalized, transform.up.normalized) <
+			    0)
 			{
 				_myRigidBody.velocity *=
 					projectionVelocityUp.normalized.magnitude * maxFallingSpeed / projectionVelocityUp.magnitude;
@@ -395,8 +396,8 @@ public class PlayerController : MonoBehaviour
 		{
 			timer += Time.deltaTime;
 			transform.eulerAngles = Vector3.forward *
-									(Mathf.LerpAngle(initRotPlayer, (float) _actualGravityDirection * 90.0f,
-										timer / time));
+			                        (Mathf.LerpAngle(initRotPlayer, (float) _actualGravityDirection * 90.0f,
+				                        timer / time));
 			yield return null;
 		}
 
@@ -421,6 +422,7 @@ public class PlayerController : MonoBehaviour
 			_isAlive = false;
 			_canMove = false;
 			_canTurn = false;
+			_myAudioSource.PlayOneShot(deathSound);
 			GameManager.Instance.DeathsCounter++;
 			GameManager.Instance.LoadLevel(SceneManager.GetActiveScene().name, true, true);
 		}
