@@ -30,6 +30,9 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private TrailRenderer[] myTrails = null;
 	[SerializeField] private Gradient gradientTrailPowerOn = null;
 	[SerializeField] private Gradient gradientTrailPowerOff = null;
+	[SerializeField] private Color powerOnColor = Color.magenta;
+	[SerializeField] private Color powerOffColor = Color.grey;
+	[SerializeField] private float timeFlashColor = 0.1f;
 
 	public enum CardinalDirection
 	{
@@ -44,6 +47,7 @@ public class PlayerController : MonoBehaviour
 	private CardinalDirection _actualGravityDirection;
 	public CardinalDirection ActualGravityDirection => _actualGravityDirection;
 	private Coroutine _rotatingCoroutine;
+	private Coroutine flashColorCoroutine;
 	private Rigidbody2D _myRigidBody;
 	private bool _isGrounded;
 	private bool _previousIsGrounded;
@@ -59,11 +63,13 @@ public class PlayerController : MonoBehaviour
 	private int _numberGravityUseRemaining;
 	private Vector3 _previousVelocity;
 	private AudioSource _myAudioSource;
+	private SpriteRenderer _mySpriteRenderer;
 
 	private void Awake()
 	{
 		_myRigidBody = GetComponent<Rigidbody2D>();
 		_myAudioSource = GetComponent<AudioSource>();
+		_mySpriteRenderer = GetComponentInChildren<SpriteRenderer>();
 		_numberGravityUseRemaining = maxNumberGravityUse;
 		//setup correctly the direction the player is positioned at setup
 		float initRot = transform.eulerAngles.z;
@@ -136,19 +142,21 @@ public class PlayerController : MonoBehaviour
 			{
 				_isPressingLeft = true;
 				TurnTo(_actualGravityDirection -
-				       (_actualGravityDirection == CardinalDirection.South ? -3 : 1));
+					   (_actualGravityDirection == CardinalDirection.South ? -3 : 1));
 			}
 			else if (Input.GetButtonDown("TurnRight") && !_isPressingLeft)
 			{
 				_isPressingRight = true;
 				TurnTo(_actualGravityDirection +
-				       (_actualGravityDirection == CardinalDirection.West ? -3 : 1));
+					   (_actualGravityDirection == CardinalDirection.West ? -3 : 1));
 			}
 		}
 		//handles when player try to turn but can't
 		else if (Input.GetButtonDown("TurnLeft") || Input.GetButtonDown("TurnRight"))
 		{
 			//todo to test properly
+			Debug.Log(powerOffColor.ToString());
+			FlashColor(powerOffColor);
 			_myAudioSource.PlayOneShot(gravityNoUseSound);
 		}
 
@@ -165,7 +173,7 @@ public class PlayerController : MonoBehaviour
 			foreach (var item in _interactives)
 			{
 				if ((closestToPlayer.transform.position - transform.position).magnitude >
-				    (item.transform.position - transform.position).magnitude)
+					(item.transform.position - transform.position).magnitude)
 				{
 					closestToPlayer = item;
 				}
@@ -242,26 +250,26 @@ public class PlayerController : MonoBehaviour
 			_myRigidBody.AddForce(transform.up.normalized * gravityMultiplier * Physics2D.gravity.y);
 			//moves the player depending on direction
 			_myRigidBody.velocity = transform.right.normalized * playerHorizontalSpeed * _horizontalInput +
-			                        projectionVelocityUp;
+									projectionVelocityUp;
 			//executes a jump depending on direction
 			if (_isPressingJump)
 			{
 				_myAudioSource.PlayOneShot(jumpSounds[Random.Range(0, jumpSounds.Length)]);
 				_myRigidBody.velocity = transform.up.normalized * jumpSpeed +
-				                        Vector3.Project(_myRigidBody.velocity, transform.right);
+										Vector3.Project(_myRigidBody.velocity, transform.right);
 				_isPressingJump = false;
 			}
 
 			//applies fallMultiplier
 			if (Vector3.Dot(Vector3.Project(_myRigidBody.velocity, transform.up).normalized,
-				    transform.up.normalized) < 0)
+					transform.up.normalized) < 0)
 			{
 				_myRigidBody.velocity += (Vector2) transform.up.normalized * Physics2D.gravity.y *
-				                         (fallMultiplier - 1) * Time.deltaTime;
+										 (fallMultiplier - 1) * Time.deltaTime;
 			}
 			//applies lowJumpMultiplier
 			else if (Vector3.Dot(projectionVelocityUp.normalized, transform.up.normalized) > 0 &&
-			         !Input.GetButton("Jump"))
+					 !Input.GetButton("Jump"))
 			{
 				_myRigidBody.velocity +=
 					(Vector2) transform.up.normalized * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
@@ -269,8 +277,8 @@ public class PlayerController : MonoBehaviour
 
 			//applies maxSpeed
 			if (projectionVelocityUp.magnitude > maxFallingSpeed &&
-			    Vector3.Dot(projectionVelocityUp.normalized, transform.up.normalized) <
-			    0)
+				Vector3.Dot(projectionVelocityUp.normalized, transform.up.normalized) <
+				0)
 			{
 				_myRigidBody.velocity *=
 					projectionVelocityUp.normalized.magnitude * maxFallingSpeed / projectionVelocityUp.magnitude;
@@ -294,6 +302,8 @@ public class PlayerController : MonoBehaviour
 			{
 				trail.colorGradient = gradientTrailPowerOn;
 			}
+
+			FlashColor(powerOnColor);
 
 			return true;
 		}
@@ -319,6 +329,23 @@ public class PlayerController : MonoBehaviour
 		_previousIsGrounded = _isGrounded;
 		_isGrounded = Physics2D.CircleCast(transform.position, radiusGroundCheck, -transform.up, distMaxGroundCheck,
 			layerGround);
+	}
+
+	private void FlashColor(Color color)
+	{
+		if (flashColorCoroutine != null)
+		{
+			StopCoroutine(flashColorCoroutine);
+		}
+
+		StartCoroutine(FlashingColor(color, timeFlashColor));
+	}
+
+	private IEnumerator FlashingColor(Color color, float time)
+	{
+		_mySpriteRenderer.color = color;
+		yield return new WaitForSeconds(time);
+		_mySpriteRenderer.color = Color.white;
 	}
 
 	private void TurnTo(CardinalDirection direction)
@@ -364,8 +391,8 @@ public class PlayerController : MonoBehaviour
 		{
 			timer += Time.deltaTime;
 			transform.eulerAngles = Vector3.forward *
-			                        (Mathf.LerpAngle(initRotPlayer, (float) _actualGravityDirection * 90.0f,
-				                        timer / time));
+									(Mathf.LerpAngle(initRotPlayer, (float) _actualGravityDirection * 90.0f,
+										timer / time));
 			yield return null;
 		}
 
@@ -390,6 +417,7 @@ public class PlayerController : MonoBehaviour
 			_isAlive = false;
 			_canMove = false;
 			_canTurn = false;
+			GameManager.Instance.DeathsCounter++;
 			GameManager.Instance.LoadLevel(SceneManager.GetActiveScene().name, true, true);
 		}
 	}
