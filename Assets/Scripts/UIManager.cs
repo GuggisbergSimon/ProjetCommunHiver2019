@@ -11,10 +11,18 @@ public class UIManager : MonoBehaviour
 	[SerializeField] private Image blackPanel = null;
 	[SerializeField] private GameObject dialoguePanel = null;
 	[SerializeField] private TextMeshProUGUI textDisplayed = null;
+	[SerializeField] private AudioClip openMessageSound = null;
+	[SerializeField] private AudioClip closeMessageSound = null;
 	private Coroutine _currentDialogue;
 	private Message _currentMessage;
 	private bool _isFadingToBlack;
+	private AudioSource _myAudioSource;
 	public bool IsFadingToBlack => _isFadingToBlack;
+
+	private void Start()
+	{
+		_myAudioSource = GetComponent<AudioSource>();
+	}
 
 	public void FadeToBlack(bool value)
 	{
@@ -41,6 +49,7 @@ public class UIManager : MonoBehaviour
 
 	public void PrintMessage(Message message)
 	{
+		_myAudioSource.PlayOneShot(openMessageSound);
 		dialoguePanel.SetActive(true);
 		if (_currentDialogue != null)
 		{
@@ -62,6 +71,7 @@ public class UIManager : MonoBehaviour
 
 	public void CloseMessage()
 	{
+		_myAudioSource.PlayOneShot(closeMessageSound);
 		dialoguePanel.SetActive(false);
 	}
 
