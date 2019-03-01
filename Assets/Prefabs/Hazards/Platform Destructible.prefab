@@ -218,6 +218,22 @@ PrefabInstance:
       propertyPath: crumblingAfterSound
       value: 
       objectReference: {fileID: 8300000, guid: 7b98391be830d7f4da91c9b9cacfae94, type: 3}
+    - target: {fileID: 8890301536615535166, guid: 34fe727e5c27d2e4db274ef609f386f9,
+        type: 3}
+      propertyPath: m_Size.x
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8890301536615535166, guid: 34fe727e5c27d2e4db274ef609f386f9,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8890301536555349199, guid: 34fe727e5c27d2e4db274ef609f386f9,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300002, guid: ebe00e11ee3b74e47a095d24294bab0b,
+        type: 3}
     m_RemovedComponents:
     - {fileID: 8890301536615535163, guid: 34fe727e5c27d2e4db274ef609f386f9, type: 3}
     - {fileID: 3221130707056526703, guid: 34fe727e5c27d2e4db274ef609f386f9, type: 3}
