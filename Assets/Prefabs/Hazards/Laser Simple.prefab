@@ -57,7 +57,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -108,25 +108,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Laser Simple
-      objectReference: {fileID: 0}
-    - target: {fileID: 366171199, guid: a80735bd3f46a9d439b6ccb242a7fc3b, type: 3}
-      propertyPath: m_Parameters.widthMultiplier
-      value: 0.16
-      objectReference: {fileID: 0}
-    - target: {fileID: 7922744736234831715, guid: a80735bd3f46a9d439b6ccb242a7fc3b,
-        type: 3}
-      propertyPath: myAim
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 7922744736234831715, guid: a80735bd3f46a9d439b6ccb242a7fc3b,
-        type: 3}
-      propertyPath: activeColorAlt.g
-      value: 0.083333336
-      objectReference: {fileID: 0}
-    - target: {fileID: 7922744736234831715, guid: a80735bd3f46a9d439b6ccb242a7fc3b,
-        type: 3}
-      propertyPath: changeActiveColorSpeed
-      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 7922744736234831717, guid: a80735bd3f46a9d439b6ccb242a7fc3b,
         type: 3}
@@ -183,6 +164,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 366171199, guid: a80735bd3f46a9d439b6ccb242a7fc3b, type: 3}
+      propertyPath: m_Parameters.widthMultiplier
+      value: 0.16
+      objectReference: {fileID: 0}
+    - target: {fileID: 7922744736234831715, guid: a80735bd3f46a9d439b6ccb242a7fc3b,
+        type: 3}
+      propertyPath: myAim
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7922744736234831715, guid: a80735bd3f46a9d439b6ccb242a7fc3b,
+        type: 3}
+      propertyPath: activeColorAlt.g
+      value: 0.083333336
+      objectReference: {fileID: 0}
+    - target: {fileID: 7922744736234831715, guid: a80735bd3f46a9d439b6ccb242a7fc3b,
+        type: 3}
+      propertyPath: changeActiveColorSpeed
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 7922744736234831716, guid: a80735bd3f46a9d439b6ccb242a7fc3b,
         type: 3}
       propertyPath: m_Size.x
@@ -206,7 +206,7 @@ PrefabInstance:
     - target: {fileID: 9216702991105750860, guid: a80735bd3f46a9d439b6ccb242a7fc3b,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.095
+      value: -0.36
       objectReference: {fileID: 0}
     - target: {fileID: 9216702991105750860, guid: a80735bd3f46a9d439b6ccb242a7fc3b,
         type: 3}
@@ -238,6 +238,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Color.b
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3236394241507437933, guid: a80735bd3f46a9d439b6ccb242a7fc3b,
+        type: 3}
+      propertyPath: m_SortingOrder
+      value: 110
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a80735bd3f46a9d439b6ccb242a7fc3b, type: 3}

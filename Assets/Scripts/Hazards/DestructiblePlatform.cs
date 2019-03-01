@@ -19,6 +19,7 @@ public class DestructiblePlatform : MonoBehaviour
 	private float _timerShaking;
 	private Vector2 _initSpritePos;
 	private AudioSource _myAudioSource;
+	private Animator _myAnimator;
 
 	private void Start()
 	{
@@ -26,6 +27,7 @@ public class DestructiblePlatform : MonoBehaviour
 		_myCollider = GetComponent<Collider2D>();
 		_mySprite = GetComponentInChildren<SpriteRenderer>();
 		_myAudioSource = GetComponent<AudioSource>();
+		_myAnimator = GetComponent<Animator>();
 	}
 
 	private void Update()
@@ -57,7 +59,7 @@ public class DestructiblePlatform : MonoBehaviour
 		
 		//is destroyed
 		_myCollider.enabled = false;
-		_mySprite.enabled = false;
+		_myAnimator.SetTrigger("Destroy");
 		_isShaking = false;
 		_myAudioSource.PlayOneShot(crumblingAfterSound);
 		if (destroyedTime >= 0)
@@ -66,14 +68,14 @@ public class DestructiblePlatform : MonoBehaviour
 			{
 				yield return new WaitForSeconds(destroyedTime);
 			}
-
-			//todo set respawning sprite
+			
+			_myAnimator.SetTrigger("Respawn");
 			yield return new WaitForSeconds(respawningTime);
 			
 			//respawns
+			_myAnimator.SetTrigger("Respawned");
 			_canBeActivated = true;
 			_myCollider.enabled = true;
-			_mySprite.enabled = true;
 		}
 	}
 }
