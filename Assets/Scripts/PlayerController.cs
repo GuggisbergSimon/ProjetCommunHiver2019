@@ -239,6 +239,7 @@ public class PlayerController : MonoBehaviour
 	{
 		_myRigidBody.velocity = Vector2.zero;
 		_horizontalInput = 0;
+		_myAnimator.SetFloat("Speed", 0.0f);
 		_isPressingJump = false;
 		_isPressingLeft = false;
 		_isPressingRight = false;
