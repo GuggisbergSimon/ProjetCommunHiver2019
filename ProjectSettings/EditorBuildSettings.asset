@@ -21,20 +21,11 @@ EditorBuildSettings:
     path: Assets/Scenes/2.Follow/LevelFollow3.unity
     guid: 96192fd9c9d1859459efcd6532dac96f
   - enabled: 1
-    path: Assets/Scenes/1.Laser/LevelLaser9.unity
-    guid: ac3d057a54b9675469ae56b3ec8d1fa8
-  - enabled: 1
     path: Assets/Scenes/GravityLimiter/Level1.6.unity
     guid: a61bb54ded345f244bae394ab5668cd2
   - enabled: 1
     path: Assets/Scenes/4.Reset/LevelReset2.unity
     guid: 19e8f30c02833534cb556d83c132c894
-  - enabled: 0
-    path: Assets/__DELETED_GUID_Trash/0db54d0aeeb4cbe4e96f7d802df28070
-    guid: 0db54d0aeeb4cbe4e96f7d802df28070
-  - enabled: 1
-    path: Assets/Scenes/1.Laser/LevelLaser6.unity
-    guid: 09fe56c5e17a48146af11964ec527cad
   - enabled: 1
     path: Assets/Scenes/2.Follow/LevelFollow1.unity
     guid: 8ea5a8ca83b5df94d84805bcf4d052b4
@@ -56,15 +47,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/4.Reset/LevelReset4.unity
     guid: 4f8f9103baf2c2c44a823ac46beb4825
-  - enabled: 0
-    path: Assets/__DELETED_GUID_Trash/1385cebe57856494d9f6e13170412e88
-    guid: 1385cebe57856494d9f6e13170412e88
   - enabled: 1
     path: Assets/Scenes/3.Platforms/LevelPlatforms3.unity
     guid: 2599716855e6a644fa487cffe4c314bf
-  - enabled: 0
-    path: Assets/__DELETED_GUID_Trash/4eb074720cd64554fa01a893f7bce8f5
-    guid: 4eb074720cd64554fa01a893f7bce8f5
   - enabled: 1
     path: Assets/Scenes/2.Follow/LevelFollow5.unity
     guid: 0e489dd1dde652e43968831b8ca24026
@@ -74,8 +59,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/1.Laser/LevelLaser3.unity
     guid: ab9868681dd101849a89890c8e7fd98c
-  - enabled: 0
-    path: Assets/__DELETED_GUID_Trash/82013fda899546c40b4122a25cd18125
+  - enabled: 1
+    path: Assets/Scenes/1.Laser/LevelLaser6.unity
     guid: 82013fda899546c40b4122a25cd18125
   - enabled: 1
     path: Assets/Scenes/2.Follow/LevelFollow4.unity
@@ -110,4 +95,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/3.Platforms/LevelPlatforms8.unity
     guid: 5d50099b896e5a040ba4d250529ea531
+  - enabled: 1
+    path: Assets/Scenes/1.Laser/LevelLaser9.unity
+    guid: 0e5b011fa68db3e4295442ac8e862ae0
   m_configObjects: {}
