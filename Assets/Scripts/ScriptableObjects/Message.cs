@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "new Message",fileName = "messageSO")]
+[CreateAssetMenu(menuName = "New Message",fileName = "MessageSO")]
 public class Message : ScriptableObject
 {
     public string text;

@@ -24,6 +24,7 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private AudioClip gravityUseSound = null;
 	[SerializeField] private AudioClip[] jumpSounds = null;
 	[SerializeField] private AudioClip stepSound = null;
+	[SerializeField] private AudioClip deathSound = null;
 	[SerializeField] private float gravityTimeScale = 0.1f;
 	[SerializeField] private float amplitudeShakeGravityUse = 1.0f;
 	[SerializeField] private float frequencyShakeGravityUse = 1.0f;
@@ -34,6 +35,7 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private Color powerOnColor = Color.magenta;
 	[SerializeField] private Color powerOffColor = Color.grey;
 	[SerializeField] private float timeFlashColor = 0.1f;
+	[SerializeField] private SpriteRenderer interactivePrompt = null;
 
 	public enum CardinalDirection
 	{
@@ -48,7 +50,7 @@ public class PlayerController : MonoBehaviour
 	private CardinalDirection _actualGravityDirection;
 	public CardinalDirection ActualGravityDirection => _actualGravityDirection;
 	private Coroutine _rotatingCoroutine;
-	private Coroutine flashColorCoroutine;
+	private Coroutine _flashColorCoroutine;
 	private Rigidbody2D _myRigidBody;
 	private bool _isGrounded;
 	private bool _previousIsGrounded;
@@ -57,7 +59,7 @@ public class PlayerController : MonoBehaviour
 	private bool _canMove = true;
 	private Vector2 _inputs;
 	private float _horizontalInput;
-	private float _verticalInput;
+	private bool _isPressingDown;
 	private bool _isPressingJump;
 	private bool _isPressingRight;
 	private bool _isPressingLeft;
@@ -142,20 +144,18 @@ public class PlayerController : MonoBehaviour
 			{
 				_isPressingLeft = true;
 				TurnTo(_actualGravityDirection -
-					   (_actualGravityDirection == CardinalDirection.South ? -3 : 1));
+				       (_actualGravityDirection == CardinalDirection.South ? -3 : 1));
 			}
 			else if (Input.GetButtonDown("TurnRight") && !_isPressingLeft)
 			{
 				_isPressingRight = true;
 				TurnTo(_actualGravityDirection +
-					   (_actualGravityDirection == CardinalDirection.West ? -3 : 1));
+				       (_actualGravityDirection == CardinalDirection.West ? -3 : 1));
 			}
 		}
 		//handles when player try to turn but can't
 		else if (Input.GetButtonDown("TurnLeft") || Input.GetButtonDown("TurnRight"))
 		{
-			//todo to test properly
-			Debug.Log(powerOffColor.ToString());
 			FlashColor(powerOffColor);
 			_myAudioSource.PlayOneShot(gravityNoUseSound);
 		}
@@ -173,7 +173,7 @@ public class PlayerController : MonoBehaviour
 			foreach (var item in _interactives)
 			{
 				if ((closestToPlayer.transform.position - transform.position).magnitude >
-					(item.transform.position - transform.position).magnitude)
+				    (item.transform.position - transform.position).magnitude)
 				{
 					closestToPlayer = item;
 				}
@@ -187,21 +187,22 @@ public class PlayerController : MonoBehaviour
 		//handles zoom/dezoom of map
 		if (_isGrounded && _inputs.y <= 0)
 		{
-			_verticalInput = Input.GetAxisRaw("Vertical");
+			if (_isPressingDown != Input.GetAxisRaw("Vertical") < 0)
+			{
+				_isPressingDown = Input.GetAxisRaw("Vertical") < 0;
+				ToggleFreeze(_isPressingDown);
+				GameManager.Instance.CameraManager.ToggleGlobalCamera(_isPressingDown);
+			}
 
-			bool isPressingDown = _verticalInput < -deadZoneVertical;
-			ToggleFreeze(isPressingDown);
-			if (isPressingDown)
+			if (_isPressingDown)
 			{
 				CheckGrounded();
 				if (!_isGrounded)
 				{
-					isPressingDown = false;
 					ToggleFreeze(false);
+					GameManager.Instance.CameraManager.ToggleGlobalCamera(false);
 				}
 			}
-
-			GameManager.Instance.CameraManager.ToggleGlobalCamera(isPressingDown);
 		}
 	}
 
@@ -219,7 +220,6 @@ public class PlayerController : MonoBehaviour
 	{
 		_myRigidBody.velocity = Vector2.zero;
 		_horizontalInput = 0;
-		_verticalInput = 0;
 		_isPressingJump = false;
 		_isPressingLeft = false;
 		_isPressingRight = false;
@@ -229,6 +229,7 @@ public class PlayerController : MonoBehaviour
 	{
 		if (other.gameObject.CompareTag("Interactive") && !_interactives.Contains(other.gameObject))
 		{
+			interactivePrompt.enabled = true;
 			_interactives.Add(other.gameObject);
 		}
 	}
@@ -238,6 +239,10 @@ public class PlayerController : MonoBehaviour
 		if (other.gameObject.CompareTag("Interactive") && _interactives.Contains(other.gameObject))
 		{
 			_interactives.Remove(other.gameObject);
+			if (_interactives.Count < 1)
+			{
+				interactivePrompt.enabled = false;
+			}
 		}
 	}
 
@@ -250,26 +255,26 @@ public class PlayerController : MonoBehaviour
 			_myRigidBody.AddForce(transform.up.normalized * gravityMultiplier * Physics2D.gravity.y);
 			//moves the player depending on direction
 			_myRigidBody.velocity = transform.right.normalized * playerHorizontalSpeed * _horizontalInput +
-									projectionVelocityUp;
+			                        projectionVelocityUp;
 			//executes a jump depending on direction
 			if (_isPressingJump)
 			{
 				_myAudioSource.PlayOneShot(jumpSounds[Random.Range(0, jumpSounds.Length)]);
 				_myRigidBody.velocity = transform.up.normalized * jumpSpeed +
-										Vector3.Project(_myRigidBody.velocity, transform.right);
+				                        Vector3.Project(_myRigidBody.velocity, transform.right);
 				_isPressingJump = false;
 			}
 
 			//applies fallMultiplier
 			if (Vector3.Dot(Vector3.Project(_myRigidBody.velocity, transform.up).normalized,
-					transform.up.normalized) < 0)
+				    transform.up.normalized) < 0)
 			{
 				_myRigidBody.velocity += (Vector2) transform.up.normalized * Physics2D.gravity.y *
-										 (fallMultiplier - 1) * Time.deltaTime;
+				                         (fallMultiplier - 1) * Time.deltaTime;
 			}
 			//applies lowJumpMultiplier
 			else if (Vector3.Dot(projectionVelocityUp.normalized, transform.up.normalized) > 0 &&
-					 !Input.GetButton("Jump"))
+			         !Input.GetButton("Jump"))
 			{
 				_myRigidBody.velocity +=
 					(Vector2) transform.up.normalized * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
@@ -277,8 +282,8 @@ public class PlayerController : MonoBehaviour
 
 			//applies maxSpeed
 			if (projectionVelocityUp.magnitude > maxFallingSpeed &&
-				Vector3.Dot(projectionVelocityUp.normalized, transform.up.normalized) <
-				0)
+			    Vector3.Dot(projectionVelocityUp.normalized, transform.up.normalized) <
+			    0)
 			{
 				_myRigidBody.velocity *=
 					projectionVelocityUp.normalized.magnitude * maxFallingSpeed / projectionVelocityUp.magnitude;
@@ -333,9 +338,9 @@ public class PlayerController : MonoBehaviour
 
 	private void FlashColor(Color color)
 	{
-		if (flashColorCoroutine != null)
+		if (_flashColorCoroutine != null)
 		{
-			StopCoroutine(flashColorCoroutine);
+			StopCoroutine(_flashColorCoroutine);
 		}
 
 		StartCoroutine(FlashingColor(color, timeFlashColor));
@@ -391,8 +396,8 @@ public class PlayerController : MonoBehaviour
 		{
 			timer += Time.deltaTime;
 			transform.eulerAngles = Vector3.forward *
-									(Mathf.LerpAngle(initRotPlayer, (float) _actualGravityDirection * 90.0f,
-										timer / time));
+			                        (Mathf.LerpAngle(initRotPlayer, (float) _actualGravityDirection * 90.0f,
+				                        timer / time));
 			yield return null;
 		}
 
@@ -417,6 +422,7 @@ public class PlayerController : MonoBehaviour
 			_isAlive = false;
 			_canMove = false;
 			_canTurn = false;
+			_myAudioSource.PlayOneShot(deathSound);
 			GameManager.Instance.DeathsCounter++;
 			GameManager.Instance.LoadLevel(SceneManager.GetActiveScene().name, true, true);
 		}
