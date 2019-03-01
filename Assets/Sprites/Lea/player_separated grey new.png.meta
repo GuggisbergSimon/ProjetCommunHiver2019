@@ -97,82 +97,82 @@ TextureImporter:
     outline: []
     physicsShape: []
     bones:
-    - name: bone_1
+    - name: root
       position: {x: 431.93417, y: 42.13998, z: 0}
       rotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
       length: 155.9177
       parentId: -1
-    - name: bone_2
+    - name: torso 3
       position: {x: 577.31683, y: -50.56801, z: 0}
       rotation: {x: 0, y: 0, z: -0.013509604, w: 0.99990875}
       length: 77.98732
       parentId: 0
-    - name: bone_3
+    - name: torso 2
       position: {x: 77.98732, y: -0.0000014623756, z: 0}
       rotation: {x: 0, y: 0, z: 0.15524514, w: 0.987876}
       length: 90.01092
       parentId: 1
-    - name: bone_4
+    - name: torso 1
       position: {x: 90.010895, y: -0.00000056657336, z: 0}
       rotation: {x: 0, y: 0, z: -0.122834176, w: 0.99242723}
       length: 54.822357
       parentId: 2
-    - name: bone_5
+    - name: left leg 1
       position: {x: -114.64684, y: 342.575, z: 1}
       rotation: {x: 0, y: -0, z: -0.9976456, w: 0.06857988}
       length: 229.6838
       parentId: 1
-    - name: bone_6
+    - name: left leg 2
       position: {x: 229.68378, y: 0.000028290939, z: 1}
       rotation: {x: 0, y: 0, z: -0.045790207, w: 0.9989511}
       length: 226.86101
       parentId: 4
-    - name: bone_7
-      position: {x: 226.861, y: 0.000018435892, z: 1}
+    - name: left leg 3
+      position: {x: 226.861, y: 0.00003369203, z: 1}
       rotation: {x: 0, y: 0, z: 0.6599492, w: 0.7513102}
       length: 57.238934
       parentId: 5
-    - name: bone_8
+    - name: right leg 1
       position: {x: -95.52019, y: -287.12988, z: -2}
-      rotation: {x: 0, y: -0, z: -0.99796736, w: 0.063727394}
-      length: 223.8108
+      rotation: {x: 0, y: -0, z: -0.9979674, w: 0.063726805}
+      length: 223.80745
       parentId: 1
-    - name: bone_9
-      position: {x: 223.80745, y: -0.00020599915, z: -2}
-      rotation: {x: 0, y: 0, z: -0.048670713, w: 0.99881494}
-      length: 228.21754
+    - name: right leg 2
+      position: {x: 223.80745, y: 0.000091872964, z: -2}
+      rotation: {x: 0, y: 0, z: -0.048671935, w: 0.9988148}
+      length: 228.21913
       parentId: 7
-    - name: bone_10
-      position: {x: 228.21913, y: -0.00088541483, z: -2}
-      rotation: {x: 0, y: 0, z: 0.6782966, w: 0.73478824}
+    - name: right leg 3
+      position: {x: 228.21913, y: -0.000084401545, z: -2}
+      rotation: {x: 0, y: 0, z: 0.678298, w: 0.73478705}
       length: 54.94388
       parentId: 8
-    - name: bone_11
+    - name: left arm 1
       position: {x: 25.50795, y: 169.81172, z: 3}
-      rotation: {x: 0, y: -0, z: 0.98674357, w: 0.16228712}
-      length: 156.00343
+      rotation: {x: 0, y: -0, z: 0.98674357, w: 0.16228713}
+      length: 156.0035
       parentId: 3
-    - name: bone_12
-      position: {x: 156.00345, y: -0.000023393088, z: 3}
-      rotation: {x: 0, y: 0, z: 0.24621607, w: 0.969215}
+    - name: left arm 2
+      position: {x: 156.00345, y: -0.000013477053, z: 3}
+      rotation: {x: 0, y: 0, z: 0.24621612, w: 0.96921504}
       length: 131.413
       parentId: 10
-    - name: bone_13
+    - name: right arm 1
       position: {x: 5.426044, y: -187.86977, z: -3}
-      rotation: {x: 0, y: -0, z: 0.98666143, w: 0.16278595}
-      length: 140.6647
+      rotation: {x: 0, y: -0, z: 0.9866615, w: 0.16278595}
+      length: 140.66345
       parentId: 3
-    - name: bone_14
-      position: {x: 140.66347, y: -0.0000062846375, z: -3}
+    - name: right arm 2
+      position: {x: 140.66344, y: -0.000028427261, z: -3}
       rotation: {x: 0, y: 0, z: 0.261766, w: 0.9651314}
       length: 132.35551
       parentId: 12
-    - name: bone_15
+    - name: head
       position: {x: 113.85571, y: -0.16184793, z: -1}
       rotation: {x: 0, y: 0, z: 0.008527466, w: 0.99996364}
       length: 75.96876
       parentId: 3
-    - name: bone_16
+    - name: belt
       position: {x: -117.137436, y: 102.34127, z: 2}
       rotation: {x: 0, y: -0, z: -0.88158333, w: 0.4720284}
       length: 70.63938
