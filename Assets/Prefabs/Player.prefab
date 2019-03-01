@@ -1180,7 +1180,7 @@ MonoBehaviour:
   stepSound: {fileID: 8300000, guid: 9b687cd413d36114f873926481c5944e, type: 3}
   deathSound: {fileID: 8300000, guid: c70f02290a95e434c944cc5aa45ed337, type: 3}
   gravityTimeScale: 0.3
-  amplitudeShakeGravityUse: 3
+  amplitudeShakeGravityUse: 1.5
   frequencyShakeGravityUse: 1
   timeShakeGravityUse: 0.3
   myTrails:
