@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Timers;
 using UnityEngine;
 using UnityEngine.Experimental.UIElements;
 using UnityEngine.SceneManagement;
@@ -37,8 +38,10 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private Color powerNoUseColor = Color.grey;
 	[SerializeField] private float timeFlashColor = 0.1f;
 	[SerializeField] private SpriteRenderer interactivePrompt = null;
+	[SerializeField] private AudioClip interactivePromptSound = null;
 	[SerializeField] private Sprite gravityOnSprite = null;
 	[SerializeField] private Sprite gravityOffSprite = null;
+	[SerializeField] private float desintegrationTime = 0.3f;
 
 	public enum CardinalDirection
 	{
@@ -246,6 +249,7 @@ public class PlayerController : MonoBehaviour
 		if (other.gameObject.CompareTag("Interactive") && !_interactives.Contains(other.gameObject))
 		{
 			interactivePrompt.enabled = true;
+			_myAudioSource.PlayOneShot(interactivePromptSound);
 			_interactives.Add(other.gameObject);
 		}
 	}
@@ -463,8 +467,20 @@ public class PlayerController : MonoBehaviour
 			_canTurn = false;
 			_myAudioSource.PlayOneShot(deathSound);
 			_myAnimator.SetTrigger("Death");
+			StartCoroutine(Dying());
 			GameManager.Instance.DeathsCounter++;
 			GameManager.Instance.LoadLevel(SceneManager.GetActiveScene().name, true, true);
+		}
+	}
+
+	private IEnumerator Dying()
+	{
+		float timer = 0.0f;
+		while (timer < desintegrationTime)
+		{
+			timer += Time.deltaTime;
+			_mySpriteRenderer.color = Color.Lerp(Color.white, new Color(0, 0, 0, 0.5f), timer / desintegrationTime);
+			yield return null;
 		}
 	}
 }
