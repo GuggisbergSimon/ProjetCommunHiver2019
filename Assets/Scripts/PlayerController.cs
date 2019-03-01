@@ -445,6 +445,7 @@ public class PlayerController : MonoBehaviour
 		_canMove = true;
 		_numberGravityUseRemaining--;
 		GameManager.Instance.ChangeTimeScale(1.0f);
+		_myAnimator.SetTrigger("Fall");
 		foreach (var trail in myTrails)
 		{
 			trail.colorGradient = gradientTrailPowerOff;

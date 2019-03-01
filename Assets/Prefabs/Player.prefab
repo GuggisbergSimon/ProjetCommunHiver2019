@@ -23,7 +23,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 16789587}
-  m_LocalRotation: {x: 0, y: 0, z: -0.99796784, w: 0.06372101}
+  m_LocalRotation: {x: 0, y: 0, z: -0.99796784, w: 0.063721016}
   m_LocalPosition: {x: -0.9310017, y: 0.2020606, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -100,7 +100,7 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Time: 0.2
+  m_Time: 0.4
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 0.1
@@ -193,7 +193,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 181725405}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.02, y: 0.1, z: 0}
+  m_LocalPosition: {x: 0, y: 0.1, z: 0}
   m_LocalScale: {x: 0.125, y: 0.125, z: 1}
   m_Children:
   - {fileID: 2086523972}
@@ -434,10 +434,10 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Time: 0.2
+  m_Time: 0.4
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 0.1
+    widthMultiplier: 0.05
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -648,10 +648,10 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Time: 0.2
+  m_Time: 0.4
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 0.1
+    widthMultiplier: 0.05
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -844,10 +844,10 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Time: 0.2
+  m_Time: 0.4
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 0.1
+    widthMultiplier: 0.07
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -995,7 +995,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1287745849}
-  m_LocalRotation: {x: 0, y: 0, z: 0.00000023197754, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0.00000022894514, w: 1}
   m_LocalPosition: {x: 2.23, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -1056,7 +1056,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1337460720}
-  m_LocalRotation: {x: 0, y: 0, z: 0.9866614, w: 0.16278632}
+  m_LocalRotation: {x: 0, y: 0, z: 0.9866614, w: 0.16278645}
   m_LocalPosition: {x: 0.01211996, y: 0.3039442, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -1248,7 +1248,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1666873968}
-  m_LocalRotation: {x: 0, y: 0, z: 0.0000032461692, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0.0000032340397, w: 1}
   m_LocalPosition: {x: 2.23, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -1530,7 +1530,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1922716484}
-  m_LocalRotation: {x: 0, y: 0, z: 0.00000040027498, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0.00000053369996, w: 1}
   m_LocalPosition: {x: 1.415, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -1801,7 +1801,7 @@ MonoBehaviour:
     m_Mode: 0
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
-  powerUseColor: {r: 0.75, g: 0, b: 1, a: 1}
+  powerUseColor: {r: 0.8745098, g: 0.5, b: 1, a: 1}
   powerNoUseColor: {r: 0.25, g: 0.25, b: 0.25, a: 1}
   timeFlashColor: 0.2
   interactivePrompt: {fileID: 615698379}
