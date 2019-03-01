@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Timers;
 using UnityEngine;
 using UnityEngine.Experimental.UIElements;
 using UnityEngine.SceneManagement;
@@ -32,10 +33,15 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private TrailRenderer[] myTrails = null;
 	[SerializeField] private Gradient gradientTrailPowerOn = null;
 	[SerializeField] private Gradient gradientTrailPowerOff = null;
-	[SerializeField] private Color powerOnColor = Color.magenta;
-	[SerializeField] private Color powerOffColor = Color.grey;
+	[SerializeField] private Gradient gradientTrailNoUsePower = null;
+	[SerializeField] private Color powerUseColor = Color.magenta;
+	[SerializeField] private Color powerNoUseColor = Color.grey;
 	[SerializeField] private float timeFlashColor = 0.1f;
 	[SerializeField] private SpriteRenderer interactivePrompt = null;
+	[SerializeField] private AudioClip interactivePromptSound = null;
+	[SerializeField] private Sprite gravityOnSprite = null;
+	[SerializeField] private Sprite gravityOffSprite = null;
+	[SerializeField] private float desintegrationTime = 0.3f;
 
 	public enum CardinalDirection
 	{
@@ -66,12 +72,16 @@ public class PlayerController : MonoBehaviour
 	private int _numberGravityUseRemaining;
 	private AudioSource _myAudioSource;
 	private SpriteRenderer _mySpriteRenderer;
+	private Animator _myAnimator;
+	private bool _isFalling;
+	private bool _isLookingRight = true;
 
 	private void Awake()
 	{
 		_myRigidBody = GetComponent<Rigidbody2D>();
 		_myAudioSource = GetComponent<AudioSource>();
 		_mySpriteRenderer = GetComponentInChildren<SpriteRenderer>();
+		_myAnimator = GetComponent<Animator>();
 		_numberGravityUseRemaining = maxNumberGravityUse;
 		//setup correctly the direction the player is positioned at setup
 		float initRot = transform.eulerAngles.z;
@@ -116,11 +126,20 @@ public class PlayerController : MonoBehaviour
 		if (_canMove)
 		{
 			//handles horizontal input
+
 			_horizontalInput = _inputs.x;
+			if ((_isLookingRight && _horizontalInput < 0) || (!_isLookingRight && _horizontalInput > 0))
+			{
+				_isLookingRight = !_isLookingRight;
+				_mySpriteRenderer.transform.localEulerAngles += Vector3.up * 180;
+			}
+
 			CheckGrounded();
 			//restores gravity power
 			if (_isGrounded && _previousIsGrounded != _isGrounded)
 			{
+				_myAnimator.SetTrigger("Land");
+				_isFalling = false;
 				_myAudioSource.PlayOneShot(stepSound);
 				RestoreGravityPower();
 			}
@@ -156,7 +175,7 @@ public class PlayerController : MonoBehaviour
 		//handles when player try to turn but can't
 		else if (Input.GetButtonDown("TurnLeft") || Input.GetButtonDown("TurnRight"))
 		{
-			FlashColor(powerOffColor);
+			FlashColor(powerNoUseColor, gradientTrailNoUsePower);
 			_myAudioSource.PlayOneShot(gravityNoUseSound);
 		}
 
@@ -230,6 +249,7 @@ public class PlayerController : MonoBehaviour
 		if (other.gameObject.CompareTag("Interactive") && !_interactives.Contains(other.gameObject))
 		{
 			interactivePrompt.enabled = true;
+			_myAudioSource.PlayOneShot(interactivePromptSound);
 			_interactives.Add(other.gameObject);
 		}
 	}
@@ -256,9 +276,11 @@ public class PlayerController : MonoBehaviour
 			//moves the player depending on direction
 			_myRigidBody.velocity = transform.right.normalized * playerHorizontalSpeed * _horizontalInput +
 			                        projectionVelocityUp;
+			_myAnimator.SetFloat("Speed", Mathf.Abs(_horizontalInput));
 			//executes a jump depending on direction
 			if (_isPressingJump)
 			{
+				_myAnimator.SetTrigger("Jump");
 				_myAudioSource.PlayOneShot(jumpSounds[Random.Range(0, jumpSounds.Length)]);
 				_myRigidBody.velocity = transform.up.normalized * jumpSpeed +
 				                        Vector3.Project(_myRigidBody.velocity, transform.right);
@@ -269,6 +291,12 @@ public class PlayerController : MonoBehaviour
 			if (Vector3.Dot(Vector3.Project(_myRigidBody.velocity, transform.up).normalized,
 				    transform.up.normalized) < 0)
 			{
+				if (!_isFalling && !_isGrounded)
+				{
+					_isFalling = true;
+					_myAnimator.SetTrigger("Fall");
+				}
+
 				_myRigidBody.velocity += (Vector2) transform.up.normalized * Physics2D.gravity.y *
 				                         (fallMultiplier - 1) * Time.deltaTime;
 			}
@@ -308,7 +336,8 @@ public class PlayerController : MonoBehaviour
 				trail.colorGradient = gradientTrailPowerOn;
 			}
 
-			FlashColor(powerOnColor);
+			FlashColor(powerUseColor, gradientTrailPowerOn);
+			_mySpriteRenderer.sprite = gravityOnSprite;
 
 			return true;
 		}
@@ -336,21 +365,31 @@ public class PlayerController : MonoBehaviour
 			layerGround);
 	}
 
-	private void FlashColor(Color color)
+	private void FlashColor(Color color, Gradient gradient)
 	{
 		if (_flashColorCoroutine != null)
 		{
 			StopCoroutine(_flashColorCoroutine);
 		}
 
-		StartCoroutine(FlashingColor(color, timeFlashColor));
+		StartCoroutine(FlashingColor(color, gradient, timeFlashColor));
 	}
 
-	private IEnumerator FlashingColor(Color color, float time)
+	private IEnumerator FlashingColor(Color color, Gradient gradient, float time)
 	{
 		_mySpriteRenderer.color = color;
+		Gradient previousGradient = myTrails[0].colorGradient;
+		foreach (var trail in myTrails)
+		{
+			trail.colorGradient = gradient;
+		}
+
 		yield return new WaitForSeconds(time);
 		_mySpriteRenderer.color = Color.white;
+		foreach (var trail in myTrails)
+		{
+			trail.colorGradient = previousGradient;
+		}
 	}
 
 	private void TurnTo(CardinalDirection direction)
@@ -361,6 +400,7 @@ public class PlayerController : MonoBehaviour
 			//setup the first 90° turn
 			if (_canMove)
 			{
+				_myAnimator.SetTrigger("UseGravity");
 				GameManager.Instance.ChangeTimeScale(gravityTimeScale);
 				_isGrounded = false;
 				_myAudioSource.PlayOneShot(gravityUseSound);
@@ -409,10 +449,13 @@ public class PlayerController : MonoBehaviour
 		_canMove = true;
 		_numberGravityUseRemaining--;
 		GameManager.Instance.ChangeTimeScale(1.0f);
+		_myAnimator.SetTrigger("Fall");
 		foreach (var trail in myTrails)
 		{
 			trail.colorGradient = gradientTrailPowerOff;
 		}
+
+		_mySpriteRenderer.sprite = gravityOffSprite;
 	}
 
 	public void Die()
@@ -423,8 +466,21 @@ public class PlayerController : MonoBehaviour
 			_canMove = false;
 			_canTurn = false;
 			_myAudioSource.PlayOneShot(deathSound);
+			_myAnimator.SetTrigger("Death");
+			StartCoroutine(Dying());
 			GameManager.Instance.DeathsCounter++;
 			GameManager.Instance.LoadLevel(SceneManager.GetActiveScene().name, true, true);
+		}
+	}
+
+	private IEnumerator Dying()
+	{
+		float timer = 0.0f;
+		while (timer < desintegrationTime)
+		{
+			timer += Time.deltaTime;
+			_mySpriteRenderer.color = Color.Lerp(Color.white, new Color(0, 0, 0, 0.5f), timer / desintegrationTime);
+			yield return null;
 		}
 	}
 }
