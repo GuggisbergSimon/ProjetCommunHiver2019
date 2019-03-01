@@ -291,7 +291,7 @@ public class PlayerController : MonoBehaviour
 			if (Vector3.Dot(Vector3.Project(_myRigidBody.velocity, transform.up).normalized,
 				    transform.up.normalized) < 0)
 			{
-				if (!_isFalling)
+				if (!_isFalling && !_isGrounded)
 				{
 					_isFalling = true;
 					_myAnimator.SetTrigger("Fall");
