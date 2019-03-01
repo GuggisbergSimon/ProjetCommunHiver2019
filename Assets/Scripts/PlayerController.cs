@@ -32,10 +32,13 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private TrailRenderer[] myTrails = null;
 	[SerializeField] private Gradient gradientTrailPowerOn = null;
 	[SerializeField] private Gradient gradientTrailPowerOff = null;
-	[SerializeField] private Color powerOnColor = Color.magenta;
-	[SerializeField] private Color powerOffColor = Color.grey;
+	[SerializeField] private Gradient gradientTrailNoUsePower = null;
+	[SerializeField] private Color powerUseColor = Color.magenta;
+	[SerializeField] private Color powerNoUseColor = Color.grey;
 	[SerializeField] private float timeFlashColor = 0.1f;
 	[SerializeField] private SpriteRenderer interactivePrompt = null;
+	[SerializeField] private Sprite gravityOnSprite = null;
+	[SerializeField] private Sprite gravityOffSprite = null;
 
 	public enum CardinalDirection
 	{
@@ -156,7 +159,7 @@ public class PlayerController : MonoBehaviour
 		//handles when player try to turn but can't
 		else if (Input.GetButtonDown("TurnLeft") || Input.GetButtonDown("TurnRight"))
 		{
-			FlashColor(powerOffColor);
+			FlashColor(powerNoUseColor, gradientTrailNoUsePower);
 			_myAudioSource.PlayOneShot(gravityNoUseSound);
 		}
 
@@ -308,7 +311,8 @@ public class PlayerController : MonoBehaviour
 				trail.colorGradient = gradientTrailPowerOn;
 			}
 
-			FlashColor(powerOnColor);
+			FlashColor(powerUseColor, gradientTrailPowerOn);
+			_mySpriteRenderer.sprite = gravityOnSprite;
 
 			return true;
 		}
@@ -336,21 +340,30 @@ public class PlayerController : MonoBehaviour
 			layerGround);
 	}
 
-	private void FlashColor(Color color)
+	private void FlashColor(Color color, Gradient gradient)
 	{
 		if (_flashColorCoroutine != null)
 		{
 			StopCoroutine(_flashColorCoroutine);
 		}
 
-		StartCoroutine(FlashingColor(color, timeFlashColor));
+		StartCoroutine(FlashingColor(color, gradient, timeFlashColor));
 	}
 
-	private IEnumerator FlashingColor(Color color, float time)
+	private IEnumerator FlashingColor(Color color, Gradient gradient, float time)
 	{
 		_mySpriteRenderer.color = color;
+		Gradient previousGradient = myTrails[0].colorGradient;
+		foreach (var trail in myTrails)
+		{
+			trail.colorGradient = gradient;
+		}
 		yield return new WaitForSeconds(time);
 		_mySpriteRenderer.color = Color.white;
+		foreach (var trail in myTrails)
+		{
+			trail.colorGradient = previousGradient;
+		}
 	}
 
 	private void TurnTo(CardinalDirection direction)
@@ -413,6 +426,8 @@ public class PlayerController : MonoBehaviour
 		{
 			trail.colorGradient = gradientTrailPowerOff;
 		}
+
+		_mySpriteRenderer.sprite = gravityOffSprite;
 	}
 
 	public void Die()
