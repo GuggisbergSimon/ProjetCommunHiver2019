@@ -1099,7 +1099,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: e080efd5b77615d4bbd4d1fbec7857df, type: 3}
   stepSound: {fileID: 8300000, guid: 9b687cd413d36114f873926481c5944e, type: 3}
   gravityTimeScale: 0.3
-  amplitudeShakeGravityUse: 3
+  amplitudeShakeGravityUse: 1.5
   frequencyShakeGravityUse: 1
   timeShakeGravityUse: 0.3
   myTrails:
