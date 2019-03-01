@@ -69,12 +69,16 @@ public class PlayerController : MonoBehaviour
 	private int _numberGravityUseRemaining;
 	private AudioSource _myAudioSource;
 	private SpriteRenderer _mySpriteRenderer;
+	private Animator _myAnimator;
+	private bool _isFalling;
+	private bool _isLookingRight = true;
 
 	private void Awake()
 	{
 		_myRigidBody = GetComponent<Rigidbody2D>();
 		_myAudioSource = GetComponent<AudioSource>();
 		_mySpriteRenderer = GetComponentInChildren<SpriteRenderer>();
+		_myAnimator = GetComponent<Animator>();
 		_numberGravityUseRemaining = maxNumberGravityUse;
 		//setup correctly the direction the player is positioned at setup
 		float initRot = transform.eulerAngles.z;
@@ -119,11 +123,20 @@ public class PlayerController : MonoBehaviour
 		if (_canMove)
 		{
 			//handles horizontal input
+
 			_horizontalInput = _inputs.x;
+			if ((_isLookingRight && _horizontalInput < 0) || (!_isLookingRight && _horizontalInput > 0))
+			{
+				_isLookingRight = !_isLookingRight;
+				_mySpriteRenderer.transform.localEulerAngles += Vector3.up * 180;
+			}
+
 			CheckGrounded();
 			//restores gravity power
 			if (_isGrounded && _previousIsGrounded != _isGrounded)
 			{
+				_myAnimator.SetTrigger("Land");
+				_isFalling = false;
 				_myAudioSource.PlayOneShot(stepSound);
 				RestoreGravityPower();
 			}
@@ -259,9 +272,11 @@ public class PlayerController : MonoBehaviour
 			//moves the player depending on direction
 			_myRigidBody.velocity = transform.right.normalized * playerHorizontalSpeed * _horizontalInput +
 			                        projectionVelocityUp;
+			_myAnimator.SetFloat("Speed", Mathf.Abs(_horizontalInput));
 			//executes a jump depending on direction
 			if (_isPressingJump)
 			{
+				_myAnimator.SetTrigger("Jump");
 				_myAudioSource.PlayOneShot(jumpSounds[Random.Range(0, jumpSounds.Length)]);
 				_myRigidBody.velocity = transform.up.normalized * jumpSpeed +
 				                        Vector3.Project(_myRigidBody.velocity, transform.right);
@@ -272,6 +287,12 @@ public class PlayerController : MonoBehaviour
 			if (Vector3.Dot(Vector3.Project(_myRigidBody.velocity, transform.up).normalized,
 				    transform.up.normalized) < 0)
 			{
+				if (!_isFalling)
+				{
+					_isFalling = true;
+					_myAnimator.SetTrigger("Fall");
+				}
+
 				_myRigidBody.velocity += (Vector2) transform.up.normalized * Physics2D.gravity.y *
 				                         (fallMultiplier - 1) * Time.deltaTime;
 			}
@@ -358,6 +379,7 @@ public class PlayerController : MonoBehaviour
 		{
 			trail.colorGradient = gradient;
 		}
+
 		yield return new WaitForSeconds(time);
 		_mySpriteRenderer.color = Color.white;
 		foreach (var trail in myTrails)
@@ -374,6 +396,7 @@ public class PlayerController : MonoBehaviour
 			//setup the first 90° turn
 			if (_canMove)
 			{
+				_myAnimator.SetTrigger("UseGravity");
 				GameManager.Instance.ChangeTimeScale(gravityTimeScale);
 				_isGrounded = false;
 				_myAudioSource.PlayOneShot(gravityUseSound);
@@ -438,6 +461,7 @@ public class PlayerController : MonoBehaviour
 			_canMove = false;
 			_canTurn = false;
 			_myAudioSource.PlayOneShot(deathSound);
+			_myAnimator.SetTrigger("Death");
 			GameManager.Instance.DeathsCounter++;
 			GameManager.Instance.LoadLevel(SceneManager.GetActiveScene().name, true, true);
 		}
