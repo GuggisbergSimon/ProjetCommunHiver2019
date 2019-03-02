@@ -36,8 +36,8 @@ public class DestructiblePlatform : MonoBehaviour
 		{
 			_timerShaking += Time.deltaTime;
 			_mySprite.transform.position = _initSpritePos +
-										   (Vector2) transform.right *
-										   (Mathf.Sin(_timerShaking * speedShaking) * amplitudeShaking);
+			                               (Vector2) transform.right *
+			                               (Mathf.Sin(_timerShaking * speedShaking) * amplitudeShaking);
 		}
 	}
 
@@ -52,11 +52,12 @@ public class DestructiblePlatform : MonoBehaviour
 	IEnumerator Destroy()
 	{
 		//crumbles
+		_canBeActivated = false;
 		_isShaking = true;
 		_timerShaking = 0.0f;
 		_myAudioSource.PlayOneShot(crumblingBeforeSound);
 		yield return new WaitForSeconds(beforeDestructingTime);
-		
+
 		//is destroyed
 		_myCollider.enabled = false;
 		_myAnimator.SetTrigger("Destroy");
@@ -68,10 +69,10 @@ public class DestructiblePlatform : MonoBehaviour
 			{
 				yield return new WaitForSeconds(destroyedTime);
 			}
-			
+
 			_myAnimator.SetTrigger("Respawn");
 			yield return new WaitForSeconds(respawningTime);
-			
+
 			//respawns
 			_myAnimator.SetTrigger("Respawned");
 			_canBeActivated = true;
