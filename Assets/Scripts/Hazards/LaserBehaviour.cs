@@ -17,6 +17,7 @@ public class LaserBehaviour : MonoBehaviour
 	[SerializeField] private Color activeColorAlt = Color.red;
 	[SerializeField] private float changeActiveColorSpeed = 1.0f;
 	[SerializeField] private bool isActive = true;
+	[SerializeField] private Transform visor = null;
 	private LineRenderer _myLineRenderer;
 	private BoxCollider2D _myCollider;
 	private AudioSource _myAudioSource;
@@ -25,7 +26,7 @@ public class LaserBehaviour : MonoBehaviour
 	{
 		FollowsPlayerGravity,
 		FollowsPlayer,
-		FollowsNothing	
+		FollowsNothing
 	}
 
 	private void Start()
@@ -68,6 +69,10 @@ public class LaserBehaviour : MonoBehaviour
 		transform.rotation = Quaternion.RotateTowards(transform.rotation, focusAngle, rotationSpeed * Time.deltaTime);
 		RaycastHit2D hit = Physics2D.Raycast(currentPos, -transform.up, distance,
 			layerGround);
+		if (myAim == LaserMode.FollowsPlayer)
+		{
+			visor.position = hit.point;
+		}
 
 		//adjusts the linerenderer and the collider based on the raycast
 		_myLineRenderer.SetPosition(0, Vector3.zero);
@@ -77,7 +82,8 @@ public class LaserBehaviour : MonoBehaviour
 
 		if (isActive)
 		{
-			ChangeColor(Color.Lerp(activeColor, activeColorAlt, Mathf.Sin(Time.time * changeActiveColorSpeed) * 0.5f + 0.5f));
+			ChangeColor(Color.Lerp(activeColor, activeColorAlt,
+				Mathf.Sin(Time.time * changeActiveColorSpeed) * 0.5f + 0.5f));
 		}
 	}
 
