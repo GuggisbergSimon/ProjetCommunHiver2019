@@ -251,7 +251,7 @@ PrefabInstance:
     - target: {fileID: 3954014939479097124, guid: e1e68ed75263c00498617e865aff1eb9,
         type: 3}
       propertyPath: slowerRotationSpeed
-      value: 10
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 3954014939479097124, guid: e1e68ed75263c00498617e865aff1eb9,
         type: 3}
