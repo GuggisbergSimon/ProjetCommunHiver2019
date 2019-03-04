@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   text: UwU u brock the gaem LALILULELO
   timeBetweenLetters: 0.01
-  color: {r: 1, g: 1, b: 1, a: 1}
+  color: {r: 1, g: 0.5424528, b: 0.5424528, a: 1}
