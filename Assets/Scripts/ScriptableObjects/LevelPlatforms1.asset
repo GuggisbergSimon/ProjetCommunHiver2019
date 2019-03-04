@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7effcaca6ce8339478cf39a23582c785, type: 3}
   m_Name: LevelPlatforms1
   m_EditorClassIdentifier: 
-  text: Be careful, this kind of platforms will collapse under your feet
+  text: Be careful, these kind of platform will collapse under your feet.
   timeBetweenLetters: 0.01
   color: {r: 1, g: 1, b: 1, a: 1}

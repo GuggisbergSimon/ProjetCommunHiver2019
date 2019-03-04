@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7effcaca6ce8339478cf39a23582c785, type: 3}
   m_Name: LevelLaser3
   m_EditorClassIdentifier: 
-  text: You can jump by pressing Space or the button A
+  text: You can jump by pressing Space or the button A.
   timeBetweenLetters: 0.01
   color: {r: 1, g: 1, b: 1, a: 1}

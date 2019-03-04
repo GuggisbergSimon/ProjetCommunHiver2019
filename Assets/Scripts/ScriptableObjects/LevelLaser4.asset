@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7effcaca6ce8339478cf39a23582c785, type: 3}
   m_Name: LevelLaser4
   m_EditorClassIdentifier: 
-  text: If you double tap Q/E or RB/LB, the player will walk on the ceiling
+  text: "If you double tap Q/E or RB/LB, the player will turn the gravity for a 180\xB0."
   timeBetweenLetters: 0.01
   color: {r: 1, g: 1, b: 1, a: 1}

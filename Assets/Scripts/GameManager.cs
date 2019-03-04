@@ -96,7 +96,7 @@ public class GameManager : MonoBehaviour
 		{
 			PlayMusic(endMusic);
 		}
-		else if (sceneName.Equals("FinalLevel"))
+		else if (sceneName.Equals("LevelFinal1"))
 		{
 			PlayMusic(finalLevelMusic);
 		}
