@@ -8,6 +8,8 @@ public class LaserBehaviour : MonoBehaviour
 	[SerializeField] private float activeTime = 2.0f;
 	[SerializeField] private float inactiveTime = 2.0f;
 	[SerializeField] private float rotationSpeed = 10.0f;
+	[SerializeField] private float slowerRotationSpeed = 5.0f;
+	[SerializeField] private float angleSlowerSpeed = 30.0f;
 	[SerializeField] private LayerMask layerGround = 0;
 	[SerializeField] private float distance = 100.0f;
 	[SerializeField] private LaserMode myAim = 0;
@@ -66,13 +68,24 @@ public class LaserBehaviour : MonoBehaviour
 
 		//limit the rotation through a rotationSpeed
 		//note : it is possible that this speed is 0 or a value so high, turning seems to be instantaneous
-		transform.rotation = Quaternion.RotateTowards(transform.rotation, focusAngle, rotationSpeed * Time.deltaTime);
 		RaycastHit2D hit = Physics2D.Raycast(currentPos, -transform.up, distance,
 			layerGround);
+		float actualRotationSpeed = rotationSpeed;
 		if (myAim == LaserMode.FollowsPlayer)
 		{
 			visor.position = hit.point;
+			if (Mathf.Abs(Quaternion.Angle(transform.rotation, focusAngle)) < angleSlowerSpeed)
+			{
+				actualRotationSpeed = slowerRotationSpeed;
+			}
+			else
+			{
+				actualRotationSpeed = rotationSpeed;
+			}
 		}
+
+		transform.rotation =
+			Quaternion.RotateTowards(transform.rotation, focusAngle, actualRotationSpeed * Time.deltaTime);
 
 		//adjusts the linerenderer and the collider based on the raycast
 		_myLineRenderer.SetPosition(0, Vector3.zero);

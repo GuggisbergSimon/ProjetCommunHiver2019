@@ -138,7 +138,6 @@ public class PlayerController : MonoBehaviour
 
 			CheckGrounded();
 			//if become grounded since last frame
-			Debug.Log(_isGrounded + " " + _previousIsGrounded);
 			if (_isGrounded && _previousIsGrounded != _isGrounded)
 			{
 				_myAnimator.SetTrigger("Land");
