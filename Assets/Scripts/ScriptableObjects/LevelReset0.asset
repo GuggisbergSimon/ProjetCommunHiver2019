@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7effcaca6ce8339478cf39a23582c785, type: 3}
   m_Name: LevelReset0
   m_EditorClassIdentifier: 
-  text: If you take this object, you can use your gravity again without touching the
-    ground
+  text: If you take this object, you can use your gravity power again without touching
+    the ground
   timeBetweenLetters: 0.01
   color: {r: 1, g: 1, b: 1, a: 1}
