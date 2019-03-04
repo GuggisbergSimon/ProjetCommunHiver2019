@@ -42,6 +42,7 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private Sprite gravityOnSprite = null;
 	[SerializeField] private Sprite gravityOffSprite = null;
 	[SerializeField] private float desintegrationTime = 0.3f;
+	[SerializeField] private float coyoteTime = 0.05f;
 
 	public enum CardinalDirection
 	{
@@ -75,6 +76,7 @@ public class PlayerController : MonoBehaviour
 	private Animator _myAnimator;
 	private bool _isFalling;
 	private bool _isLookingRight = true;
+	private bool _isInCoyoteTime;
 
 	private void Awake()
 	{
@@ -135,7 +137,8 @@ public class PlayerController : MonoBehaviour
 			}
 
 			CheckGrounded();
-			//restores gravity power
+			//if become grounded since last frame
+			Debug.Log(_isGrounded + " " + _previousIsGrounded);
 			if (_isGrounded && _previousIsGrounded != _isGrounded)
 			{
 				_myAnimator.SetTrigger("Land");
@@ -143,10 +146,15 @@ public class PlayerController : MonoBehaviour
 				_myAudioSource.PlayOneShot(stepSound);
 				RestoreGravityPower();
 			}
+			else if (!_isGrounded && _isGrounded != _previousIsGrounded && !_isInCoyoteTime)
+			{
+				StartCoroutine(CoyoteTime());
+			}
 		}
 
 		//handles jump input
-		if (Input.GetButtonDown("Jump") && _isGrounded)
+		//todo change condition for coyote time
+		if (Input.GetButtonDown("Jump") && (_isGrounded || _isInCoyoteTime))
 		{
 			_isPressingJump = true;
 		}
@@ -320,6 +328,13 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
+	private IEnumerator CoyoteTime()
+	{
+		_isInCoyoteTime = true;
+		yield return new WaitForSeconds(coyoteTime);
+		_isInCoyoteTime = false;
+	}
+
 	public void StopMoving()
 	{
 		_myRigidBody.velocity = Vector2.zero;
@@ -373,7 +388,7 @@ public class PlayerController : MonoBehaviour
 			StopCoroutine(_flashColorCoroutine);
 		}
 
-		StartCoroutine(FlashingColor(color, gradient, timeFlashColor));
+		_flashColorCoroutine = StartCoroutine(FlashingColor(color, gradient, timeFlashColor));
 	}
 
 	private IEnumerator FlashingColor(Color color, Gradient gradient, float time)
