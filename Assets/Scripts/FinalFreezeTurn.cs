@@ -4,12 +4,15 @@ using UnityEngine;
 
 public class FinalFreezeTurn : MonoBehaviour
 {
+	[SerializeField] private float fadeToBlackTimeFinal = 5.0f;
+
 	private void OnTriggerEnter2D(Collider2D other)
 	{
 		if (other.CompareTag("Player"))
 		{
 			GameManager.Instance.Player.ToggleTurningUse(false);
 			GameManager.Instance.StopMusic();
+			GameManager.Instance.UIManager.FadingToBlackTime = fadeToBlackTimeFinal;
 		}
 	}
 }
