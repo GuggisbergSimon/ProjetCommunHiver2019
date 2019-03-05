@@ -19,6 +19,12 @@ public class UIManager : MonoBehaviour
 	private AudioSource _myAudioSource;
 	public bool IsFadingToBlack => _isFadingToBlack;
 
+	public float FadingToBlackTime
+	{
+		get => fadingToBlackTime;
+		set => fadingToBlackTime = value;
+	}
+	
 	private void Start()
 	{
 		_myAudioSource = GetComponent<AudioSource>();
