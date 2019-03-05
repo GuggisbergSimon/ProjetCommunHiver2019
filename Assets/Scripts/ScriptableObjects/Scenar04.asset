@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7effcaca6ce8339478cf39a23582c785, type: 3}
   m_Name: Scenar04
   m_EditorClassIdentifier: 
-  text: The wage is indeed incredible. That's why you signed the contract, didn't
-    you ?
+  text: '[Electronic voice] Thank you for participating, those tests will be over
+    soon.'
   timeBetweenLetters: 0.01
-  color: {r: 0.9163999, g: 0.66999996, b: 1, a: 1}
+  color: {r: 0.91764706, g: 0.67058825, b: 1, a: 1}
