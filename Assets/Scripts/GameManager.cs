@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
 	[SerializeField] private AudioClip levelMusic = null;
 	[SerializeField] private AudioClip finalLevelMusic = null;
 	[SerializeField] private AudioClip endMusic = null;
+	[SerializeField] private float fadeOutMusicTime = 1.0f;
 
 	public static GameManager Instance { get; private set; }
 	private Coroutine _timeScaleCoroutine;
@@ -151,6 +152,23 @@ public class GameManager : MonoBehaviour
 	{
 		_myAudioSource.clip = clip;
 		_myAudioSource.Play();
+	}
+
+	public void StopMusic()
+	{
+		StartCoroutine(StoppingMusic());
+	}
+
+	private IEnumerator StoppingMusic()
+	{
+		float timer = 0.0f;
+		float currentVolume = _myAudioSource.volume;
+		while (timer < fadeOutMusicTime)
+		{
+			timer += Time.deltaTime;
+			_myAudioSource.volume = Mathf.Lerp(currentVolume, 0.0f, timer / fadeOutMusicTime);
+			yield return null;
+		}
 	}
 
 	public void LoadLevelFadeInAndOut(string nameLevel)
