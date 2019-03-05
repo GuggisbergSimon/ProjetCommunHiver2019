@@ -77,6 +77,13 @@ public class PlayerController : MonoBehaviour
 	private bool _isFalling;
 	private bool _isLookingRight = true;
 	private bool _isInCoyoteTime;
+	private bool _canDezoom = true;
+
+	public bool CanDezoom
+	{
+		get => _canDezoom;
+		set => _canDezoom = value;
+	}
 
 	private void Awake()
 	{
@@ -211,7 +218,7 @@ public class PlayerController : MonoBehaviour
 		}
 
 		//handles zoom/dezoom of map
-		if (_isGrounded && _inputs.y <= 0)
+		if (_isGrounded && _inputs.y <= 0 && _canDezoom)
 		{
 			if (_isPressingDown != Input.GetAxisRaw("Vertical") < 0)
 			{
