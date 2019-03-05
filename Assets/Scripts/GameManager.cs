@@ -91,15 +91,13 @@ public class GameManager : MonoBehaviour
 		string sceneName = SceneManager.GetActiveScene().name;
 		if (sceneName.Equals("MainMenu"))
 		{
+			_myAudioSource.volume = 1.0f;
 			PlayMusic(menuMusic);
 		}
 		else if (sceneName.Equals("End"))
 		{
+			_myAudioSource.volume = 1.0f;
 			PlayMusic(endMusic);
-		}
-		else if (sceneName.Equals("LevelFinal1"))
-		{
-			PlayMusic(finalLevelMusic);
 		}
 	}
 
@@ -146,6 +144,11 @@ public class GameManager : MonoBehaviour
 	public void PlayMusicLevels()
 	{
 		PlayMusic(levelMusic);
+	}
+
+	public void PlayMusicFinals()
+	{
+		PlayMusic(finalLevelMusic);
 	}
 
 	private void PlayMusic(AudioClip clip)
