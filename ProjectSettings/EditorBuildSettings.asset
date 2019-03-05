@@ -22,10 +22,10 @@ EditorBuildSettings:
     guid: ab9868681dd101849a89890c8e7fd98c
   - enabled: 1
     path: Assets/Scenes/1.Laser/LevelLaser4.unity
-    guid: 09fe56c5e17a48146af11964ec527cad
+    guid: 7bfd5854e769ac0499c3644e9079387d
   - enabled: 1
     path: Assets/Scenes/1.Laser/LevelLaser5.unity
-    guid: ac3d057a54b9675469ae56b3ec8d1fa8
+    guid: 6f63268c3f2c93649a01c114bf3dc056
   - enabled: 1
     path: Assets/Scenes/1.Laser/LevelLaser6.unity
     guid: 82013fda899546c40b4122a25cd18125
@@ -52,7 +52,7 @@ EditorBuildSettings:
     guid: 3bae88fa82a196a44a59d48dcdf646ff
   - enabled: 1
     path: Assets/Scenes/2.Follow/LevelFollow5.unity
-    guid: 4eb074720cd64554fa01a893f7bce8f5
+    guid: 0e489dd1dde652e43968831b8ca24026
   - enabled: 1
     path: Assets/Scenes/2.Follow/LevelFollow6.unity
     guid: 1c4e0f3e309dd474faebc2171a455a23
@@ -64,7 +64,7 @@ EditorBuildSettings:
     guid: 31da4cccf5dd485438e2415be75f3816
   - enabled: 1
     path: Assets/Scenes/3.Platforms/LevelPlatforms3.unity
-    guid: 759c5414e8aded345ab23f784563f7d7
+    guid: 2599716855e6a644fa487cffe4c314bf
   - enabled: 1
     path: Assets/Scenes/3.Platforms/LevelPlatforms4.unity
     guid: 9670a2f088b71fa4696faba17b356ac5
@@ -73,7 +73,7 @@ EditorBuildSettings:
     guid: 8cebeb79635e0e640acb11576968384f
   - enabled: 1
     path: Assets/Scenes/3.Platforms/LevelPlatforms6.unity
-    guid: 1385cebe57856494d9f6e13170412e88
+    guid: 759c5414e8aded345ab23f784563f7d7
   - enabled: 1
     path: Assets/Scenes/3.Platforms/LevelPlatforms7.unity
     guid: cdf26953c9b8c344db3def55bab669f2
@@ -105,15 +105,9 @@ EditorBuildSettings:
     path: Assets/Scenes/5.FinalLevel(s)/LevelFinal2.unity
     guid: 01aa64e198246d7478004187a9582ef9
   - enabled: 1
-    path: Assets/Scenes/End.unity
-    guid: 6e0c49b7e4a0f594dbe2933b0a10bf77
-  - enabled: 1
-    path: Assets/Scenes/5.FinalLevel(s)/LevelFinal1.unity
-    guid: 3829edd5cdb60c94f9a6833441ccb8c9
-  - enabled: 1
-    path: Assets/Scenes/5.FinalLevel(s)/LevelFinal2.unity
-    guid: 01aa64e198246d7478004187a9582ef9
-  - enabled: 1
     path: Assets/Scenes/5.FinalLevel(s)/LevelFinal3.unity
     guid: 4c613f1f4c56f3241a5a5b7209030b1c
+  - enabled: 1
+    path: Assets/Scenes/End.unity
+    guid: 6e0c49b7e4a0f594dbe2933b0a10bf77
   m_configObjects: {}
