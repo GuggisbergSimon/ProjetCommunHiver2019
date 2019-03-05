@@ -65,14 +65,6 @@ public class GameManager : MonoBehaviour
 		SceneManager.sceneLoaded += OnLevelFinishedLoadingScene;
 	}
 
-	private void Update()
-	{
-		if (Input.GetKeyDown(KeyCode.Escape))
-		{
-			Application.Quit();
-		}
-	}
-
 	private void OnDisable()
 	{
 		SceneManager.sceneLoaded -= OnLevelFinishedLoadingScene;
