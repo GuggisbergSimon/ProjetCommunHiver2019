@@ -20,6 +20,11 @@ public class Door : Interactive
 			_myAudioSource.Play();
 			_isInteracting = true;
 			base.Interact();
+			if (nameLevelToLoad.Equals("LevelFinal1"))
+			{
+				GameManager.Instance.PlayMusicFinals();
+			}
+
 			GameManager.Instance.LoadLevel(nameLevelToLoad, true, true);
 		}
 	}
