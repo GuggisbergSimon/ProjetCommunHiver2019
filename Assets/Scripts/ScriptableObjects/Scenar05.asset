@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7effcaca6ce8339478cf39a23582c785, type: 3}
   m_Name: Scenar05
   m_EditorClassIdentifier: 
-  text: Congratulations for your success on the first set of tests.
+  text: '[Electronic voice] We thAnk youU, fO____ -pating AnD lEt uS baThE iNt_o THE
+    SUN.'
   timeBetweenLetters: 0.01
   color: {r: 0.91764706, g: 0.67058825, b: 1, a: 1}
